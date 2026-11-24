@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var KF = window.KF;
-  var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 1], ['zh-Hans', '简体中文', 1], ['zh-Hant', '繁體中文', 1], ['es', 'Español', 0],
+  var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 1], ['zh-Hans', '简体中文', 1], ['zh-Hant', '繁體中文', 1], ['es', 'Español', 1],
     ['vi', 'Tiếng Việt', 0], ['th', 'ไทย', 0], ['id', 'Bahasa Indonesia', 0], ['de', 'Deutsch', 0], ['fr', 'Français', 0], ['ar', 'العربية', 0]];
   var PLACES = [
     ['서울', 'Seoul', 540, 126.98], ['부산', 'Busan', 540, 129.08], ['대구', 'Daegu', 540, 128.6], ['인천', 'Incheon', 540, 126.7], ['광주', 'Gwangju', 540, 126.85],
@@ -28,6 +28,7 @@
   function U(k, vars) { var t = TX().ui || {}, v = t[k]; if (v == null) v = ((window.KF_TXT.ko || {}).ui || {})[k]; if (v == null) return k; return fill(v, vars); }
   function D() { return TX().daily || window.KF_TXT.ko.daily; }
   function fill(s, vars) { if (typeof s !== 'string' || !vars) return s; return s.replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; }); }
+  function cap(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function prof() { return S.profiles.filter(function (p) { return p.id === S.active; })[0] || S.profiles[0]; }
   function isSub() { return S.ent.sub && S.ent.sub >= todayStr(); }
@@ -137,7 +138,7 @@
       '<div class="wrap"><div style="padding-top:8px"><div class="small">' + dateLine(t) + ' · <span class="serif" style="color:var(--ink)">' + r.pillar.txt + '</span>' + esc(U('dayOf')) + '</div>' +
       '<h1>' + esc(U('hello', { name: p.name })) + '<br>' + esc(tx.head) + '</h1></div>' +
       '<section class="dark" style="display:flex;flex-direction:column;gap:14px"><div class="row" style="gap:16px">' + ring(r.scores.total) +
-      '<div style="flex:1"><div class="mut" style="font-size:12px">' + esc(U('oneLine')) + '</div><div class="lead" style="font-size:16px">' + esc(d.tenImg[r.tenS]) + '</div></div></div>' +
+      '<div style="flex:1"><div class="mut" style="font-size:12px">' + esc(U('oneLine')) + '</div><div class="lead" style="font-size:16px">' + esc(cap(d.tenImg[r.tenS])) + '</div></div></div>' +
       '<div class="grid5">' + g5 + '</div><a class="btn gold" href="#today">' + esc(U('todayMore')) + '</a></section>' +
       '<section class="card row" style="padding:12px 14px"><div style="min-width:64px"><div class="small">' + esc(U('mySaju')) + '</div><b style="font-size:13px">' + esc(U('dm')) + ' ' + KF.STEMS[c.dayMaster] + ' ' + d.elName[c.dayMasterEl] + '</b></div><div style="flex:1;display:flex;justify-content:flex-end">' + miniChars(c) + '</div></section>' +
       '<section class="tiles">' +
