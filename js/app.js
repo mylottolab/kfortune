@@ -3,7 +3,7 @@
   'use strict';
   var KF = window.KF;
   var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 1], ['zh-Hans', '简体中文', 1], ['zh-Hant', '繁體中文', 1], ['es', 'Español', 1],
-    ['vi', 'Tiếng Việt', 0], ['th', 'ไทย', 0], ['id', 'Bahasa Indonesia', 0], ['de', 'Deutsch', 1], ['fr', 'Français', 1], ['ar', 'العربية', 0]];
+    ['vi', 'Tiếng Việt', 0], ['th', 'ไทย', 0], ['id', 'Bahasa Indonesia', 1], ['de', 'Deutsch', 1], ['fr', 'Français', 1], ['ar', 'العربية', 0]];
   var PLACES = [
     ['서울', 'Seoul', 540, 126.98], ['부산', 'Busan', 540, 129.08], ['대구', 'Daegu', 540, 128.6], ['인천', 'Incheon', 540, 126.7], ['광주', 'Gwangju', 540, 126.85],
     ['대전', 'Daejeon', 540, 127.38], ['울산', 'Ulsan', 540, 129.31], ['수원', 'Suwon', 540, 127.03], ['춘천', 'Chuncheon', 540, 127.73], ['강릉', 'Gangneung', 540, 128.9],
