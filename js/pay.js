@@ -95,14 +95,14 @@
           P_IDCCODE: 'Y', P_AMT: d.amt, P_GOODS: d.goodname, P_UNAME: d.buyername, P_MOBILE: '', P_EMAIL: d.buyeremail, P_NEXT_URL: d.nextUrl, P_NOTI_URL: d.notiUrl,
           P_CLOSE_URL: d.closeUrl, P_CHARSET: 'UTF-8', P_TIMESTAMP: d.timestamp, P_CHKFAKE: d.chkfake });
         msg(''); btn.disabled = false;
-      }).catch(function () { msg(t('fail')); btn.disabled = false; });
+      }).catch(function (e) { msg(t('fail') + ' (' + (e && e.message ? e.message : 'script') + ')'); btn.disabled = false; });
     };
     paypalButtons(order, msg, kind);
   }
 
   var scripts = {};
   function loadScript(src) {
-    return scripts[src] || (scripts[src] = new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.charset = 'UTF-8'; s.onload = ok; s.onerror = function () { delete scripts[src]; no(); }; document.head.appendChild(s); }));
+    return scripts[src] || (scripts[src] = new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.charset = 'UTF-8'; s.onload = ok; s.onerror = function () { delete scripts[src]; no(new Error('INIpay script')); }; document.head.appendChild(s); }));
   }
   function paypalButtons(order, msg, kind) {
     var loc = { ko: 'ko_KR', ja: 'ja_JP', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW', es: 'es_ES' }[A.lang()] || 'en_US';
