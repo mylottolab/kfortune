@@ -80,11 +80,11 @@ public class KFBilling extends Plugin implements PurchasesUpdatedListener {
             JSONObject prices = new JSONObject();
             for (ProductDetails pd : found) {
                 details.put(pd.getProductId(), pd);
-                try { ProductDetails.OneTimePurchaseOfferDetails o = pd.getOneTimePurchaseOfferDetails();
-                      if (o != null) prices.put(pd.getProductId(), o.getFormattedPrice()); } catch (Throwable ignore) {}
+                try { ProductDetails.OneTimePurchaseOfferDetails one = pd.getOneTimePurchaseOfferDetails();
+                      if (one != null) prices.put(pd.getProductId(), one.getFormattedPrice()); } catch (Throwable ignore) {}
             }
-            JSObject o = new JSObject(); o.put("prices", prices.toString());
-            notifyListeners("prices", o, true);
+            JSObject ev = new JSObject(); ev.put("prices", prices.toString());
+            notifyListeners("prices", ev, true);
         });
     }
 
