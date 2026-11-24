@@ -49,17 +49,21 @@ var MON = [
   ['동짓달 긴 밤에 좋은 꿈을 꾼다. 반가운 소식이 온다.', '조용히 힘을 모으는 달.', '추위에 몸이 움츠러든다. 건강을 먼저 살피라.'],
   ['한 해를 웃으며 닫는다. 감사를 전하라.', '차분히 한 해를 돌아보는 달.', '섣달에는 빚과 다툼을 정리하고 넘어가라.']
 ];
-function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-var T = {};
-for (var u = 1; u <= 8; u++) for (var m = 1; m <= 6; m++) for (var l = 1; l <= 3; l++) {
-  var U = UP[u - 1], M = MID[m - 1], L = LOW[l - 1], code = '' + u + m + l, h2 = H2[m - 1][l - 1];
-  var months = M.s.map(function (v, i) {
-    var sc = Math.round(72 + U.lv * 3 + v * 5 + (i >= 9 ? L.adj : L.adj / 2) + (hash(code + i) % 5) - 2);
-    sc = Math.max(50, Math.min(95, sc));
-    return { s: sc, t: MON[i][sc >= 78 ? 0 : sc >= 66 ? 1 : 2] };
-  });
-  T[code] = { h: [U.h, h2[0]], hk: U.hk + ', ' + h2[1] + '.', y: [U.y, M.y + ' ' + L.y], m: months };
-}
+window.KF_TOJ_BUILD = function (UP, MID, LOW, H2, MON) {
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  var T = {};
+  for (var u = 1; u <= 8; u++) for (var m = 1; m <= 6; m++) for (var l = 1; l <= 3; l++) {
+    var U = UP[u - 1], M = MID[m - 1], L = LOW[l - 1], code = '' + u + m + l, h2 = H2[m - 1][l - 1];
+    var months = M.s.map(function (v, i) {
+      var sc = Math.round(72 + U.lv * 3 + v * 5 + (i >= 9 ? L.adj : L.adj / 2) + (hash(code + i) % 5) - 2);
+      sc = Math.max(50, Math.min(95, sc));
+      return { s: sc, t: MON[i][sc >= 78 ? 0 : sc >= 66 ? 1 : 2] };
+    });
+    T[code] = { h: [U.h, h2[0]], hk: U.hk + (L.sep || ', ') + h2[1] + (L.end == null ? '.' : L.end), y: [U.y, M.y + ' ' + L.y], m: months };
+  }
+  return T;
+};
+var T = window.KF_TOJ_BUILD(UP, MID, LOW, H2, MON);
 var ko = (window.KF_TXT = window.KF_TXT || {}).ko = (window.KF_TXT.ko || {});
 ko.toj = T;
 })();

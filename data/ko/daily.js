@@ -3,6 +3,8 @@
    ten 순서: 0비견 1겁재 2식신 3상관 4편재 5정재 6편관 7정관 8편인 9정인 · band: 0 좋음(80↑) 1 보통 2 조심(65↓) */
 (window.KF_TXT = window.KF_TXT || {}).ko = Object.assign((window.KF_TXT || {}).ko || {}, { daily: {
 
+  p1: '{name}님은 「{meName}」, {meImg}입니다. {meLine} 오늘은 {day}이고, 이 기운은 {name}님에게 「{ten}」입니다.',
+
   // 일간 10 — 「나」의 그림 (이름 · 짧은 그림 · 한 문장)
   me: [
     { name: '갑목(甲木)', img: '하늘로 곧게 뻗는 큰 나무', line: '한번 뿌리내린 자리를 쉽게 떠나지 않고, 곧게 위로 자라는 사람입니다.' },

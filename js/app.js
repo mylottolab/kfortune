@@ -95,7 +95,7 @@
   /* ── 글 엮기 ── */
   function dailyText(p, c, r) {
     var d = D(), me = d.me[c.dayMaster], ten = r.tenS, b = band(r.scores.total), nm = { name: esc(p.name) };
-    var p1 = fill('{name}님은 「' + me.name + '」, ' + me.img + '입니다. ' + me.line + ' 오늘은 ' + d.day[r.pillar.s] + '이고, 이 기운은 {name}님에게 「' + d.tenImg[ten] + '」입니다.', nm);
+    var p1 = fill(d.p1, { name: esc(p.name), meName: me.name, meImg: me.img, meLine: fill(me.line, nm), day: d.day[r.pillar.s], ten: d.tenImg[ten] });
     var p2 = fill(d.story[ten][b], nm);
     var p3 = fill(d.branch[r.chung ? 'chung' : r.hap ? 'hap' : r.dohwa ? 'dohwa' : 'plain'], nm);
     var h = KF.hash(r.date.y + '' + r.date.m + r.date.d);
@@ -137,7 +137,7 @@
       '<section class="dark" style="display:flex;flex-direction:column;gap:14px"><div class="row" style="gap:16px">' + ring(r.scores.total) +
       '<div style="flex:1"><div class="mut" style="font-size:12px">' + esc(U('oneLine')) + '</div><div class="lead" style="font-size:16px">' + esc(d.tenImg[r.tenS]) + '</div></div></div>' +
       '<div class="grid5">' + g5 + '</div><a class="btn gold" href="#today">' + esc(U('todayMore')) + '</a></section>' +
-      '<section class="card row" style="padding:12px 14px"><div style="min-width:64px"><div class="small">' + esc(U('mySaju')) + '</div><b style="font-size:13px">' + esc(U('dm')) + ' ' + KF.STEMS[c.dayMaster] + d.elName[c.dayMasterEl] + '</b></div><div style="flex:1;display:flex;justify-content:flex-end">' + miniChars(c) + '</div></section>' +
+      '<section class="card row" style="padding:12px 14px"><div style="min-width:64px"><div class="small">' + esc(U('mySaju')) + '</div><b style="font-size:13px">' + esc(U('dm')) + ' ' + KF.STEMS[c.dayMaster] + ' ' + d.elName[c.dayMasterEl] + '</b></div><div style="flex:1;display:flex;justify-content:flex-end">' + miniChars(c) + '</div></section>' +
       '<section class="tiles">' +
       tile('#saju', '四柱', U('mSaju'), U('mSajuS')) + tile('#tojeong', '土亭', U('mToj', { y: ty }), U('mTojS', { gz: KF.pillar(ty - 4).ko })) +
       tile('#week', '七日', U('mWeek'), '', 1) + tile('#year', '歲運', U('mYear'), U('mYearS'), 1) +
@@ -189,8 +189,8 @@
     var p = prof(), c = chartOf(p), d = D(), sj = TX().saju || (window.KF_TXT.ko || {}).saju, P = c.pillars, H = U('pillarsH');
     var cells = '', keys = ['hour', 'day', 'month', 'year'];
     keys.forEach(function (k, i) { cells += '<div class="small" style="' + (k === 'day' ? 'color:var(--red);font-weight:700' : '') + '">' + esc(H[i]) + '</div>'; });
-    keys.forEach(function (k) { var x = P[k]; cells += x ? '<div class="ch ' + elOf(x.s, 1) + (k === 'day' ? ' me' : '') + '"><div class="g">' + KF.STEMS[x.s] + '</div><small>' + KF.STEMS_KO[x.s] + ' · ' + d.elName[KF.STEM_EL[x.s]] + (k === 'day' ? '' : ' · ' + KF.TEN[KF.tenGod(c.dayMaster, x.s)]) + '</small></div>' : '<div class="ch none"><div class="g">?</div><small>—</small></div>'; });
-    keys.forEach(function (k) { var x = P[k]; cells += x ? '<div class="ch ' + elOf(x.b) + '"><div class="g">' + KF.BRANCHES[x.b] + '</div><small>' + KF.BRANCHES_KO[x.b] + ' · ' + d.elName[KF.BR_EL[x.b]] + ' · ' + KF.TEN[KF.tenGod(c.dayMaster, KF.HIDDEN[x.b][KF.HIDDEN[x.b].length - 1])] + '</small></div>' : '<div class="ch none"><div class="g">?</div><small>—</small></div>'; });
+    keys.forEach(function (k) { var x = P[k]; cells += x ? '<div class="ch ' + elOf(x.s, 1) + (k === 'day' ? ' me' : '') + '"><div class="g">' + KF.STEMS[x.s] + '</div><small>' + U('stemRead')[x.s] + ' · ' + d.elName[KF.STEM_EL[x.s]] + (k === 'day' ? '' : ' · ' + U('ten')[KF.tenGod(c.dayMaster, x.s)]) + '</small></div>' : '<div class="ch none"><div class="g">?</div><small>—</small></div>'; });
+    keys.forEach(function (k) { var x = P[k]; cells += x ? '<div class="ch ' + elOf(x.b) + '"><div class="g">' + KF.BRANCHES[x.b] + '</div><small>' + U('branchRead')[x.b] + ' · ' + d.elName[KF.BR_EL[x.b]] + ' · ' + U('ten')[KF.tenGod(c.dayMaster, KF.HIDDEN[x.b][KF.HIDDEN[x.b].length - 1])] + '</small></div>' : '<div class="ch none"><div class="g">?</div><small>—</small></div>'; });
     var legend = c.elements.map(function (v, i) { var col = ['var(--wood)', 'var(--fire)', 'var(--earth)', 'var(--metal)', 'var(--water)'][i]; return '<div style="display:flex;justify-content:space-between"><span><span style="color:' + col + '">■</span> ' + esc(d.elName[i]) + '</span><b>' + v + (v ? '' : ' · ' + esc(U('none'))) + '</b></div>'; }).join('');
     var now = new Date().getFullYear() - c.solar.y, du = c.daeun.list, ni = -1;
     du.forEach(function (x, i) { if (now >= x.age) ni = i; });
@@ -208,7 +208,7 @@
   }
   function sajuStory(p, c, sj) {
     var d = D(), me = d.me[c.dayMaster], nm = { name: esc(p.name) };
-    if (!sj) return { title: me.name, free: [fill('{name}님은 「' + me.name + '」, ' + me.img + '입니다. ' + me.line, nm)], paid: [], lockedTitles: [] };
+    if (!sj) return { title: me.name, free: [fill(d.p1.split(/(?<=[.。])\s/)[0], { name: esc(p.name), meName: me.name, meImg: me.img })], paid: [], lockedTitles: [] };
     return window.KF_SAJU_COMPOSE ? window.KF_SAJU_COMPOSE(p, c, sj, d, fill, esc) : { title: me.name, free: [], paid: [], lockedTitles: [] };
   }
 
@@ -234,7 +234,7 @@
       '<div style="font-size:12px;color:#B9AE9E">' + esc(U('gwae', { code: g.code })) + '</div>' +
       (tj ? '<div class="serif" style="font-weight:900;font-size:28px;letter-spacing:5px;line-height:1.5;color:var(--gold)">' + esc(tj.h[0]) + '<br>' + esc(tj.h[1]) + '</div><div style="font-size:14px;line-height:1.6;color:#E6DED1">' + esc(tj.hk) + '</div>' : '<div style="color:#B9AE9E">' + esc(U('soonOpen')) + '</div>') + '</section>' +
       (tj ? '<article class="story"><h2 style="margin-bottom:10px">' + esc(U('tojYear')) + '</h2>' + tj.y.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</article>' : '') +
-      '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('tojMonths')) + '</h2>' + bars(ms, mn.map(function (x) { return x.slice(0, 1); }), null, hi, lo, -1) + '</section>' +
+      '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('tojMonths')) + '</h2>' + bars(ms, U('monthShort'), null, hi, lo, -1) + '</section>' +
       '<section class="list">' + months + (locked ? '<a class="btn" href="#pay">' + esc(U('tojMore')) + '</a>' : '') +
       (isLast ? '' : '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: y - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a>') + '</section>' +
       '<section class="item" style="background:var(--soft);font-size:12.5px;line-height:1.7">' + esc(U('tojAbout')) + '</section></div>' + tab('tojeong');
