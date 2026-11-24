@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var KF = window.KF;
-  var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 1], ['zh-Hans', '简体中文', 1], ['zh-Hant', '繁體中文', 1], ['es', 'Español', 1],
+  var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 0], ['zh-Hans', '简体中文', 0], ['zh-Hant', '繁體中文', 0], ['es', 'Español', 0],
     ['vi', 'Tiếng Việt', 0], ['th', 'ไทย', 0], ['id', 'Bahasa Indonesia', 0], ['de', 'Deutsch', 0], ['fr', 'Français', 0], ['ar', 'العربية', 0]];
   var PLACES = [
     ['서울', 'Seoul', 540, 126.98], ['부산', 'Busan', 540, 129.08], ['대구', 'Daegu', 540, 128.6], ['인천', 'Incheon', 540, 126.7], ['광주', 'Gwangju', 540, 126.85],
@@ -17,7 +17,9 @@
 
   /* ── 저장 ── */
   function ls(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  var READY = LANGS.filter(function (l) { return l[2]; }).map(function (l) { return l[0]; });
   var S = { lang: ls('kf_lang') || pickLang(), profiles: ls('kf_profiles') || [], active: ls('kf_active'), ent: ls('kf_ent') || {} };
+  if (READY.indexOf(S.lang) < 0) S.lang = 'en';
   if (/[?&]pro=1/.test(location.search)) S.ent = { sub: '2099-12-31' };   // 시험용
   function save() { ls('kf_lang', S.lang); ls('kf_profiles', S.profiles); ls('kf_active', S.active); }
   function pickLang() { var n = (navigator.language || 'ko').toLowerCase(); if (n.indexOf('ko') === 0) return 'ko'; if (n.indexOf('ja') === 0) return 'ja';
