@@ -75,3 +75,17 @@ input.in,select.in{height:48px;border-radius:12px;border:1px solid var(--line2);
 .sheet>div{background:var(--paper);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto}
 .svgwrap{display:flex;justify-content:center}
 .svgwrap svg{max-width:100%;height:auto}
+
+/* 첫 실행 소개 */
+.welcome{min-height:100vh;min-height:100dvh;background:#141210;color:#F4EEE3;display:flex;flex-direction:column;justify-content:space-between;gap:24px;box-sizing:border-box;padding:calc(36px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));max-width:560px;margin:0 auto}
+.welcome .wtop{display:flex;flex-direction:column;gap:14px}
+.welcome .wname{font:700 13px var(--sans);letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-top:6px}
+.welcome h1{font:900 28px/1.35 var(--serif);margin:0;text-wrap:balance;color:#F4EEE3}
+.welcome p{margin:0;font-size:15px;line-height:1.7;color:#CFC6B8}
+.welcome ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:15px}
+.welcome li{display:flex;gap:10px}.welcome li span{color:var(--gold)}
+.welcome .wbot{display:flex;flex-direction:column;gap:12px}
+.welcome .wlh{font-size:12px;color:#9C9284;letter-spacing:1px}
+.welcome .wls{display:flex;flex-wrap:wrap;gap:8px}
+.wl{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #4A4239;background:transparent;color:#CFC6B8;font:500 14px var(--sans)}
+.wl.on{border-color:var(--gold);color:#141210;background:var(--gold);font-weight:700}

@@ -348,6 +348,14 @@
   }
 
   var F = { cal: 'solar', leap: false, gender: 'F', unknown: false };
+  function vWelcome() {
+    var langs = LANGS.filter(function (l) { return l[2]; }).map(function (l) { return '<button class="wl' + (S.lang === l[0] ? ' on' : '') + '" data-lang="' + l[0] + '" lang="' + l[0] + '">' + esc(l[1]) + '</button>'; }).join('');
+    return '<div class="welcome"><div class="wtop"><img src="icons/icon.svg?v=2" width="112" height="112" alt="" style="border-radius:26px">' +
+      '<div class="wname">' + esc(U('app')) + '</div><h1>' + esc(U('wTitle')).replace(/\n/g, '<br>') + '</h1><p>' + esc(U('wLead')) + '</p>' +
+      '<ul>' + U('wF').map(function (f) { return '<li><span>◆</span>' + esc(f) + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="wbot"><div class="wlh">' + esc(U('wLang')) + '</div><div class="wls">' + langs + '</div>' +
+      '<a class="btn gold" href="#start" data-seen="1">' + esc(U('wStart')) + '</a></div></div>';
+  }
   function vStart() {
     var opts = PLACES.map(function (x, i) { return '<option value="' + i + '">' + esc(S.lang === 'ko' ? x[0] : x[1]) + ' (UTC' + (x[2] >= 0 ? '+' : '') + (x[2] / 60) + ')</option>'; }).join('');
     return '<div class="wrap" style="padding-top:calc(24px + env(safe-area-inset-top,0px));gap:16px">' + (S.profiles.length ? '<a class="back" href="#home" aria-label="back" style="margin-left:-12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>' : '<div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>') +
@@ -380,8 +388,8 @@
   function render() {
     var h = (location.hash || '#home').slice(1), hq = h.split('?'); h = hq[0]; R.q = hq[1] || '';
     if (h !== 'ask') { Q.kind = null; Q.shown = false; }
-    if (!S.profiles.length && h !== 'about') h = 'start';
-    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, pay: vPay, paid: function () { return window.KF_PAY ? KF_PAY.vPaid(R.q) : vHome(); }, restore: function () { return window.KF_PAY ? KF_PAY.vRestore() : vPay(); }, about: vAbout, gung: vGung, ask: vAsk, me: vMe, start: vStart }[h] || vHome;
+    if (!S.profiles.length && h !== 'about') h = (h === 'start' || ls('kf_seen')) ? 'start' : 'welcome';
+    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, welcome: vWelcome, pay: vPay, paid: function () { return window.KF_PAY ? KF_PAY.vPaid(R.q) : vHome(); }, restore: function () { return window.KF_PAY ? KF_PAY.vRestore() : vPay(); }, about: vAbout, gung: vGung, ask: vAsk, me: vMe, start: vStart }[h] || vHome;
     document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
@@ -391,6 +399,7 @@
   window.KF_APP = { U: U, esc: esc, bkey: bkey, render: render, lang: function () { return S.lang; }, prof: prof,
     setEnt: function (e) { if (PRO) return; e = e || {}; if (JSON.stringify(e) === JSON.stringify(S.ent)) return; S.ent = e; ls('kf_ent', S.ent); var h = (location.hash || '').slice(1).split('?')[0]; if (h !== 'start' && h !== 'restore') render(); } };
   app.addEventListener('click', function (e) {
+    var sn = e.target.closest('[data-seen]'); if (sn) ls('kf_seen', 1);
     var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
     if (t.dataset.gt) { G.type = t.dataset.gt; return render(); }
     if (t.dataset.go) { G.other = t.dataset.go; return render(); }
