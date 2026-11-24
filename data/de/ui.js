@@ -44,3 +44,6 @@
   stemRead: ['gap', 'eul', 'byeong', 'jeong', 'mu', 'gi', 'gyeong', 'sin', 'im', 'gye'], branchRead: ['ja', 'chuk', 'in', 'myo', 'jin', 'sa', 'o', 'mi', 'sin', 'yu', 'sul', 'hae'],
   wdFull: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'], dateFmt: '{wd}, {d}.{m}.{y}', dayOf: '', soonOpen: 'Bald verfügbar'
 }});
+
+/* 1년 이용권 · 본인 포함 4명 */
+(function (u) { Object.assign(u, {"subClaim": "{name} zum Jahrespass hinzufügen · noch {n} frei", "subClaimNote": "Der Jahrespass gilt für bis zu {n} Personen, dich eingeschlossen. Einmal hinzugefügt, kann eine Person nicht getauscht werden.", "subFull": "Alle {n} Plätze deines Jahrespasses sind belegt. Diese Person kannst du einzeln freischalten.", "subBadge": "Pass", "subSeats": "Jahrespass · {k}/{n} Personen · bis {d}", "rG": "In der App (Google Play) gekauft? Keine E-Mail nötig – gib nur die Bestellnummer aus Googles Beleg-E-Mail ein (beginnt mit GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Bis zu 4 Personen, du eingeschlossen"]); })(window.KF_TXT["de"].ui);

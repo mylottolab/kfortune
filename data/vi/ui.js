@@ -44,3 +44,6 @@
   stemRead: ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý'], branchRead: ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'],
   wdFull: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], dateFmt: '{wd}, {d}/{m}/{y}', dayOf: '', soonOpen: 'Sắp ra mắt'
 }});
+
+/* 1년 이용권 · 본인 포함 4명 */
+(function (u) { Object.assign(u, {"subClaim": "Thêm {name} vào gói 1 năm · còn {n} chỗ", "subClaimNote": "Gói 1 năm dùng cho tối đa {n} người, gồm cả bạn. Đã thêm thì không đổi được.", "subFull": "Gói 1 năm đã đủ {n} người. Người này có thể mở riêng.", "subBadge": "Gói", "subSeats": "Gói 1 năm · {k}/{n} người · đến {d}", "rG": "Mua trong ứng dụng (Google Play)? Không cần email — chỉ cần nhập mã đơn hàng trong email biên nhận của Google (bắt đầu bằng GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Tối đa 4 người, gồm cả bạn"]); })(window.KF_TXT["vi"].ui);

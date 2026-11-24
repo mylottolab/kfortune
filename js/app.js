@@ -36,8 +36,22 @@
   // 산 것은 "누구의 사주인지"(생년월일시 요약)로 기억합니다 — 다른 기기에서 같은 사람을 다시 입력해도 열림
   function bkey(p) { var z = function (n) { return ('0' + n).slice(-2); };
     return (p.cal === 'lunar' ? 'l' + (p.leap ? 1 : 0) : 's0') + ':' + p.y + z(p.m) + z(p.d) + ':' + (p.hh == null ? 'xx' : z(p.hh) + z(p.mm || 0)) + ':' + (p.gender || 'X'); }
-  function hasSaju(p) { var a = S.ent.saju || []; return isSub() || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
-  function hasToj(p, y) { var a = (S.ent.toj || {})[y] || []; return isSub() || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
+  function hasSaju(p) { var a = S.ent.saju || []; return subOn(p) || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
+  function hasToj(p, y) { var a = (S.ent.toj || {})[y] || []; return subOn(p) || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
+  // 1년 이용권은 등록한 사람(본인 포함 4명)에게만 — 한 번 등록하면 바꾸지 않음
+  function people() { return S.ent.people || []; }
+  function peopleMax() { return S.ent.peopleMax || 4; }
+  function subOn(p) { return !!isSub() && !!p && (PRO || people().indexOf(bkey(p)) >= 0); }
+  // 잠긴 곳의 버튼: 이용권이 있고 자리가 남았으면 「이 사람 등록」, 다 찼으면 안내 + 따로 사기
+  function payBtn(p, label, cls) {
+    cls = cls || 'btn';
+    if (isSub() && p && !subOn(p)) {
+      var left = peopleMax() - people().length;
+      if (left > 0) return '<button class="' + cls + '" data-claim="' + esc(bkey(p)) + '">' + esc(U('subClaim', { name: p.name, n: left })) + '</button><div class="small" style="text-align:center">' + esc(U('subClaimNote', { n: peopleMax() })) + '</div>';
+      return '<div class="small" style="text-align:center">' + esc(U('subFull', { n: peopleMax() })) + '</div><a class="' + cls + '" href="#pay">' + esc(label) + '</a>';
+    }
+    return '<a class="' + cls + '" href="#pay">' + esc(label) + '</a>';
+  }
   function todayYMD() { var n = new Date(); return { y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate(), wd: (n.getDay() + 6) % 7 }; }
   function todayStr() { var t = todayYMD(); return t.y + '-' + ('0' + t.m).slice(-2) + '-' + ('0' + t.d).slice(-2); }
 
@@ -161,7 +175,7 @@
     var slots = r.slots.map(function (s, i) { return '<div class="' + (i === bestSlot ? 'best' : '') + '"><span class="mut"' + (i === bestSlot ? ' style="color:var(--red);font-weight:700"' : '') + '>' + esc(d.slotName[i]) + (i === bestSlot ? ' · ' + esc(U('bestSlot')) : '') + '</span><b>' + esc(d.slot[s.ten]) + '</b><span class="mut">' + s.score + '</span></div>'; }).join('');
     var colorHex = { green: '#2F6B3F', teal: '#2C7A78', red: '#A9322A', purple: '#6B3F7A', yellow: '#D8B23A', beige: '#D9C6A3', white: '#FFFFFF', silver: '#B9BCC0', navy: '#1E2E4A', black: '#16130F' }[L.color];
     var areas = areaText(r).map(function (x) { return '<p style="margin:0 0 10px;font-size:14.5px;line-height:1.75"><b>' + esc(d.areaName[x.a]) + ' ' + x.v + '</b> · ' + esc(x.t) + '</p>'; }).join('');
-    var locked = !isSub();
+    var locked = !subOn(p);
     return bar(U('todayTitle'), dateLine(t) + ' · <span class="serif">' + r.pillar.txt + '</span> · ' + esc(p.name)) +
       '<div class="wrap" style="padding-top:8px"><section class="card" style="display:flex;flex-direction:column;align-items:center"><div><span class="serif" style="font-weight:900;font-size:46px;color:var(--red)">' + r.scores.total + '</span> <span class="mut">/ 100 ' + esc(U('total')) + '</span></div><div class="svgwrap">' + radar(r.scores) + '</div></section>' +
       '<section class="dark"><div class="mut" style="font-size:12px">' + esc(U('oneLine')) + '</div><div class="lead">' + esc(tx.head) + '</div></section>' +
@@ -174,7 +188,7 @@
       '<div style="font-size:14px;line-height:1.7"><b style="color:var(--wood)">' + esc(U('doIt')) + '</b> · ' + esc(tx.doo) + '<br><b style="color:var(--red)">' + esc(U('avoid')) + '</b> · ' + esc(tx.dont) + '</div>' +
       '<a href="https://mylottolab.github.io/my-lotto-lab/main_page.html" target="_blank" rel="noopener" style="font-size:13px">' + esc(U('lotto')) + '</a></section>' +
       '<section class="card' + (locked ? ' lock' : '') + '"><h2 style="font-size:17px;margin-bottom:10px">' + esc(U('areasTitle')) + '</h2><div class="' + (locked ? 'blur' : '') + '" ' + (locked ? 'aria-hidden="true"' : '') + '>' + areas + '</div>' +
-      (locked ? '<div class="over">' + esc(U('areasLock')) + '<a class="btn" href="#pay">' + esc(U('subscribeAll')) + '</a></div><div style="height:60px"></div>' : '') + '</section>' +
+      (locked ? '<div class="over">' + esc(U('areasLock')) + payBtn(p, U('subscribeAll')) + '</div><div style="height:60px"></div>' : '') + '</section>' +
       '<p class="note">' + esc(d.note) + '</p></div>' + tab('home');
   }
 
@@ -183,13 +197,13 @@
     var vals = w.map(function (x) { return x.scores.total; }), hi = vals.indexOf(Math.max.apply(null, vals)), lo = vals.indexOf(Math.min.apply(null, vals));
     var story = Math.max.apply(null, vals) - Math.min.apply(null, vals) < 8 ? d.week.flat :
       fill(d.week.best, { wd: d.wd[hi], head: d.head[w[hi].tenS][band(vals[hi])] }) + ' ' + fill(d.week.worst, { wd: d.wd[lo], head: d.head[w[lo].tenS][band(vals[lo])] });
-    var a = w[0].date, z = w[6].date, locked = !isSub();
+    var a = w[0].date, z = w[6].date, locked = !subOn(p);
     var items = w.map(function (x, i) { var free = i < 5 || !locked, cls = i === hi ? 'item hl' : i === lo ? 'item low' : 'item';
       return free ? '<div class="' + cls + '"><div class="row" style="align-items:flex-start"><b style="min-width:52px' + (i === hi ? ';color:var(--red)' : '') + '">' + esc(d.wd[i]) + ' ' + vals[i] + '</b><span>' + esc(d.head[x.tenS][band(vals[i])]) + '</span></div></div>' : ''; }).join('');
     return bar(U('weekTitle'), a.m + '.' + a.d + ' ~ ' + z.m + '.' + z.d + ' · ' + esc(p.name)) +
       '<div class="wrap" style="padding-top:8px"><section class="dark"><div class="mut" style="font-size:12px">' + esc(U('weekStory')) + '</div><p style="margin:8px 0 0;font-size:14.5px;line-height:1.8">' + esc(story) + '</p></section>' +
       '<section class="card svgwrap" style="padding:14px 6px 6px">' + lineChart(vals, d.wd, w.map(function (x) { return x.pillar.txt; }), hi) + '</section>' +
-      '<section class="list">' + items + (locked ? '<a class="btn line" href="#pay">' + esc(U('weekMore')) + '</a>' : '') + '</section></div>' + tab('home');
+      '<section class="list">' + items + (locked ? payBtn(p, U('weekMore'), 'btn line') : '') + '</section></div>' + tab('home');
   }
 
   function vSaju() {
@@ -209,7 +223,7 @@
       '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('daeunTitle')) + '</h2>' +
       bars(du.slice(0, 8).map(function (x) { return x.score; }), du.slice(0, 8).map(function (x) { return x.pillar.txt; }), du.slice(0, 8).map(function (x) { return U('age', { n: x.age }); }), -1, -1, ni) + '</section>' +
       (locked ? '<section class="card" style="display:flex;flex-direction:column;gap:10px"><h2 style="font-size:17px">' + esc(U('deeper')) + '</h2>' + paras.lockedTitles.map(function (x) { return '<div class="item">' + esc(x) + '</div>'; }).join('') +
-        '<a class="btn" href="#pay">' + esc(U('openSaju')) + '</a><div class="small" style="text-align:center">' + esc(U('openSajuS')) + '</div></section>'
+        payBtn(p, U('openSaju')) + '<div class="small" style="text-align:center">' + esc(U('openSajuS')) + '</div></section>'
         : '<article class="story">' + paras.paid.map(function (x) { return x.h ? '<h2 style="margin:6px 0 10px;font-size:17px">' + esc(x.h) + '</h2>' : '<p>' + x + '</p>'; }).join('') + '</article>') +
       '</div>' + tab('saju');
   }
@@ -242,7 +256,7 @@
       (tj ? '<div class="serif" style="font-weight:900;font-size:28px;letter-spacing:5px;line-height:1.5;color:var(--gold)">' + esc(tj.h[0]) + '<br>' + esc(tj.h[1]) + '</div><div style="font-size:14px;line-height:1.6;color:#E6DED1">' + esc(tj.hk) + '</div>' : '<div style="color:#B9AE9E">' + esc(U('soonOpen')) + '</div>') + '</section>' +
       (tj ? '<article class="story"><h2 style="margin-bottom:10px">' + esc(U('tojYear')) + '</h2>' + tj.y.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</article>' : '') +
       '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('tojMonths')) + '</h2>' + bars(ms, U('monthShort'), null, hi, lo, -1) + '</section>' +
-      '<section class="list">' + months + (locked ? '<a class="btn" href="#pay">' + esc(U('tojMore')) + '</a>' : '') +
+      '<section class="list">' + months + (locked ? payBtn(p, U('tojMore')) : '') +
       (isLast ? '' : '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: y - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a>') + '</section>' +
       '<section class="item" style="background:var(--soft);font-size:12.5px;line-height:1.7">' + esc(U('tojAbout')) + '</section></div>' + tab('tojeong');
   }
@@ -275,10 +289,10 @@
     for (var e = 0; e < 5; e++) { if (!A.elements[e] && B.elements[e]) { paras.push(fill(g.comp[0], { a: esc(p.name), b: esc(o.name), e: d.elName[e] })); break; } }
     for (var e2 = 0; e2 < 5; e2++) { if (!A.elements[e2] && !B.elements[e2]) { paras.push(fill(g.comp[1], { e: d.elName[e2], eh: g.eHint[e2] })); break; } }
     paras.push(g.money[band(sc.money)]); paras.push(g.end[G.type][band(sc.total)]);
-    var locked = !isSub();
+    var locked = !subOn(p);
     return head + '<section class="card" style="display:flex;flex-direction:column;gap:12px;align-items:stretch"><div class="row" style="justify-content:space-around;text-align:center">' +
       '<div><b>' + esc(p.name) + '</b><div style="margin-top:6px">' + miniChars(A) + '</div></div><div class="serif" style="font-weight:900;font-size:44px;color:var(--red)">' + sc.total + '</div><div><b>' + esc(o.name) + '</b><div style="margin-top:6px">' + miniChars(B) + '</div></div></div>' + hbars + '</section>' +
-      '<article class="story' + (locked ? ' lock' : '') + '"><p>' + paras[0] + '</p>' + (locked ? '<div class="blur" aria-hidden="true">' + paras.slice(1, 3).map(function (x) { return '<p>' + x + '</p>'; }).join('') + '</div><div class="over">' + esc(U('gungLock')) + '<a class="btn" href="#pay">' + esc(U('subscribeAll')) + '</a></div><div style="height:40px"></div>'
+      '<article class="story' + (locked ? ' lock' : '') + '"><p>' + paras[0] + '</p>' + (locked ? '<div class="blur" aria-hidden="true">' + paras.slice(1, 3).map(function (x) { return '<p>' + x + '</p>'; }).join('') + '</div><div class="over">' + esc(U('gungLock')) + payBtn(p, U('subscribeAll')) + '</div><div style="height:40px"></div>'
         : paras.slice(1).map(function (x) { return '<p>' + x + '</p>'; }).join('')) + '</article><p class="note">' + esc(g.note) + '</p></div>' + tab('home');
   }
 
@@ -309,9 +323,9 @@
       if (H) { body.push(a.health.lead); body.push(fill(a.health.low, r.best)); body.push((TX().saju || window.KF_TXT.ko.saju).health[r.why[0]]); body.push(a.health.note); }
       else { body.push(a.ans[Q.kind][r.verdict]); body.push(fill(a.why, { who: esc(who.name), ten: d.tenImg[r.why[0]] }) + ' ' + (a.why2[r.why[1]] || ''));
         body.push(r.best.day ? fill(a.bestDay, r.best.day) : fill(a.best, r.best)); }
-      var locked = !isSub();
+      var locked = !subOn(who);
       out = '<section class="dark" style="text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center"><div class="serif" style="font-size:56px;font-weight:900;line-height:1;color:var(--gold)">' + mark + '</div><div class="lead" style="margin:0">' + esc(verdictTxt) + '</div><div class="mut" style="font-size:12px">' + esc(who.name) + ' · ' + r.score + '</div></section>' +
-        '<article class="story' + (locked ? ' lock' : '') + '"><p>' + body[0] + '</p>' + (locked ? '<div class="blur" aria-hidden="true"><p>' + body.slice(1).join('</p><p>') + '</p></div><div class="over">' + esc(U('askLock')) + '<a class="btn" href="#pay">' + esc(U('subscribeAll')) + '</a></div><div style="height:30px"></div>' : '<p>' + body.slice(1).join('</p><p>') + '</p>') + '</article>' +
+        '<article class="story' + (locked ? ' lock' : '') + '"><p>' + body[0] + '</p>' + (locked ? '<div class="blur" aria-hidden="true"><p>' + body.slice(1).join('</p><p>') + '</p></div><div class="over">' + esc(U('askLock')) + payBtn(who, U('subscribeAll')) + '</div><div style="height:30px"></div>' : '<p>' + body.slice(1).join('</p><p>') + '</p>') + '</article>' +
         '<button class="btn ghost" data-qreset="1">' + esc(a.again) + '</button>';
     }
     return bar(a.title, '', 'ask') + '<div class="wrap" style="padding-top:8px">' + form + out + '</div>' + tab('home');
@@ -343,8 +357,8 @@
   function vMe() {
     var list = S.profiles.map(function (p) { var c = chartOf(p);
       return '<div class="item' + (p.id === (prof() || {}).id ? ' hl' : '') + '"><div class="row" style="justify-content:space-between"><div><b>' + esc(p.name) + '</b><div class="small">' + c.solar.y + '.' + c.solar.m + '.' + c.solar.d + ' · ' + c.pillars.day.txt + '</div></div>' + miniChars(c) + '</div>' +
-        '<div class="row" style="margin-top:8px;gap:8px">' + (p.id === (prof() || {}).id ? '<span class="chip">' + esc(U('current')) + '</span>' : '<button class="pill" data-use="' + p.id + '">' + esc(U('use')) + '</button>') + '<button class="pill" data-del="' + p.id + '">' + esc(U('del')) + '</button></div></div>'; }).join('');
-    return bar(U('meTitle')) + '<div class="wrap" style="padding-top:8px"><section class="list">' + list + '</section><a class="btn ghost" href="#start">' + esc(U('add')) + '</a><button class="btn ghost" data-langsheet="1">🌐 ' + esc(U('langTitle')) + ' · ' + esc(U('lang')) + '</button></div>' + tab('me');
+        '<div class="row" style="margin-top:8px;gap:8px">' + (subOn(p) ? '<span class="chip" style="background:var(--gold);color:var(--ink)">' + esc(U('subBadge')) + '</span>' : '') + (p.id === (prof() || {}).id ? '<span class="chip">' + esc(U('current')) + '</span>' : '<button class="pill" data-use="' + p.id + '">' + esc(U('use')) + '</button>') + '<button class="pill" data-del="' + p.id + '">' + esc(U('del')) + '</button></div></div>'; }).join('');
+    return bar(U('meTitle')) + '<div class="wrap" style="padding-top:8px">' + (isSub() ? '<div class="item" style="font-size:13.5px;line-height:1.6">' + esc(U('subSeats', { k: people().length, n: peopleMax(), d: S.ent.sub })) + '</div>' : '') + '<section class="list">' + list + '</section><a class="btn ghost" href="#start">' + esc(U('add')) + '</a><button class="btn ghost" data-langsheet="1">🌐 ' + esc(U('langTitle')) + ' · ' + esc(U('lang')) + '</button></div>' + tab('me');
   }
 
   var F = { cal: 'solar', leap: false, gender: 'F', unknown: false };

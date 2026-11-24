@@ -44,3 +44,6 @@
   stemRead: ['gap', 'eul', 'byeong', 'jeong', 'mu', 'gi', 'gyeong', 'sin', 'im', 'gye'], branchRead: ['ja', 'chuk', 'in', 'myo', 'jin', 'sa', 'o', 'mi', 'sin', 'yu', 'sul', 'hae'],
   wdFull: ['الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'], dateFmt: '{wd} {d}/{m}/{y}', dayOf: '', soonOpen: 'قريبًا'
 }});
+
+/* 1년 이용권 · 본인 포함 4명 */
+(function (u) { Object.assign(u, {"subClaim": "أضف {name} إلى باقة السنة · بقي {n}", "subClaimNote": "تشمل باقة السنة حتى {n} أشخاص بمن فيهم أنت. لا يمكن استبدال من أُضيف.", "subFull": "امتلأت أماكن باقة السنة الـ{n}. يمكنك فتح هذا الشخص بشكل منفصل.", "subBadge": "الباقة", "subSeats": "باقة السنة · {k}/{n} أشخاص · حتى {d}", "rG": "اشتريت داخل التطبيق (Google Play)؟ لا حاجة للبريد — أدخل فقط رقم الطلب من رسالة إيصال Google (يبدأ بـ GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["حتى 4 أشخاص بمن فيهم أنت"]); })(window.KF_TXT["ar"].ui);

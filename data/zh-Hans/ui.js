@@ -44,3 +44,6 @@
   stemRead: ['jiǎ', 'yǐ', 'bǐng', 'dīng', 'wù', 'jǐ', 'gēng', 'xīn', 'rén', 'guǐ'], branchRead: ['zǐ', 'chǒu', 'yín', 'mǎo', 'chén', 'sì', 'wǔ', 'wèi', 'shēn', 'yǒu', 'xū', 'hài'],
   wdFull: ['一', '二', '三', '四', '五', '六', '日'], dateFmt: '{y}年{m}月{d}日 星期{wd}', dayOf: '日', soonOpen: '准备中'
 }});
+
+/* 1년 이용권 · 본인 포함 4명 */
+(function (u) { Object.assign(u, {"subClaim": "将{name}加入1年通行证 · 剩余{n}位", "subClaimNote": "1年通行证含本人最多可看{n}人。一旦加入不可更换。", "subFull": "1年通行证的{n}个名额已满。此人可单独解锁。", "subBadge": "通行证", "subSeats": "1年通行证 · 已登记{k}/{n}人 · 至{d}", "rG": "若在应用内(Google Play)购买：无需邮箱，只需输入Google收据邮件中的订单号(以GPA.开头)。"}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["含本人最多4人一起看"]); })(window.KF_TXT["zh-Hans"].ui);

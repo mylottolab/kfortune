@@ -82,7 +82,21 @@
     var o = body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {};
     return fetch(API + path, o).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || r.status); return d; }); });
   }
-  function sync() { return api('/ent?uid=' + uid).then(A.setEnt).catch(function () {}); }
+  function sync() { return api('/ent?uid=' + uid).then(function (e) { A.setEnt(e); autoClaim(e); }).catch(function () {}); }
+  // 1년 이용권: 아직 아무도 등록 안 했으면 지금 보고 있는 사람(보통 본인)을 먼저 등록
+  function autoClaim(e) {
+    if (!e || !e.sub || e.sub < new Date().toISOString().slice(0, 10) || (e.people && e.people.length)) return;
+    var p = A.prof && A.prof(); if (p) claim(A.bkey(p));
+  }
+  function claim(bk, btn) {
+    if (btn) btn.disabled = true;
+    return api('/people', { uid: uid, bkey: bk }).then(A.setEnt)
+      .catch(function (e) { if (btn) btn.disabled = false; toast(e && e.message === 'full' ? A.U('subFull', { n: 4 }) : t('fail')); return sync(); });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-claim]'); if (!b) return;
+    e.preventDefault(); claim(b.getAttribute('data-claim'), b);
+  });
 
   // 가격 표시
   var PRICES = ls('kf_prices');
@@ -181,6 +195,7 @@
     return '<div class="bar"><a class="back" href="#pay" aria-label="back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a><div class="t">' + esc(t('rT')) + '</div></div>' +
       '<div class="wrap" style="padding-top:8px"><form id="rf" class="card" style="display:flex;flex-direction:column;gap:10px"><p style="margin:0;font-size:14px;line-height:1.7">' + esc(t('rL')) + '</p>' +
       '<input class="in" id="re" type="email" autocomplete="email" placeholder="email@example.com" value="' + esc(ls('kf_email') || '') + '"><input class="in" id="ro" placeholder="' + esc(t('order')) + '" autocapitalize="characters">' +
+      '<p class="small" style="margin:0;line-height:1.6">' + esc(A.U('rG')) + '</p>' +
       '<div class="small" id="rm" hidden></div><button class="btn" type="submit">' + esc(t('rBtn')) + '</button></form></div>';
   }
 
@@ -222,7 +237,7 @@
       f.addEventListener('submit', function (e) {
         e.preventDefault(); var m = document.getElementById('rm'), em = document.getElementById('re').value.trim(), oid = document.getElementById('ro').value.trim();
         m.hidden = false; m.style.color = 'var(--mute)'; m.textContent = t('wait');
-        api('/restore', { uid: uid, email: em, oid: oid }).then(function () { ls('kf_email', em); m.style.color = 'var(--indigo)'; m.textContent = t('rOk'); return sync(); })
+        api('/restore', { uid: uid, email: em, oid: oid }).then(function () { if (em && !/^GPA\./i.test(oid)) ls('kf_email', em); m.style.color = 'var(--indigo)'; m.textContent = t('rOk'); return sync(); })
           .catch(function () { m.style.color = 'var(--red)'; m.textContent = t('rNo'); });
       });
     }

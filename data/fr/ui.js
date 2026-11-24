@@ -44,3 +44,6 @@
   stemRead: ['gap', 'eul', 'byeong', 'jeong', 'mu', 'gi', 'gyeong', 'sin', 'im', 'gye'], branchRead: ['ja', 'chuk', 'in', 'myo', 'jin', 'sa', 'o', 'mi', 'sin', 'yu', 'sul', 'hae'],
   wdFull: ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'], dateFmt: '{wd} {d}/{m}/{y}', dayOf: '', soonOpen: 'Bientôt'
 }});
+
+/* 1년 이용권 · 본인 포함 4명 */
+(function (u) { Object.assign(u, {"subClaim": "Ajouter {name} au pass 1 an · {n} place(s) restante(s)", "subClaimNote": "Le pass 1 an couvre jusqu’à {n} personnes, vous compris. Une personne ajoutée ne peut pas être remplacée.", "subFull": "Les {n} places de votre pass 1 an sont prises. Vous pouvez débloquer cette personne séparément.", "subBadge": "Pass", "subSeats": "Pass 1 an · {k}/{n} personnes · jusqu’au {d}", "rG": "Acheté dans l’app (Google Play) ? Pas besoin d’e-mail : saisissez seulement le numéro de commande du reçu Google (commence par GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Jusqu’à 4 personnes, vous compris"]); })(window.KF_TXT["fr"].ui);

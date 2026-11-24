@@ -44,3 +44,6 @@
   stemRead: ['gap', 'eul', 'byeong', 'jeong', 'mu', 'gi', 'gyeong', 'sin', 'im', 'gye'], branchRead: ['ja', 'chuk', 'in', 'myo', 'jin', 'sa', 'o', 'mi', 'sin', 'yu', 'sul', 'hae'],
   wdFull: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'], dateFmt: '{wd}, {d}/{m}/{y}', dayOf: '', soonOpen: 'Segera hadir'
 }});
+
+/* 1년 이용권 · 본인 포함 4명 */
+(function (u) { Object.assign(u, {"subClaim": "Tambahkan {name} ke paket 1 tahun · sisa {n}", "subClaimNote": "Paket 1 tahun berlaku untuk hingga {n} orang, termasuk kamu. Orang yang sudah ditambahkan tidak bisa diganti.", "subFull": "Semua {n} tempat di paket 1 tahunmu sudah terisi. Orang ini bisa dibuka terpisah.", "subBadge": "Paket", "subSeats": "Paket 1 tahun · {k}/{n} orang · sampai {d}", "rG": "Beli di aplikasi (Google Play)? Tanpa email — cukup masukkan nomor pesanan dari email tanda terima Google (diawali GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Hingga 4 orang, termasuk kamu"]); })(window.KF_TXT["id"].ui);
