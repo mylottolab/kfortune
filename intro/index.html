@@ -7,7 +7,7 @@
 <meta name="description" content="사주팔자와 토정비결, 그 전통의 틀 위에 새로 쓴 한국 개인운명 예언서. 13개 언어 · 오늘의 운세 무료 · Google Play · App Store 곧 출시.">
 <meta property="og:title" content="한국전통 개인운명 예언서 : 새로운 해석">
 <meta property="og:description" content="사주팔자 · 토정비결 · 궁합 · 물어보세요 — 13개 언어. 앱 곧 출시.">
-<meta property="og:image" content="https://koreanfortune.kr/intro/poster_10min.jpg">
+<meta property="og:image" content="https://koreanfortune.kr/intro/kfortune_intro_10min.jpg">
 <meta property="og:url" content="https://koreanfortune.kr/intro/">
 <meta name="theme-color" content="#141210">
 <link rel="icon" href="../icons/icon.svg?v=2" type="image/svg+xml">
@@ -38,6 +38,8 @@ h2{font:900 clamp(24px,3.6vw,32px)/1.3 var(--serif);margin:0 0 8px;word-break:ke
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .tabs button{min-height:44px;padding:0 18px;border-radius:22px;border:1px solid var(--line);background:var(--bg2);color:var(--sub);font:700 15px var(--sans);cursor:pointer}
 .tabs button[aria-selected=true]{background:var(--gold);color:#141210;border-color:var(--gold)}
+.tabs button:disabled{opacity:.35;cursor:not-allowed}
+#vlang button{min-height:38px;padding:0 14px;font-size:14px}
 .vid{border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9}
 .vid video{width:100%;height:100%;display:block;background:#000}
 .vdesc{margin:14px 2px 0;color:var(--sub);line-height:1.75;word-break:keep-all}
@@ -79,13 +81,14 @@ footer{padding-block:24px calc(28px + env(safe-area-inset-bottom,0px));color:var
 
   <section aria-labelledby="v">
     <h2 id="v">소개 영상</h2>
-    <p class="sec-l">10분은 처음부터 끝까지 천천히, 5분은 핵심만, 1분은 한눈에. 지금은 웹(koreanfortune.kr)에서 바로 쓰실 수 있고, Google Play · App Store 앱은 곧 출시됩니다.</p>
-    <div class="tabs" role="tablist">
+    <p class="sec-l">한국어·영어는 1분·5분·10분, 그 밖의 11개 언어는 1분 영상이 있습니다. 10분은 처음부터 끝까지 천천히, 5분은 핵심만, 1분은 한눈에. 지금은 웹(koreanfortune.kr)에서 바로 쓰실 수 있고, Google Play · App Store 앱은 곧 출시됩니다.</p>
+    <div class="tabs" id="vlang" aria-label="영상 언어"></div>
+    <div class="tabs" role="tablist" id="vcut">
       <button role="tab" aria-selected="true" data-v="1min">1분 · 한눈에</button>
       <button role="tab" aria-selected="false" data-v="5min">5분 · 핵심</button>
       <button role="tab" aria-selected="false" data-v="10min">10분 · 전체 안내</button>
     </div>
-    <div class="vid"><video id="player" controls playsinline preload="metadata" poster="poster_1min.jpg" src="kfortune_intro_1min.mp4"></video></div>
+    <div class="vid"><video id="player" controls playsinline preload="metadata" poster="kfortune_intro_1min.jpg" src="kfortune_intro_1min.mp4"></video></div>
     <p class="vdesc" id="vdesc"></p>
     <div class="dl" id="vdl"></div>
   </section>
@@ -132,20 +135,29 @@ footer{padding-block:24px calc(28px + env(safe-area-inset-bottom,0px));color:var
 </div>
 <script>
 (function () {
+  var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'], ['ja', '日本語'], ['es', 'Español'], ['de', 'Deutsch'], ['fr', 'Français'], ['id', 'Bahasa Indonesia'], ['th', 'ไทย'], ['vi', 'Tiếng Việt'], ['ar', 'العربية'], ['ru', 'Русский']];
   var D = {
-    '1min': ['1분 · 한눈에 — 매일 아침의 한 줄, 평생 사주, 토정비결 144괘, ○△✕ 물어보세요, 공유, 13개 언어까지 1분에 둘러봅니다.', 1],
-    '5min': ['5분 · 핵심 — 입력부터 오늘의 이야기, 평생 사주와 사주의 원리, 토정비결 열두 달, 궁합, 물어보세요, 가족 4명, 출력·PDF·공유, 밤 모드와 이용 안내까지.', 5],
-    '10min': ['10분 · 전체 안내 — 한국전통 개인운명 예언서의 모든 화면을 차례로, 천천히. 처음 쓰시는 분, 부모님께 보여 드릴 때 좋습니다.', 10]
+    '1min': '1분 · 한눈에 — 매일 아침의 한 줄, 평생 사주, 토정비결 144괘, ○△✕ 물어보세요, 공유, 13개 언어까지 1분에 둘러봅니다.',
+    '5min': '5분 · 핵심 — 입력부터 오늘의 이야기, 평생 사주와 사주의 원리, 토정비결 열두 달, 궁합, 물어보세요, 가족 4명, 출력·PDF·공유, 밤 모드와 이용 안내까지.',
+    '10min': '10분 · 전체 안내 — 한국전통 개인운명 예언서의 모든 화면을 차례로, 천천히. 처음 쓰시는 분, 부모님께 보여 드릴 때 좋습니다.'
   };
-  var v = document.getElementById('player'), d = document.getElementById('vdesc'), dl = document.getElementById('vdl');
-  function pick(k) {
-    document.querySelectorAll('.tabs button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.v === k ? 'true' : 'false'); });
-    v.pause(); v.poster = 'poster_' + k + '.jpg'; v.src = 'kfortune_intro_' + k + '.mp4'; v.load();
-    d.textContent = D[k][0];
-    dl.innerHTML = '영상 파일 주소: <a href="kfortune_intro_' + k + '.mp4" target="_blank" rel="noopener">koreanfortune.kr/intro/kfortune_intro_' + k + '.mp4</a>';
+  var cur = { L: 'ko', c: '1min' };
+  var v = document.getElementById('player'), d = document.getElementById('vdesc'), dl = document.getElementById('vdl'), lb = document.getElementById('vlang');
+  lb.innerHTML = LANGS.map(function (l) { return '<button data-l="' + l[0] + '" lang="' + l[0] + '">' + l[1] + '</button>'; }).join('');
+  function file(L, c) { return 'kfortune_intro_' + (L === 'ko' ? '' : L + '_') + c; }
+  function full(L) { return LANGS.some(function (l) { return l[0] === L && l[2]; }); }
+  function show() {
+    if (!full(cur.L)) cur.c = '1min';
+    lb.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.l === cur.L ? 'true' : 'false'); });
+    document.querySelectorAll('#vcut button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.v === cur.c ? 'true' : 'false'); b.disabled = b.dataset.v !== '1min' && !full(cur.L); });
+    var f = file(cur.L, cur.c);
+    v.pause(); v.poster = f + '.jpg'; v.src = f + '.mp4'; v.load();
+    d.textContent = D[cur.c];
+    dl.innerHTML = '영상 파일 주소: <a href="' + f + '.mp4" target="_blank" rel="noopener">koreanfortune.kr/intro/' + f + '.mp4</a>';
   }
-  document.querySelectorAll('.tabs button').forEach(function (b) { b.addEventListener('click', function () { pick(b.dataset.v); }); });
-  pick('1min');
+  lb.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { cur.L = b.dataset.l; show(); } });
+  document.querySelectorAll('#vcut button').forEach(function (b) { b.addEventListener('click', function () { if (!b.disabled) { cur.c = b.dataset.v; show(); } }); });
+  show();
 })();
 </script>
 </body>
