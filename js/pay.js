@@ -108,6 +108,23 @@
   // ── 앱(구글 플레이) 안에서: 결제는 구글 플레이로만 ──
   var GP = { sub: 'kf_year', saju: 'kf_saju', toj: 'kf_toj' }, NPRICE = {}, SEEN = {};
   var NATIVE = window.KFNative || null;
+  var IOS = !!(NATIVE && NATIVE.platform === 'ios');
+  // 아이폰 앱: 결제는 App Store 로만 — 다른 결제 방법은 말하지 않습니다(애플 3.1.1)
+  var IOS_T = {
+    ko: ['앱에서는 App Store로 결제합니다.', '아이폰 앱에서 사셨다면 이메일 없이, 애플이 보낸 영수증 메일의 주문 번호(M으로 시작)만 넣으세요.'],
+    en: ['In the app, purchases are made through the App Store.', 'Bought in the iPhone app? No email needed — just enter the Order ID from Apple’s receipt email (starts with M).'],
+    ja: ['アプリではApp Storeでお支払いいただきます。', 'iPhoneアプリで購入した場合はメール不要。Appleの領収書メールにある注文番号（Mで始まる）だけを入力してください。'],
+    'zh-Hans': ['在应用内通过 App Store 付款。', '若在 iPhone 应用内购买：无需邮箱，只需输入 Apple 收据邮件中的订单号（以 M 开头）。'],
+    'zh-Hant': ['在 App 內透過 App Store 付款。', '若在 iPhone App 內購買：不需電子郵件，只要輸入 Apple 收據郵件中的訂單編號（以 M 開頭）。'],
+    es: ['En la app, las compras se hacen a través del App Store.', '¿Compraste en la app de iPhone? No hace falta correo: escribe solo el ID de pedido del recibo de Apple (empieza por M).'],
+    de: ['In der App wird über den App Store bezahlt.', 'In der iPhone-App gekauft? Keine E-Mail nötig – gib nur die Bestell-ID aus Apples Beleg-E-Mail ein (beginnt mit M).'],
+    fr: ['Dans l’app, les achats passent par l’App Store.', 'Acheté dans l’app iPhone ? Pas besoin d’e-mail : saisissez seulement le numéro de commande du reçu Apple (commence par M).'],
+    id: ['Di aplikasi, pembelian dilakukan melalui App Store.', 'Beli di aplikasi iPhone? Tanpa email — cukup masukkan ID pesanan dari email tanda terima Apple (diawali M).'],
+    th: ['ในแอปชำระเงินผ่าน App Store', 'ซื้อในแอป iPhone? ไม่ต้องใช้อีเมล — ใส่แค่หมายเลขคำสั่งซื้อจากอีเมลใบเสร็จของ Apple (ขึ้นต้นด้วย M)'],
+    vi: ['Trong ứng dụng, thanh toán qua App Store.', 'Mua trong ứng dụng iPhone? Không cần email — chỉ cần nhập mã đơn hàng trong email biên nhận của Apple (bắt đầu bằng M).'],
+    ar: ['داخل التطبيق يتم الدفع عبر App Store.', 'اشتريت داخل تطبيق iPhone؟ لا حاجة للبريد — أدخل فقط رقم الطلب من رسالة إيصال Apple (يبدأ بـ M).'],
+    ru: ['В приложении оплата идёт через App Store.', 'Купили в приложении на iPhone? Email не нужен — введите только номер заказа из письма-чека Apple (начинается с M).']
+  };
   (function () {   // 안드로이드 앱(Capacitor) — 플러그인 KFBilling
     var C = window.Capacitor;
     if (NATIVE || !C || !C.isNativePlatform || !C.isNativePlatform() || C.getPlatform() !== 'android') return;
@@ -218,7 +235,9 @@
     var pend = ls('kf_pending') || {};
     if (pend.productId && pend.productId !== r.productId) pend = {};
     toast(t('wait'));
-    api('/google/verify', { uid: uid, productId: r.productId, purchaseToken: r.purchaseToken, bkey: pend.bkey || null, year: pend.year || null, lang: A.lang() })
+    var ios = r.platform === 'ios' || /^apple:/.test(r.purchaseToken || '');
+    (ios ? api('/apple/verify', { uid: uid, productId: r.productId, transactionId: r.purchaseToken, bkey: pend.bkey || null, year: pend.year || null, lang: A.lang() })
+         : api('/google/verify', { uid: uid, productId: r.productId, purchaseToken: r.purchaseToken, bkey: pend.bkey || null, year: pend.year || null, lang: A.lang() }))
       .then(function () {
         try { NATIVE.consume(r.purchaseToken); } catch (e) {}
         ls('kf_pending', null); ls('kf_last', { kind: pend.kind || 'sub', oid: r.orderId });
@@ -235,7 +254,8 @@
   }
 
   function after(h) {
-    if (h === 'pay' && NATIVE) { var nt = document.querySelector('.wrap .item'); if (nt) nt.textContent = t('appNote'); }
+    if (h === 'pay' && NATIVE) { var nt = document.querySelector('.wrap .item'); if (nt) nt.textContent = IOS ? (IOS_T[A.lang()] || IOS_T.en)[0] : t('appNote'); }
+    if (h === 'restore' && IOS) { var gg = document.querySelector('#rf p.small'); if (gg) gg.textContent = (IOS_T[A.lang()] || IOS_T.en)[1]; }
     if (h === 'pay') { fillPrices(); if (!PRICES) loadPrices(); }
     if (h === 'restore') {
       var f = document.getElementById('rf'); if (!f) return;

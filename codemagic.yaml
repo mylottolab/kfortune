@@ -1,0 +1,49 @@
+# =====================================================================
+# KFortune(한국전통운세) 아이폰 앱 — Codemagic 이 맥 대신 만들어서 App Store Connect 에 올립니다.
+#   [Start new build] → 워크플로 "KFortune iOS → App Store Connect" 를 고르면 끝.
+#   아이폰 앱 파일은 app-ios 폴더에 있습니다(이 저장소의 나머지는 koreanfortune.kr 사이트).
+#   ⚠ integrations 의 이름(Codemagic)은 Codemagic 에 넣은 애플 열쇠 이름과 똑같아야 합니다.
+# =====================================================================
+workflows:
+  kfortune-ios-appstore:
+    name: KFortune iOS → App Store Connect
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: app-ios
+    integrations:
+      app_store_connect: Codemagic
+    environment:
+      node: 22
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.weaveapp.kfortune
+    scripts:
+      - name: 준비물 설치
+        script: npm ci
+      - name: 아이폰 프로젝트 만들기 + KFortune 설정 넣기
+        script: |
+          rm -rf ios www
+          mkdir -p www && cp web_index.html www/index.html
+          npx cap add ios
+          npx cap sync ios
+          python3 ios_setup.py
+      - name: 서명 정보 넣기
+        script: xcode-project use-profiles
+      - name: 빌드 번호 올리기 (빌드할 때마다 1씩)
+        script: |
+          sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" ios/App/App.xcodeproj/project.pbxproj
+          grep -m1 CURRENT_PROJECT_VERSION ios/App/App.xcodeproj/project.pbxproj
+      - name: 앱 만들기 (.ipa)
+        script: |
+          xcode-project build-ipa \
+            --project "ios/App/App.xcodeproj" \
+            --scheme "App"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - app-ios/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false

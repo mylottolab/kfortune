@@ -1,0 +1,22 @@
+{
+  "appId": "com.weaveapp.kfortune",
+  "appName": "KFortune",
+  "webDir": "www",
+  "server": {
+    "url": "https://koreanfortune.kr/",
+    "cleartext": false,
+    "errorPath": "index.html",
+    "allowNavigation": [
+      "koreanfortune.kr",
+      "www.koreanfortune.kr",
+      "my-lotto-lab-api.onrender.com"
+    ]
+  },
+  "backgroundColor": "#141210",
+  "ios": {
+    "contentInset": "never",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true,
+    "backgroundColor": "#141210"
+  }
+}

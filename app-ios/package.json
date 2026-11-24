@@ -1,0 +1,11 @@
+{
+  "name": "kfortune-ios",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KFortune 아이폰 앱 껍데기 (koreanfortune.kr 화면을 띄웁니다)",
+  "dependencies": {
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1"
+  }
+}
