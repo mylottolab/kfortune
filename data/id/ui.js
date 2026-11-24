@@ -47,3 +47,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "Tambahkan {name} ke paket 1 tahun · sisa {n}", "subClaimNote": "Paket 1 tahun berlaku untuk hingga {n} orang, termasuk kamu. Orang yang sudah ditambahkan tidak bisa diganti.", "subFull": "Semua {n} tempat di paket 1 tahunmu sudah terisi. Orang ini bisa dibuka terpisah.", "subBadge": "Paket", "subSeats": "Paket 1 tahun · {k}/{n} orang · sampai {d}", "rG": "Beli di aplikasi (Google Play)? Tanpa email — cukup masukkan nomor pesanan dari email tanda terima Google (diawali GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Hingga 4 orang, termasuk kamu"]); })(window.KF_TXT["id"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["id"].ui, {"shop": "Beli", "print": "Cetak · PDF", "share": "Bagikan", "copied": "Disalin. Tempel ke WhatsApp, KakaoTalk, atau chat mana pun.", "themeL": "Tampilan", "themeN": ["Otomatis", "Siang", "Malam"], "shareFrom": "Ramalanku dari KoreanFortune", "printApp": "Di aplikasi gunakan Bagikan — atau cetak / simpan PDF di koreanfortune.kr."});

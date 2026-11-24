@@ -45,3 +45,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "{name}님을 1년 이용권에 등록 · 남은 자리 {n}명", "subClaimNote": "1년 이용권은 본인 포함 {n}명까지 볼 수 있어요. 한 번 등록한 사람은 바꿀 수 없어요.", "subFull": "1년 이용권 {n}명 자리가 다 찼어요. 이 분은 따로 열 수 있어요.", "subBadge": "이용권", "subSeats": "1년 이용권 · {k}/{n}명 등록 · {d}까지", "rG": "앱(구글 플레이)에서 사셨다면 이메일 없이, 구글이 보낸 영수증 메일의 주문번호(GPA.로 시작)만 넣으세요."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["본인 포함 4명까지 함께 보기"]); })(window.KF_TXT["ko"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["ko"].ui, {"shop": "구매", "print": "출력·PDF", "share": "공유하기", "copied": "복사했어요. 카카오톡·부름누름·바로너·가림콜·단톡방 등 원하는 곳에 붙여 넣으세요.", "themeL": "화면 밝기", "themeN": ["자동", "낮", "밤"], "shareFrom": "한국전통운세에서 본 나의 운세", "printApp": "앱에서는 「공유하기」로 보내거나, 홈페이지(koreanfortune.kr)에서 출력·PDF 저장을 할 수 있어요."});

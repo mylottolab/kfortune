@@ -6,6 +6,7 @@ package com.weaveapp.kfortune;
      ready()                       화면 준비됨 → 가격 알려 주기 · 끝나지 않은 결제 다시 넘기기
      buy({sku, accountId})         결제창 (obfuscatedAccountId = 기기번호 → 서버가 주인 확인)
      consume({token})              서버가 확인한 뒤 "소비" → 같은 상품을 또 살 수 있음
+     share({text}) · print()       결과 공유(공유 창) · 출력/PDF (2026-11-25 추가)
    결과는 이벤트 "native" · "prices" 로 넘깁니다(화면이 듣기 전이면 붙잡아 두었다가 넘김).
    🔴 여기서 이용권을 주지 않습니다. 판단은 서버(/api/fortune/google/verify)가 구글에 직접 물어보고 합니다.
    상품(플레이 콘솔 → 한 번 사는 상품): kf_year · kf_saju · kf_toj
@@ -139,6 +140,34 @@ public class KFBilling extends Plugin implements PurchasesUpdatedListener {
             if (r.getResponseCode() != BillingClient.BillingResponseCode.OK) result("error", sku, null, null, false);
         });
         call.resolve();
+    }
+
+    /* 공유 — 안드로이드 공유 창(카카오톡 · 부름누름 · 바로너 · 가림콜 · 단톡방 등 설치된 앱) */
+    @PluginMethod public void share(PluginCall call) {
+        final String text = call.getString("text", "");
+        main.post(() -> {
+            try {
+                android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(android.content.Intent.EXTRA_TEXT, text);
+                android.content.Intent c = android.content.Intent.createChooser(i, null);
+                c.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                getActivity().startActivity(c);
+                call.resolve();
+            } catch (Exception e) { call.reject("share"); }
+        });
+    }
+
+    /* 출력 · PDF — 안드로이드 인쇄(「PDF로 저장」 선택 가능) */
+    @PluginMethod public void print(PluginCall call) {
+        main.post(() -> {
+            try {
+                android.print.PrintManager pm = (android.print.PrintManager) getActivity().getSystemService(android.content.Context.PRINT_SERVICE);
+                android.webkit.WebView wv = getBridge().getWebView();
+                pm.print("KFortune", wv.createPrintDocumentAdapter("KFortune"), new android.print.PrintAttributes.Builder().build());
+                call.resolve();
+            } catch (Exception e) { call.reject("print"); }
+        });
     }
 
     @PluginMethod public void consume(PluginCall call) {

@@ -47,3 +47,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "{name}さんを1年パスに登録 · 残り{n}人", "subClaimNote": "1年パスはご本人を含め{n}人まで見られます。一度登録した人は変更できません。", "subFull": "1年パスの{n}人分の枠が埋まりました。この方は個別に開けます。", "subBadge": "パス", "subSeats": "1年パス · {k}/{n}人登録 · {d}まで", "rG": "アプリ(Google Play)で購入した場合はメール不要です。Googleの領収書メールにある注文番号(GPA.で始まる)だけを入力してください。"}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["ご本人を含め4人まで一緒に"]); })(window.KF_TXT["ja"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["ja"].ui, {"shop": "購入", "print": "印刷・PDF", "share": "共有", "copied": "コピーしました。カカオトークやメッセンジャーなどに貼り付けてください。", "themeL": "表示", "themeN": ["自動", "昼", "夜"], "shareFrom": "KoreanFortuneで見た私の運勢", "printApp": "アプリでは「共有」をお使いください。印刷・PDF保存はホームページ（koreanfortune.kr）でできます。"});

@@ -22,6 +22,7 @@
   if (READY.indexOf(S.lang) < 0) S.lang = 'en';
   var PRO = /[?&]pro=1/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);   // 시험용(내 컴퓨터에서만)
   if (PRO) S.ent = { sub: '2099-12-31' };
+  S.theme = ls('kf_theme') || 'auto';
   function save() { ls('kf_lang', S.lang); ls('kf_profiles', S.profiles); ls('kf_active', S.active); }
   function pickLang() { var n = (navigator.language || 'ko').toLowerCase(); if (n.indexOf('ko') === 0) return 'ko'; if (n.indexOf('ja') === 0) return 'ja';
     if (n.indexOf('zh') === 0) return /tw|hk|hant|mo/.test(n) ? 'zh-Hant' : 'zh-Hans'; var two = n.slice(0, 2); if (['es', 'de', 'fr', 'id', 'th', 'vi', 'ar', 'ru'].indexOf(two) >= 0) return two; if (two === 'in') return 'id'; return 'en'; }
@@ -138,7 +139,27 @@
     return '<div class="tab"><nav aria-label="menu">' + t.map(function (x) { return '<a href="#' + x[0] + '" class="' + (on === x[0] ? 'on' : '') + '"><i>' + x[1] + '</i>' + esc(U(x[2])) + '</a>'; }).join('') + '</nav></div>';
   }
   function bar(title, sub, back) {
-    return '<div class="bar"><a class="back" href="#' + (back || 'home') + '" aria-label="back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><div><div class="t">' + esc(title) + '</div>' + (sub ? '<div class="s">' + sub + '</div>' : '') + '</div></div>';
+    return '<div class="bar"><a class="back" href="#' + (back || 'home') + '" aria-label="back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><div class="bt"><div class="t">' + esc(title) + '</div>' + (sub ? '<div class="s">' + sub + '</div>' : '') + '</div>' + acts(true) + '</div>';
+  }
+  /* 어느 화면에서든: 밤/낮 · 언어 · 구매 */
+  var GLOBE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>';
+  function themeIcon() {
+    var t = S.theme || 'auto', o = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">';
+    if (t === 'dark') return o + '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+    if (t === 'light') return o + '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+    return o + '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg>';
+  }
+  function acts(compact) {
+    var h = (location.hash || '').slice(1).split('?')[0];
+    return '<div class="acts"><button class="ib" data-theme-toggle="1" aria-label="' + esc(U('themeL')) + '" title="' + esc(U('themeL') + ' · ' + U('themeN')[['auto', 'light', 'dark'].indexOf(S.theme || 'auto')]) + '">' + themeIcon() + '</button>' +
+      (compact ? '<button class="ib" data-langsheet="1" aria-haspopup="dialog" aria-label="' + esc(U('langTitle')) + '">' + GLOBE + '</button>' : langPill()) +
+      (isSub() || h === 'pay' ? '' : '<a class="buy" href="#pay">' + esc(U('shop')) + '</a>') + '</div>';
+  }
+  function applyTheme() {
+    var t = S.theme || 'auto', r = document.documentElement;
+    if (t === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', t);
+    var dark = t === 'dark' || (t === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+    var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', dark ? '#14110E' : '#F4EEE3');
   }
   function dateLine(t) { return esc(U('dateFmt', { y: t.y, m: t.m, d: t.d, wd: U('wdFull')[t.wd] })); }
   function elOf(i, stem) { return EL[stem ? KF.STEM_EL[i] : KF.BR_EL[i]]; }
@@ -154,7 +175,7 @@
     var c = chartOf(p), t = todayYMD(), r = KF.daily(c, t.y, t.m, t.d), tx = dailyText(p, c, r), d = D();
     var ty = tojYear();
     var g5 = ['money', 'work', 'people', 'love', 'health'].map(function (k) { return '<div><small>' + esc(d.areaName[k]) + '</small><b>' + r.scores[k] + '</b></div>'; }).join('');
-    return '<div class="top"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + langPill() + '</div>' +
+    return '<div class="top"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + acts(false) + '</div>' +
       '<div class="wrap"><div style="padding-top:8px"><div class="small">' + dateLine(t) + ' · <span class="serif" style="color:var(--ink)">' + r.pillar.txt + '</span>' + esc(U('dayOf')) + '</div>' +
       '<h1>' + esc(U('hello', { name: p.name })) + '<br>' + esc(tx.head) + '</h1></div>' +
       '<section class="dark" style="display:flex;flex-direction:column;gap:14px"><div class="row" style="gap:16px">' + ring(r.scores.total) +
@@ -168,7 +189,7 @@
       '</section>' +
       '<a class="card row" href="#ask" style="gap:14px;color:var(--ink);border:2px solid var(--red)"><span class="serif" style="font-weight:900;font-size:30px;color:var(--red)">問</span><span style="flex:1"><b style="font-size:15px">' + esc(U('mAsk')) + '</b><br><span class="small">' + esc(U('mAskS')) + '</span></span><span style="color:var(--red);font-weight:700">›</span></a><p class="note">' + esc(d.note) + '</p></div>' + tab('home');
   }
-  function tile(h, han, b, s, col) { return '<a class="tile" href="' + h + '"><span class="h"' + (col === 1 ? ' style="color:var(--indigo)"' : col === 2 ? ' style="color:var(--mute)"' : '') + '>' + han + '</span><b>' + esc(b) + '</b><small>' + esc(s) + '</small></a>'; }
+  function tile(h, han, b, s, col) { return '<a class="tile" href="' + h + '"><span class="h"' + (col === 1 ? ' style="color:var(--indigoT)"' : col === 2 ? ' style="color:var(--mute)"' : '') + '>' + han + '</span><b>' + esc(b) + '</b><small>' + esc(s) + '</small></a>'; }
   function tojYear() { var t = todayYMD(); return t.m >= 11 ? t.y + 1 : t.y; }   // 11월부터 새해 것
 
   function vToday() {
@@ -185,8 +206,8 @@
       '<section><h2 style="margin-bottom:8px;font-size:16px">' + esc(U('timeTitle')) + '</h2><div class="three">' + slots + '</div></section>' +
       '<section class="card" style="display:flex;flex-direction:column;gap:12px"><h2 style="font-size:17px">' + esc(U('lucky')) + '</h2><div class="three" style="text-align:center">' +
       '<div style="align-items:center;border:0;background:none"><span style="width:40px;height:40px;border-radius:20px;background:' + colorHex + ';border:1px solid var(--line2)"></span><span class="mut">' + esc(U('color')) + '</span><b>' + esc(d.colorName[L.color]) + '</b></div>' +
-      '<div style="align-items:center;border:0;background:none"><span class="serif" style="font-weight:900;font-size:26px;color:var(--indigo);height:40px;display:flex;align-items:center">' + L.nums.join(' · ') + '</span><span class="mut">' + esc(U('number')) + '</span><b>' + esc(d.elName[L.el]) + '</b></div>' +
-      '<div style="align-items:center;border:0;background:none"><span class="serif" style="font-weight:900;font-size:26px;color:var(--indigo);height:40px;display:flex;align-items:center">' + { E: '東', S: '南', C: '中', W: '西', N: '北' }[L.dir] + '</span><span class="mut">' + esc(U('direction')) + '</span><b>' + esc(d.dirName[L.dir]) + '</b></div></div>' +
+      '<div style="align-items:center;border:0;background:none"><span class="serif" style="font-weight:900;font-size:26px;color:var(--indigoT);height:40px;display:flex;align-items:center">' + L.nums.join(' · ') + '</span><span class="mut">' + esc(U('number')) + '</span><b>' + esc(d.elName[L.el]) + '</b></div>' +
+      '<div style="align-items:center;border:0;background:none"><span class="serif" style="font-weight:900;font-size:26px;color:var(--indigoT);height:40px;display:flex;align-items:center">' + { E: '東', S: '南', C: '中', W: '西', N: '北' }[L.dir] + '</span><span class="mut">' + esc(U('direction')) + '</span><b>' + esc(d.dirName[L.dir]) + '</b></div></div>' +
       '<div style="font-size:14px;line-height:1.7"><b style="color:var(--wood)">' + esc(U('doIt')) + '</b> · ' + esc(tx.doo) + '<br><b style="color:var(--red)">' + esc(U('avoid')) + '</b> · ' + esc(tx.dont) + '</div>' +
       (IN_APP ? '' : '<a href="https://mylottolab.github.io/my-lotto-lab/main_page.html" target="_blank" rel="noopener" style="font-size:13px">' + esc(U('lotto')) + '</a>') + '</section>' +
       '<section class="card' + (locked ? ' lock' : '') + '"><h2 style="font-size:17px;margin-bottom:10px">' + esc(U('areasTitle')) + '</h2><div class="' + (locked ? 'blur' : '') + '" ' + (locked ? 'aria-hidden="true"' : '') + '>' + areas + '</div>' +
@@ -335,7 +356,7 @@
   function vPay() {
     var y = tojYear();
     return '<div class="bar" style="justify-content:space-between"><div class="t" style="padding-left:8px">' + esc(U('payTitle')) + '</div><a class="back" href="#home" aria-label="close"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></a></div>' +
-      '<div class="wrap" style="padding-top:8px"><section class="dark" style="display:flex;flex-direction:column;gap:12px;position:relative"><span style="position:absolute;top:-10px;right:16px;background:var(--gold);color:var(--ink);font-size:12px;font-weight:700;border-radius:12px;padding:4px 10px">' + esc(U('payBest')) + '</span>' +
+      '<div class="wrap" style="padding-top:8px"><section class="dark" style="display:flex;flex-direction:column;gap:12px;position:relative"><span style="position:absolute;top:-10px;right:16px;background:var(--gold);color:#221C16;font-size:12px;font-weight:700;border-radius:12px;padding:4px 10px">' + esc(U('payBest')) + '</span>' +
       '<div class="serif" style="font-weight:700;font-size:22px">' + esc(U('payYear')) + '</div><div><span class="serif" style="font-weight:900;font-size:28px" data-price="sub">—</span> <span class="mut" style="font-size:13px">' + esc(U('payPer')) + '</span></div>' +
       '<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px">' + U('payF').map(function (f) { return '<li style="display:flex;gap:8px"><span style="color:var(--gold)">◆</span>' + esc(f) + '</li>'; }).join('') + '</ul>' +
       '<button class="btn gold" data-buy="sub">' + esc(U('payStart')) + '</button></section>' +
@@ -359,7 +380,7 @@
   function vMe() {
     var list = S.profiles.map(function (p) { var c = chartOf(p);
       return '<div class="item' + (p.id === (prof() || {}).id ? ' hl' : '') + '"><div class="row" style="justify-content:space-between"><div><b>' + esc(p.name) + '</b><div class="small">' + c.solar.y + '.' + c.solar.m + '.' + c.solar.d + ' · ' + c.pillars.day.txt + '</div></div>' + miniChars(c) + '</div>' +
-        '<div class="row" style="margin-top:8px;gap:8px">' + (subOn(p) ? '<span class="chip" style="background:var(--gold);color:var(--ink)">' + esc(U('subBadge')) + '</span>' : '') + (p.id === (prof() || {}).id ? '<span class="chip">' + esc(U('current')) + '</span>' : '<button class="pill" data-use="' + p.id + '">' + esc(U('use')) + '</button>') + '<button class="pill" data-del="' + p.id + '">' + esc(U('del')) + '</button></div></div>'; }).join('');
+        '<div class="row" style="margin-top:8px;gap:8px">' + (subOn(p) ? '<span class="chip" style="background:var(--gold);color:#221C16">' + esc(U('subBadge')) + '</span>' : '') + (p.id === (prof() || {}).id ? '<span class="chip">' + esc(U('current')) + '</span>' : '<button class="pill" data-use="' + p.id + '">' + esc(U('use')) + '</button>') + '<button class="pill" data-del="' + p.id + '">' + esc(U('del')) + '</button></div></div>'; }).join('');
     return bar(U('meTitle')) + '<div class="wrap" style="padding-top:8px">' + (isSub() ? '<div class="item" style="font-size:13.5px;line-height:1.6">' + esc(U('subSeats', { k: people().length, n: peopleMax(), d: S.ent.sub })) + '</div>' : '') + '<section class="list">' + list + '</section><a class="btn ghost" href="#start">' + esc(U('add')) + '</a><button class="btn ghost" data-langsheet="1">🌐 ' + esc(U('langTitle')) + ' · ' + esc(U('lang')) + '</button></div>' + tab('me');
   }
 
@@ -424,16 +445,64 @@
     if (!S.profiles.length && h !== 'about') h = (h === 'start' || ls('kf_seen')) ? 'start' : 'welcome';
     var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, welcome: vWelcome, pay: vPay, paid: function () { return window.KF_PAY ? KF_PAY.vPaid(R.q) : vHome(); }, restore: function () { return window.KF_PAY ? KF_PAY.vRestore() : vPay(); }, about: vAbout, gung: vGung, ask: vAsk, me: vMe, start: vStart }[h] || vHome;
     document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
+    applyTheme();
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
     var f = document.getElementById('f'); if (f) f.addEventListener('submit', submitStart);
     if (window.KF_PAY && KF_PAY.after) KF_PAY.after(h);
+    // 결과 화면: 출력·PDF · 공유
+    var RES = { today: 1, week: 1, saju: 1, year: 1, tojeong: 1, 'tojeong-last': 1, gung: !!G.other, ask: Q.shown };
+    var w = RES[h] && app.querySelector('.wrap');
+    if (w) { var d = document.createElement('div'); d.className = 'two noprint'; d.innerHTML = '<button class="btn ghost" data-print="1">🖨 ' + esc(U('print')) + '</button><button class="btn ghost" data-share="1">↗ ' + esc(U('share')) + '</button>'; w.appendChild(d); }
+  }
+  /* 출력 · PDF — 웹은 인쇄 창(→ PDF로 저장), 앱은 기기의 인쇄 기능 */
+  function doPrint() {
+    var N = window.KFNative;
+    if (N && N.print) { N.print(); return; }
+    var C = window.Capacitor;
+    if (C && C.isNativePlatform && C.isNativePlatform()) {
+      var P = C.registerPlugin ? C.registerPlugin('KFBilling') : null;
+      if (P && P.print) { P.print().catch(function () { toastA(U('printApp')); }); return; }
+      toastA(U('printApp')); return;
+    }
+    window.print();
+  }
+  /* 공유 — 휴대폰의 공유 창(카카오톡 · 부름누름 · 바로너 · 가림콜 · 단톡방 …), 안 되면 복사 */
+  function shareText() {
+    var bt = app.querySelector('.bar .t'), lead = app.querySelector('.lead') || app.querySelector('.story p') || app.querySelector('.ink .serif');
+    var txt = (lead ? lead.textContent.trim() : '').replace(/\s+/g, ' ');
+    if (txt.length > 160) txt = txt.slice(0, 158) + '…';
+    return '[' + U('shareFrom') + '] ' + (bt ? bt.textContent.trim() : '') + (txt ? '\n' + txt : '') + '\nhttps://koreanfortune.kr';
+  }
+  function doShare() {
+    var text = shareText(), N = window.KFNative, C = window.Capacitor;
+    if (N && N.share) { N.share(text); return; }
+    if (C && C.isNativePlatform && C.isNativePlatform() && C.registerPlugin) {
+      var P = C.registerPlugin('KFBilling');
+      P.share({ text: text }).catch(function () { copyText(text); }); return;
+    }
+    if (navigator.share) { navigator.share({ title: 'KoreanFortune', text: text }).catch(function () {}); return; }
+    copyText(text);
+  }
+  function copyText(text) {
+    var ok = function () { toastA(U('copied')); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, function () { fallbackCopy(text); ok(); });
+    else { fallbackCopy(text); ok(); }
+  }
+  function fallbackCopy(text) { var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
+  function toastA(msg) {
+    var el = document.getElementById('kftoast');
+    if (!el) { el = document.createElement('div'); el.id = 'kftoast'; el.setAttribute('role', 'status'); el.style.cssText = 'position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:420px;width:calc(100% - 32px);background:#221C16;color:#F4EEE3;border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.6;z-index:30;box-shadow:0 6px 24px rgba(0,0,0,.25)'; document.body.appendChild(el); }
+    el.textContent = msg; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(function () { el.hidden = true; }, 4200);
   }
   window.KF_APP = { U: U, esc: esc, bkey: bkey, render: render, lang: function () { return S.lang; }, prof: prof,
     setEnt: function (e) { if (PRO) return; e = e || {}; if (JSON.stringify(e) === JSON.stringify(S.ent)) return; S.ent = e; ls('kf_ent', S.ent); var h = (location.hash || '').slice(1).split('?')[0]; if (h !== 'start' && h !== 'restore') render(); } };
   app.addEventListener('click', function (e) {
     var sn = e.target.closest('[data-seen]'); if (sn) ls('kf_seen', 1);
     if (e.target.closest('[data-langsheet]')) { langSheet(); return; }
+    if (e.target.closest('[data-theme-toggle]')) { var o = ['auto', 'light', 'dark']; S.theme = o[(o.indexOf(S.theme || 'auto') + 1) % 3]; ls('kf_theme', S.theme); render(); return; }
+    if (e.target.closest('[data-print]')) { doPrint(); return; }
+    if (e.target.closest('[data-share]')) { doShare(); return; }
     var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
     if (t.dataset.gt) { G.type = t.dataset.gt; return render(); }
     if (t.dataset.go) { G.other = t.dataset.go; return render(); }

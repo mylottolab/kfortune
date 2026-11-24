@@ -137,6 +137,21 @@
   function fillPrices() { document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = fmt(el.dataset.price); }); }
   function loadPrices() { return api('/products').then(function (d) { PRICES = d; ls('kf_prices', d); fillPrices(); }).catch(function () {}); }
 
+  // 한국 밖(한국어가 아닌 화면): 달러로 PayPal 결제를 먼저 — 카드(이니시스)는 한국 카드용
+  var PP_NOTE = {
+    en: 'Outside Korea, please pay with PayPal (USD). You can use a PayPal account or most credit cards through PayPal. The KG Inicis option below is for Korean-issued cards.',
+    ja: '韓国国外からは PayPal（米ドル）でお支払いください。PayPal アカウントのほか、PayPal 経由でクレジットカードも使えます。下の KG イニシスは韓国発行カード用です。',
+    'zh-Hans': '在韩国以外，请使用 PayPal（美元）付款。可用 PayPal 账户，或通过 PayPal 使用大多数信用卡。下方 KG Inicis 仅适用于韩国发行的卡。',
+    'zh-Hant': '在韓國以外，請使用 PayPal（美元）付款。可用 PayPal 帳戶，或透過 PayPal 使用大多數信用卡。下方 KG Inicis 僅適用於韓國發行的卡。',
+    es: 'Fuera de Corea, paga con PayPal (USD). Puedes usar una cuenta PayPal o la mayoría de tarjetas a través de PayPal. La opción KG Inicis de abajo es para tarjetas emitidas en Corea.',
+    de: 'Außerhalb Koreas bitte mit PayPal (USD) bezahlen – per PayPal-Konto oder mit den meisten Kreditkarten über PayPal. Die Option KG Inicis unten ist für in Korea ausgestellte Karten.',
+    fr: 'Hors de Corée, payez avec PayPal (USD) — compte PayPal ou la plupart des cartes via PayPal. L’option KG Inicis ci-dessous est réservée aux cartes émises en Corée.',
+    id: 'Di luar Korea, silakan bayar dengan PayPal (USD) — akun PayPal atau sebagian besar kartu kredit lewat PayPal. Opsi KG Inicis di bawah untuk kartu terbitan Korea.',
+    th: 'นอกประเทศเกาหลี กรุณาชำระด้วย PayPal (ดอลลาร์สหรัฐ) ใช้บัญชี PayPal หรือบัตรเครดิตส่วนใหญ่ผ่าน PayPal ได้ ตัวเลือก KG Inicis ด้านล่างสำหรับบัตรที่ออกในเกาหลี',
+    vi: 'Ngoài Hàn Quốc, vui lòng thanh toán bằng PayPal (USD) — tài khoản PayPal hoặc hầu hết thẻ tín dụng qua PayPal. Lựa chọn KG Inicis bên dưới dành cho thẻ phát hành tại Hàn Quốc.',
+    ar: 'خارج كوريا يُرجى الدفع عبر PayPal (بالدولار) — بحساب PayPal أو بمعظم البطاقات عبر PayPal. خيار KG Inicis أدناه مخصص للبطاقات الصادرة في كوريا.',
+    ru: 'За пределами Кореи оплачивайте через PayPal (USD) — аккаунтом PayPal или большинством карт через PayPal. Вариант KG Inicis ниже — для карт, выпущенных в Корее.'
+  };
   // ── 결제 시트 ──
   var sheet = null;
   function closeSheet() { if (sheet) { sheet.remove(); sheet = null; } }
@@ -144,6 +159,7 @@
     if (NATIVE) return nativeBuy(kind, p, year);
     if (!p && kind !== 'sub') { location.hash = '#start'; return; }
     closeSheet();
+    var KR = A.lang() === 'ko';
     var U = A.U, label = kind === 'sub' ? U('payYear') : kind === 'saju' ? U('paySaju') : U('payToj', { y: year });
     var who = kind === 'sub' ? '' : '<div class="small">' + esc(t('forWho', { name: p.name })) + '</div>';
     sheet = document.createElement('div'); sheet.className = 'sheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
@@ -151,8 +167,11 @@
       '<div class="row" style="justify-content:space-between"><b class="serif" style="font-size:18px">' + esc(label) + '</b><b class="serif" style="font-size:18px">' + esc(fmt(kind)) + '</b></div>' + who +
       '<label for="pe" style="font-size:13px;font-weight:700">' + esc(t('email')) + '</label><input class="in" id="pe" type="email" autocomplete="email" inputmode="email" value="' + esc(ls('kf_email') || '') + '">' +
       '<div class="small" id="pm" hidden style="color:var(--red)"></div>' +
-      '<button class="btn" id="pcard">' + esc(t('card')) + ' · ' + (PRICES ? '₩' + PRICES[kind].krw.toLocaleString('ko-KR') : '') + '</button>' +
-      '<div class="small" style="text-align:center">' + esc(t('or')) + ' · ' + esc(t('paypal')) + (PRICES ? ' $' + PRICES[kind].usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>' +
+      (KR ? '<button class="btn" id="pcard">' + esc(t('card')) + ' · ' + (PRICES ? '₩' + PRICES[kind].krw.toLocaleString('ko-KR') : '') + '</button>' +
+        '<div class="small" style="text-align:center">' + esc(t('or')) + ' · ' + esc(t('paypal')) + (PRICES ? ' $' + PRICES[kind].usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>'
+      : '<div class="item" style="font-size:13px;line-height:1.6;border-color:var(--gold)">🌏 ' + esc(PP_NOTE[A.lang()] || PP_NOTE.en) + '</div>' +
+        '<div class="small" style="text-align:center;font-weight:700">' + esc(t('paypal')) + (PRICES ? ' · $' + PRICES[kind].usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>' +
+        '<div class="small" style="text-align:center">' + esc(t('or')) + '</div><button class="btn ghost" id="pcard">' + esc(t('card')) + ' · ' + (PRICES ? '₩' + PRICES[kind].krw.toLocaleString('ko-KR') : '') + '</button>') +
       '<div class="small" style="line-height:1.6">' + esc(t('refund')) + ' <a href="terms.html" target="_blank" rel="noopener">' + esc(A.U('terms')) + '</a></div>' +
       '<button class="btn ghost" id="pclose">' + esc(t('close')) + '</button></div>';
     document.body.appendChild(sheet);

@@ -47,3 +47,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "{name} zum Jahrespass hinzufügen · noch {n} frei", "subClaimNote": "Der Jahrespass gilt für bis zu {n} Personen, dich eingeschlossen. Einmal hinzugefügt, kann eine Person nicht getauscht werden.", "subFull": "Alle {n} Plätze deines Jahrespasses sind belegt. Diese Person kannst du einzeln freischalten.", "subBadge": "Pass", "subSeats": "Jahrespass · {k}/{n} Personen · bis {d}", "rG": "In der App (Google Play) gekauft? Keine E-Mail nötig – gib nur die Bestellnummer aus Googles Beleg-E-Mail ein (beginnt mit GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Bis zu 4 Personen, du eingeschlossen"]); })(window.KF_TXT["de"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["de"].ui, {"shop": "Kaufen", "print": "Drucken · PDF", "share": "Teilen", "copied": "Kopiert. Füge es in WhatsApp, KakaoTalk oder einen anderen Chat ein.", "themeL": "Anzeige", "themeN": ["Auto", "Tag", "Nacht"], "shareFrom": "Meine Deutung von KoreanFortune", "printApp": "In der App „Teilen“ nutzen – drucken oder als PDF speichern geht auf koreanfortune.kr."});

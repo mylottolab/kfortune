@@ -47,3 +47,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "將{name}加入1年通行證 · 剩餘{n}位", "subClaimNote": "1年通行證含本人最多可看{n}人。一旦加入不可更換。", "subFull": "1年通行證的{n}個名額已滿。此人可單獨解鎖。", "subBadge": "通行證", "subSeats": "1年通行證 · 已登記{k}/{n}人 · 至{d}", "rG": "若在App內(Google Play)購買：不需電子郵件，只要輸入Google收據郵件中的訂單編號(以GPA.開頭)。"}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["含本人最多4人一起看"]); })(window.KF_TXT["zh-Hant"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["zh-Hant"].ui, {"shop": "購買", "print": "列印·PDF", "share": "分享", "copied": "已複製。請貼到 LINE、KakaoTalk 等任何聊天中。", "themeL": "顯示", "themeN": ["自動", "日間", "夜間"], "shareFrom": "我在 KoreanFortune 看到的運勢", "printApp": "在 App 內請用「分享」；列印或存成 PDF 可在網站 koreanfortune.kr 進行。"});

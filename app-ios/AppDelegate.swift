@@ -46,6 +46,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
    ===================================================================== */
 final class KFBridge: NSObject, WKScriptMessageHandler {
     static let shared = KFBridge()
+
+    func topController() -> UIViewController? {
+        var c = currentWebView()?.window?.rootViewController
+        while let p = c?.presentedViewController { c = p }
+        return c
+    }
+    /* 공유 — 아이폰 공유 창(카카오톡 · 메시지 · 부름누름 등 설치된 앱) */
+    func share(_ text: String) {
+        guard let top = topController(), !text.isEmpty else { return }
+        let vc = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        if let pop = vc.popoverPresentationController { pop.sourceView = top.view; pop.sourceRect = CGRect(x: top.view.bounds.midX, y: top.view.bounds.maxY - 80, width: 1, height: 1) }
+        top.present(vc, animated: true)
+    }
+    /* 출력 · PDF — 아이폰 인쇄 창(오른쪽 위 공유 단추로 PDF 저장도 됩니다) */
+    func printPage() {
+        guard let wv = currentWebView() else { return }
+        let info = UIPrintInfo(dictionary: nil)
+        info.outputType = .general
+        info.jobName = "KFortune"
+        let pc = UIPrintInteractionController.shared
+        pc.printInfo = info
+        pc.printFormatter = wv.viewPrintFormatter()
+        pc.present(animated: true, completionHandler: nil)
+    }
     private weak var attachedWeb: WKWebView?
     private var xWatch: NSKeyValueObservation?
 
@@ -67,7 +91,9 @@ final class KFBridge: NSObject, WKScriptMessageHandler {
         platform: 'ios',
         ready: function(){ post({ act: 'ready' }); },
         buy: function(sku, account){ post({ act: 'buy', sku: String(sku || ''), account: String(account || '') }); },
-        consume: function(token){ post({ act: 'finish', token: String(token || '') }); }
+        consume: function(token){ post({ act: 'finish', token: String(token || '') }); },
+        share: function(text){ post({ act: 'share', text: String(text || '') }); },
+        print: function(){ post({ act: 'print' }); }
       };
       /* 우리 사이트 주소를 새 창으로 열면 사파리로 튀어 나가지 않게 같은 화면에서 엽니다 */
       var OWN = /^(https?:)?\/\/((www\.)?koreanfortune\.kr)(\/|$)/i;
@@ -111,6 +137,8 @@ final class KFBridge: NSObject, WKScriptMessageHandler {
         case "ready": KFStore.shared.ready()
         case "buy": KFStore.shared.buy(sku: (m["sku"] as? String) ?? "", account: (m["account"] as? String) ?? "")
         case "finish": KFStore.shared.finish(token: (m["token"] as? String) ?? "")
+        case "share": DispatchQueue.main.async { self.share((m["text"] as? String) ?? "") }
+        case "print": DispatchQueue.main.async { self.printPage() }
         default: break
         }
     }

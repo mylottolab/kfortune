@@ -47,3 +47,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "Ajouter {name} au pass 1 an · {n} place(s) restante(s)", "subClaimNote": "Le pass 1 an couvre jusqu’à {n} personnes, vous compris. Une personne ajoutée ne peut pas être remplacée.", "subFull": "Les {n} places de votre pass 1 an sont prises. Vous pouvez débloquer cette personne séparément.", "subBadge": "Pass", "subSeats": "Pass 1 an · {k}/{n} personnes · jusqu’au {d}", "rG": "Acheté dans l’app (Google Play) ? Pas besoin d’e-mail : saisissez seulement le numéro de commande du reçu Google (commence par GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Jusqu’à 4 personnes, vous compris"]); })(window.KF_TXT["fr"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["fr"].ui, {"shop": "Acheter", "print": "Imprimer · PDF", "share": "Partager", "copied": "Copié. Collez-le dans WhatsApp, KakaoTalk ou la messagerie de votre choix.", "themeL": "Affichage", "themeN": ["Auto", "Jour", "Nuit"], "shareFrom": "Ma lecture sur KoreanFortune", "printApp": "Dans l’app, utilisez Partager — ou imprimez / enregistrez en PDF sur koreanfortune.kr."});

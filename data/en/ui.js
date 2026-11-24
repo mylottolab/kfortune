@@ -47,3 +47,6 @@
 
 /* 1년 이용권 · 본인 포함 4명 */
 (function (u) { Object.assign(u, {"subClaim": "Add {name} to your 1-year pass · {n} left", "subClaimNote": "The 1-year pass covers up to {n} people, including you. Once added, a person can’t be swapped.", "subFull": "All {n} places on your 1-year pass are taken. You can unlock this person separately.", "subBadge": "Pass", "subSeats": "1-year pass · {k}/{n} people · until {d}", "rG": "Bought in the app (Google Play)? No email needed — just enter the order number from Google’s receipt email (starts with GPA.)."}); if (u.payF) u.payF = u.payF.slice(0, 3).concat(["Up to 4 people, including you"]); })(window.KF_TXT["en"].ui);
+
+/* 출력 · 공유 · 구매 · 밤 모드 */
+Object.assign(window.KF_TXT["en"].ui, {"shop": "Buy", "print": "Print · PDF", "share": "Share", "copied": "Copied. Paste it into KakaoTalk, a messenger or any chat you like.", "themeL": "Display", "themeN": ["Auto", "Day", "Night"], "shareFrom": "My reading from KoreanFortune", "printApp": "In the app, use Share — or print / save as PDF on koreanfortune.kr."});
