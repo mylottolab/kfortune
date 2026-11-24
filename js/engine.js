@@ -258,10 +258,87 @@
       monthPillar: mp, dayPillar: dp, monthDays: mdays };
   }
 
+
+  /* ── 월주 (양력 날짜의 정오 기준) ── */
+  function monthPillarAt(y, m, d, tz) {
+    tz = tz == null ? 540 : tz;
+    var utc = Date.UTC(y, m - 1, d, 12) - tz * 60000, best = null;
+    [y - 1, y, y + 1].forEach(function (yy) { jieOf(yy).forEach(function (t, k) { if (t <= utc && (!best || t > best.t)) best = { t: t, k: k }; }); });
+    var Y = y; if (utc < jieOf(y)[1]) Y -= 1;
+    var yp = pillar(Y - 4), mIdx = mod(best.k - 1, 12);
+    return pillar(sb2idx(mod((yp.s % 5) * 2 + 2 + mIdx, 10), mod(mIdx + 2, 12)));
+  }
+  // 앞으로 n달(이번 달 포함) 월운 — 매달 15일 기준
+  function months(c, n, from) {
+    var t = from || new Date(), y = t.getFullYear(), m = t.getMonth() + 1, out = [];
+    for (var i = 0; i < n; i++) { var mm = mod(m - 1 + i, 12) + 1, yy = y + Math.floor((m - 1 + i) / 12);
+      var p = monthPillarAt(yy, mm, 15); var r = areaScores(c, p, 'm' + yy + mm + c.pillars.day.txt); r.y = yy; r.m = mm; out.push(r); }
+    return out;
+  }
+
+  /* ── 궁합 ── */
+  var STEM_HAP = { 0: 5, 5: 0, 1: 6, 6: 1, 2: 7, 7: 2, 3: 8, 8: 3, 4: 9, 9: 4 };
+  var SAMHAP = [[8, 0, 4], [11, 3, 7], [2, 6, 10], [5, 9, 1]];
+  function samhap(a, b) { if (a === b) return false; return SAMHAP.some(function (g) { return g.indexOf(a) >= 0 && g.indexOf(b) >= 0; }); }
+  function branchRel(a, b) { return LIUHE[a] === b ? 'hap' : samhap(a, b) ? 'samhap' : mod(a - b, 12) === 6 ? 'chung' : 'plain'; }
+  function gunghap(A, B) {
+    var ea = A.dayMasterEl, eb = B.dayMasterEl, rel = mod(eb - ea, 5);   // 0같음 1내가생 2내가극 3나를극 4나를생
+    var stemHap = STEM_HAP[A.dayMaster] === B.dayMaster;
+    var dayRel = branchRel(A.pillars.day.b, B.pillars.day.b), yearRel = branchRel(A.pillars.year.b, B.pillars.year.b);
+    var bonus = { hap: 8, samhap: 5, chung: -9, plain: 0 };
+    var heart = 70 + (stemHap ? 14 : 0) + [3, 6, -3, -3, 6][rel] + bonus[dayRel];
+    // 서로 없는 오행을 채워 주는가
+    var comp = 0, both = 0;
+    for (var e = 0; e < 5; e++) { if (A.elements[e] === 0 && B.elements[e] > 0) comp++; if (B.elements[e] === 0 && A.elements[e] > 0) comp++; if (!A.elements[e] && !B.elements[e]) both++; }
+    var life = 70 + comp * 6 - both * 5 + { hap: 5, samhap: 4, chung: -7, plain: 0 }[yearRel];
+    var give = function (X, Y) { var s = 0, n = 0; for (var e = 0; e < 5; e++) { s += X.fav[e] * Y.elements[e]; n += Y.elements[e]; } return n ? s / n : 0; };
+    var gAB = give(A, B), gBA = give(B, A);
+    var money = 72 + Math.round((gAB + gBA) * 9);
+    var future = 72 + Math.round(Math.min(gAB, gBA) * 10) + (stemHap ? 5 : 0) + (dayRel === 'chung' ? -5 : 0);
+    var sc = { heart: heart, life: life, money: money, future: future };
+    Object.keys(sc).forEach(function (k) { sc[k] = clamp(Math.round(72 + (sc[k] - 72) * 1.4 + (hash(A.pillars.day.txt + B.pillars.day.txt + k) % 7) - 3), 45, 97); });
+    sc.total = clamp(Math.round((sc.heart + sc.life + sc.money + sc.future) / 4 + (stemHap ? 2 : 0)), 45, 97);
+    return { scores: sc, rel: rel, stemHap: stemHap, dayRel: dayRel, yearRel: yearRel, comp: comp, both: both, giveAB: gAB, giveBA: gBA,
+      tenAB: tenGod(A.dayMaster, B.dayMaster), tenBA: tenGod(B.dayMaster, A.dayMaster) };
+  }
+
+  /* ── 물어보세요 — 단답형 질문 ──
+     kind: sell · invest · lend · contact · exam · promote · health · move
+     반환: verdict 0 ○좋음 1 △반반 2 ✕기다림, score, best(앞으로 6달 중 가장 좋은 달), why(근거 키) */
+  function ask(kind, c, opt) {
+    opt = opt || {};
+    var ms = months(c, 6), now = ms[0], pick, score, why = [];
+    var by = function (f) { return ms.reduce(function (a, r) { return f(r) > f(a) ? r : a; }, ms[0]); };
+    var move = function (r) { var y = c.pillars.year.b, d = c.pillars.day.b; return mod(r.pillar.b - d, 12) === 6 || mod(r.pillar.b - y, 12) === 6; };
+    var rel = function (r) { return rel5(c, KF_STEM_EL(r.pillar.s)); };
+    if (kind === 'sell') { pick = function (r) { return r.scores.money + (move(r) ? 6 : 0) + (rel(r) === 2 ? 4 : 0); }; }
+    else if (kind === 'invest') { pick = function (r) { return r.scores.money + (c.strong ? 4 : -4) + (r.tenS === 1 ? -8 : 0); }; }
+    else if (kind === 'lend') { pick = function (r) { return r.scores.money - (r.tenS === 1 || r.tenB === 1 ? 14 : 0) - (r.tenS === 0 ? 6 : 0); }; }
+    else if (kind === 'contact') { var w = weekly(c, opt.y || new Date().getFullYear(), opt.m || new Date().getMonth() + 1, opt.d || new Date().getDate());
+      var bd = w.reduce(function (a, r) { return r.scores.love + r.scores.people > a.scores.love + a.scores.people ? r : a; }, w[0]);
+      var td = daily(c, opt.y || new Date().getFullYear(), opt.m || new Date().getMonth() + 1, opt.d || new Date().getDate());
+      score = Math.round((td.scores.love + td.scores.people) / 2); return finish(kind, score, { day: bd.date, dayScore: Math.round((bd.scores.love + bd.scores.people) / 2) }, [td.tenS, td.chung ? 'chung' : td.hap ? 'hap' : 'plain'], td); }
+    else if (kind === 'exam') { var dd = opt.date ? daily(c, opt.date.y, opt.date.m, opt.date.d) : null;
+      pick = function (r) { return r.scores.work + ([7, 9].indexOf(r.tenS) >= 0 ? 5 : 0) + ([3].indexOf(r.tenS) >= 0 ? -4 : 0); };
+      if (dd) { score = Math.round(dd.scores.work * 0.6 + dd.scores.total * 0.4 + ([6, 7, 8, 9].indexOf(dd.tenS) >= 0 ? 4 : 0) - (dd.chung ? 5 : 0)); var b0 = by(pick);
+        return finish(kind, clamp(score, 45, 97), { y: b0.y, m: b0.m, s: Math.round(pick(b0)) }, [dd.tenS, dd.chung ? 'chung' : dd.hap ? 'hap' : 'plain'], dd); } }
+    else if (kind === 'promote') { pick = function (r) { return r.scores.work + ([6, 7].indexOf(r.tenS) >= 0 ? 6 : 0) + ([3].indexOf(r.tenS) >= 0 ? -5 : 0); }; }
+    else if (kind === 'health') { pick = function (r) { return r.scores.health; };
+      var low = ms.reduce(function (a, r) { return r.scores.health < a.scores.health ? r : a; }, ms[0]);
+      var weak = c.missing.length ? c.missing[0] : c.elements.indexOf(Math.min.apply(null, c.elements));
+      score = Math.round(ms.reduce(function (a, r) { return a + r.scores.health; }, 0) / ms.length);
+      return finish(kind, score, { y: low.y, m: low.m, s: low.scores.health, care: true }, [weak, c.elements.indexOf(Math.max.apply(null, c.elements))], now); }
+    else if (kind === 'move') { pick = function (r) { return r.scores.total + (move(r) ? 7 : 0) + ([4, 1].indexOf(r.tenS) >= 0 ? 3 : 0); }; }
+    else throw new Error('모르는 질문 ' + kind);
+    var b = by(pick); score = Math.round(pick(now));
+    return finish(kind, clamp(score, 45, 97), { y: b.y, m: b.m, s: clamp(Math.round(pick(b)), 45, 97) }, [now.tenS, move(now) ? 'move' : now.hap ? 'hap' : 'plain'], now);
+  }
+  function KF_STEM_EL(s) { return STEM_EL[s]; }
+  function finish(kind, score, best, why, r) { return { kind: kind, score: score, verdict: score >= 80 ? 0 : score >= 67 ? 1 : 2, best: best, why: why, r: r }; }
   var KF = { STEMS: STEMS, STEMS_KO: STEMS_KO, BRANCHES: BRANCHES, BRANCHES_KO: BRANCHES_KO, ELEM: ELEM, STEM_EL: STEM_EL, BR_EL: BR_EL,
     TEN: TEN, TEN_KEY: TEN_KEY, STAGE12: STAGE12, HIDDEN: HIDDEN,
     pillar: pillar, dayPillar: dayPillar, chart: chart, tenGod: tenGod, stage12: stage12, daily: daily, weekly: weekly, yearly: yearly,
     areaScores: areaScores, periodScore: periodScore, tojeong: tojeong, lunarToSolar: lunarToSolar, solarToLunar: solarToLunar, lunarMonthDays: lunarMonthDays,
-    hash: hash, inKrDst: inKrDst, jieOf: jieOf };
+    hash: hash, inKrDst: inKrDst, jieOf: jieOf, monthPillarAt: monthPillarAt, months: months, gunghap: gunghap, ask: ask, branchRel: branchRel };
   if (typeof module !== 'undefined' && module.exports) module.exports = KF; else root.KF = KF;
 })(typeof window !== 'undefined' ? window : globalThis);

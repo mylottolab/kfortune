@@ -141,8 +141,9 @@
       '<section class="tiles">' +
       tile('#saju', '四柱', U('mSaju'), U('mSajuS')) + tile('#tojeong', '土亭', U('mToj', { y: ty }), U('mTojS', { gz: KF.pillar(ty - 4).ko })) +
       tile('#week', '七日', U('mWeek'), '', 1) + tile('#year', '歲運', U('mYear'), U('mYearS'), 1) +
-      '<div class="tile off"><span class="h">宮合</span><b>' + esc(U('mGung')) + '</b><small>' + esc(U('mGungS')) + '</small></div>' + tile('#about', '問', U('mAbout'), U('mAboutS'), 2) +
-      '</section><p class="note">' + esc(d.note) + '</p></div>' + tab('home');
+      tile('#gung', '宮合', U('mGung'), U('mGungS2')) + tile('#about', '文', U('mAbout'), U('mAboutS'), 2) +
+      '</section>' +
+      '<a class="card row" href="#ask" style="gap:14px;color:var(--ink);border:2px solid var(--red)"><span class="serif" style="font-weight:900;font-size:30px;color:var(--red)">問</span><span style="flex:1"><b style="font-size:15px">' + esc(U('mAsk')) + '</b><br><span class="small">' + esc(U('mAskS')) + '</span></span><span style="color:var(--red);font-weight:700">›</span></a><p class="note">' + esc(d.note) + '</p></div>' + tab('home');
   }
   function tile(h, han, b, s, col) { return '<a class="tile" href="' + h + '"><span class="h"' + (col === 1 ? ' style="color:var(--indigo)"' : col === 2 ? ' style="color:var(--mute)"' : '') + '>' + han + '</span><b>' + esc(b) + '</b><small>' + esc(s) + '</small></a>'; }
   function tojYear() { var t = todayYMD(); return t.m >= 11 ? t.y + 1 : t.y; }   // 11월부터 새해 것
@@ -244,6 +245,70 @@
     return out;
   }
 
+
+  /* ── 궁합 ── */
+  var G = { type: 'love', other: null };
+  function G_() { return TX().gung || window.KF_TXT.ko.gung; }
+  function vGung() {
+    var p = prof(), g = G_(), others = S.profiles.filter(function (x) { return x.id !== p.id; });
+    if (!G.other || !others.some(function (x) { return x.id === G.other; })) G.other = others.length ? others[others.length - 1].id : null;
+    var types = '<div class="seg" role="group" style="flex-wrap:wrap">' + g.types.map(function (t) { return '<button type="button" data-gt="' + t[0] + '" class="' + (G.type === t[0] ? 'on' : '') + '">' + esc(t[1]) + '</button>'; }).join('') + '</div>';
+    var pickO = others.length ? '<div class="two">' + others.map(function (x) { return '<button class="choice' + (G.other === x.id ? ' on' : '') + '" data-go="' + x.id + '">' + esc(x.name) + '</button>'; }).join('') + '</div>' : '';
+    var head = bar(g.title, esc(p.name)) + '<div class="wrap" style="padding-top:8px"><section class="card" style="display:flex;flex-direction:column;gap:10px"><b>' + esc(g.pick) + '</b>' + types + pickO + '<a class="btn ghost" href="#start?gung">' + esc(g.addOther) + '</a></section>';
+    if (!G.other) return head + '</div>' + tab('home');
+    var o = S.profiles.filter(function (x) { return x.id === G.other; })[0], A = chartOf(p), B = chartOf(o), r = KF.gunghap(A, B), d = D();
+    var sc = r.scores, keys = ['heart', 'life', 'money', 'future'];
+    var hbars = keys.map(function (k) { return '<div class="row" style="gap:10px;font-size:13.5px"><span style="min-width:40px">' + esc(g.area[k]) + '</span><span style="flex:1;height:12px;background:var(--soft);border-radius:6px;overflow:hidden"><span style="display:block;height:100%;width:' + sc[k] + '%;background:' + (sc[k] >= 80 ? 'var(--red)' : 'var(--indigo)') + '"></span></span><b style="min-width:26px;text-align:right">' + sc[k] + '</b></div>'; }).join('');
+    var ea = A.dayMasterEl, eb = B.dayMasterEl, gen = '';
+    if (r.rel === 1) gen = g.gen[eb]; else if (r.rel === 4) gen = g.gen[ea]; else if (r.rel === 2) gen = g.ctl[eb]; else if (r.rel === 3) gen = g.ctl[ea];
+    var nm = { a: esc(p.name), b: esc(o.name), ia: d.me[A.dayMaster].img, ib: d.me[B.dayMaster].img, gen: gen };
+    var paras = [fill(g.rel[r.rel], nm)];
+    if (r.stemHap) paras.push(g.stemHap);
+    paras.push(g.dayRel[r.dayRel] + (g.yearRel[r.yearRel] ? ' ' + g.yearRel[r.yearRel] : ''));
+    for (var e = 0; e < 5; e++) { if (!A.elements[e] && B.elements[e]) { paras.push(fill(g.comp[0], { a: esc(p.name), b: esc(o.name), e: d.elName[e] })); break; } }
+    for (var e2 = 0; e2 < 5; e2++) { if (!A.elements[e2] && !B.elements[e2]) { paras.push(fill(g.comp[1], { e: d.elName[e2], eh: g.eHint[e2] })); break; } }
+    paras.push(g.money[band(sc.money)]); paras.push(g.end[G.type][band(sc.total)]);
+    var locked = !isSub();
+    return head + '<section class="card" style="display:flex;flex-direction:column;gap:12px;align-items:stretch"><div class="row" style="justify-content:space-around;text-align:center">' +
+      '<div><b>' + esc(p.name) + '</b><div style="margin-top:6px">' + miniChars(A) + '</div></div><div class="serif" style="font-weight:900;font-size:44px;color:var(--red)">' + sc.total + '</div><div><b>' + esc(o.name) + '</b><div style="margin-top:6px">' + miniChars(B) + '</div></div></div>' + hbars + '</section>' +
+      '<article class="story' + (locked ? ' lock' : '') + '"><p>' + paras[0] + '</p>' + (locked ? '<div class="blur" aria-hidden="true">' + paras.slice(1, 3).map(function (x) { return '<p>' + x + '</p>'; }).join('') + '</div><div class="over">' + esc(U('gungLock')) + '<a class="btn" href="#pay">' + esc(U('subscribeAll')) + '</a></div><div style="height:40px"></div>'
+        : paras.slice(1).map(function (x) { return '<p>' + x + '</p>'; }).join('')) + '</article><p class="note">' + esc(g.note) + '</p></div>' + tab('home');
+  }
+
+  /* ── 물어보세요 ── */
+  var Q = { kind: null, who: null, date: '', shown: false };
+  function A_() { return TX().ask || window.KF_TXT.ko.ask; }
+  function vAsk() {
+    var a = A_(), p = prof();
+    if (!Q.kind) {
+      return bar(a.title) + '<div class="wrap" style="padding-top:8px"><p class="small" style="margin:0;font-size:13px">' + esc(a.lead) + '</p>' +
+        a.groups.map(function (gr) { return '<section class="card" style="display:flex;flex-direction:column;gap:8px"><b style="color:var(--red)">' + esc(gr[1]) + '</b>' +
+          gr[2].map(function (q) { return '<button class="item" data-q="' + q[0] + '" style="text-align:left;color:var(--ink);font:500 15px var(--sans)">' + esc(q[1]) + '</button>'; }).join('') + '</section>'; }).join('') +
+        '<p class="note">' + esc(a.note) + '</p></div>' + tab('home');
+    }
+    var qtext = ''; a.groups.forEach(function (gr) { gr[2].forEach(function (q) { if (q[0] === Q.kind) qtext = q[1]; }); });
+    if (!Q.who || !S.profiles.some(function (x) { return x.id === Q.who; })) Q.who = p.id;
+    var whoBtns = '<div class="two">' + S.profiles.map(function (x) { return '<button class="choice' + (Q.who === x.id ? ' on' : '') + '" data-qw="' + x.id + '">' + esc(x.name) + '</button>'; }).join('') + '</div>';
+    var form = '<section class="card" style="display:flex;flex-direction:column;gap:10px"><h2 style="font-size:18px">' + esc(qtext) + '</h2><b style="font-size:13px">' + esc(a.who) + '</b>' + whoBtns +
+      (Q.kind === 'exam' ? '<label class="f">' + esc(a.examDate) + '<input class="in" type="date" id="qd" value="' + esc(Q.date) + '"></label>' : '') +
+      '<button class="btn" data-qgo="1">' + esc(a.ask) + '</button></section>';
+    var out = '';
+    if (Q.shown) {
+      var who = S.profiles.filter(function (x) { return x.id === Q.who; })[0], c = chartOf(who), d = D();
+      var opt = {}; if (Q.kind === 'exam' && /^\d{4}-\d{2}-\d{2}$/.test(Q.date)) { var t = Q.date.split('-').map(Number); opt.date = { y: t[0], m: t[1], d: t[2] }; }
+      var r = KF.ask(Q.kind, c, opt), H = Q.kind === 'health', V = H ? a.health : a;
+      var verdictTxt = H ? a.health.verdict[r.verdict] : a.verdict[r.verdict], mark = H ? a.health.mark[r.verdict] : a.mark[r.verdict];
+      var body = [];
+      if (H) { body.push(a.health.lead); body.push(fill(a.health.low, r.best)); body.push((TX().saju || window.KF_TXT.ko.saju).health[r.why[0]]); body.push(a.health.note); }
+      else { body.push(a.ans[Q.kind][r.verdict]); body.push(fill(a.why, { who: esc(who.name), ten: d.tenImg[r.why[0]] }) + ' ' + (a.why2[r.why[1]] || ''));
+        body.push(r.best.day ? fill(a.bestDay, r.best.day) : fill(a.best, r.best)); }
+      var locked = !isSub();
+      out = '<section class="dark" style="text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center"><div class="serif" style="font-size:56px;font-weight:900;line-height:1;color:var(--gold)">' + mark + '</div><div class="lead" style="margin:0">' + esc(verdictTxt) + '</div><div class="mut" style="font-size:12px">' + esc(who.name) + ' · ' + r.score + '</div></section>' +
+        '<article class="story' + (locked ? ' lock' : '') + '"><p>' + body[0] + '</p>' + (locked ? '<div class="blur" aria-hidden="true"><p>' + body.slice(1).join('</p><p>') + '</p></div><div class="over">' + esc(U('askLock')) + '<a class="btn" href="#pay">' + esc(U('subscribeAll')) + '</a></div><div style="height:30px"></div>' : '<p>' + body.slice(1).join('</p><p>') + '</p>') + '</article>' +
+        '<button class="btn ghost" data-qreset="1">' + esc(a.again) + '</button>';
+    }
+    return bar(a.title, '', 'ask') + '<div class="wrap" style="padding-top:8px">' + form + out + '</div>' + tab('home');
+  }
   function vPay() {
     var y = tojYear();
     return '<div class="bar" style="justify-content:space-between"><div class="t" style="padding-left:8px">' + esc(U('payTitle')) + '</div><a class="back" href="#home" aria-label="close"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></a></div>' +
@@ -300,21 +365,29 @@
     if (!tu && bt) { var b = bt.split(':').map(Number); hh = b[0]; mm = b[1]; }
     var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: +document.getElementById('pl').value };
     try { chartOf(p); } catch (x) { err.hidden = false; return; }
-    S.profiles.push(p); S.active = p.id; save(); location.hash = '#home';
+    S.profiles.push(p); if (R.q === 'gung' && S.active) { G.other = p.id; save(); location.hash = '#gung'; return; } S.active = p.id; save(); location.hash = '#home';
   }
 
   /* ── 라우터 ── */
+  var R = { q: '' };
   function render() {
-    var h = (location.hash || '#home').slice(1);
+    var h = (location.hash || '#home').slice(1), hq = h.split('?'); h = hq[0]; R.q = hq[1] || '';
+    if (h !== 'ask') { Q.kind = null; Q.shown = false; }
     if (!S.profiles.length && h !== 'about') h = 'start';
-    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, pay: vPay, about: vAbout, me: vMe, start: vStart }[h] || vHome;
+    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, pay: vPay, about: vAbout, gung: vGung, ask: vAsk, me: vMe, start: vStart }[h] || vHome;
     document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
     var f = document.getElementById('f'); if (f) f.addEventListener('submit', submitStart);
   }
   app.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy]'); if (!t) return;
+    var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
+    if (t.dataset.gt) { G.type = t.dataset.gt; return render(); }
+    if (t.dataset.go) { G.other = t.dataset.go; return render(); }
+    if (t.dataset.q) { Q.kind = t.dataset.q; Q.shown = false; if (Q.kind === 'match') { location.hash = '#gung'; return; } return render(); }
+    if (t.dataset.qw) { Q.who = t.dataset.qw; Q.shown = false; keepQ(); return; }
+    if (t.dataset.qgo) { var qd = document.getElementById('qd'); if (qd) Q.date = qd.value; Q.shown = true; return render(); }
+    if (t.dataset.qreset) { Q.kind = null; Q.shown = false; return render(); }
     if (t.dataset.cal) { F.cal = t.dataset.cal === 'solar' ? 'solar' : 'lunar'; F.leap = t.dataset.cal === 'leap'; keepForm(); }
     else if (t.dataset.g) { F.gender = t.dataset.g; keepForm(); }
     else if (t.dataset.lang) { setLang(t.dataset.lang); }
@@ -322,12 +395,13 @@
     else if (t.dataset.del) { S.profiles = S.profiles.filter(function (p) { return p.id !== t.dataset.del; }); if (S.active === t.dataset.del) S.active = (S.profiles[0] || {}).id; save(); render(); }
     else if (t.dataset.buy && window.KF_PAY) window.KF_PAY.buy(t.dataset.buy, prof(), tojYear());
   });
+  function keepQ() { var qd = document.getElementById('qd'); if (qd) Q.date = qd.value; render(); }
   function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;
     render(); ids.forEach(function (i) { var el = document.getElementById(i); if (el && v[i] != null) el.value = v[i]; }); if (tu) document.getElementById('tu').checked = true; }
   function setLang(l) {
     S.lang = l; save();
     if (window.KF_TXT[l] || l === 'ko') return render();
-    var files = ['ui', 'daily', 'saju', 'ilju', 'toj'], n = files.length;
+    var files = ['ui', 'daily', 'saju', 'ilju', 'toj', 'gung'], n = files.length;
     window.KF_TXT[l] = window.KF_TXT[l] || {};
     files.forEach(function (f) { var s = document.createElement('script'); s.src = 'data/' + l + '/' + f + '.js?v=' + (window.KF_VER || 1); s.onload = s.onerror = function () { if (--n === 0) render(); }; document.head.appendChild(s); });
   }

@@ -13,7 +13,7 @@
   hello: '{name}님, 오늘은', todayMore: '오늘의 운세 자세히 보기', oneLine: '오늘의 한 줄', total: '총운',
   mySaju: '나의 사주', dm: '일간',
   mSaju: '사주팔자', mSajuS: '평생 풀이', mToj: '{y} 토정비결', mTojS: '{gz}년 열두 달', mWeek: '주간 운세', mYear: '올해 운세', mYearS: '들어오는 기운',
-  mGung: '궁합', mGungS: '곧 열려요', mAbout: '사주란?', mAboutS: '한국 문화 안내',
+  mGung: '궁합', mGungS: '곧 열려요', mGungS2: '두 사람의 인연', mAsk: '물어보세요', mAskS: '집을 팔까? 합격할까? 저 사람이 맞을까? — ○ △ ✕로 바로 답해 드려요', gungLock: '두 사람의 이야기 전체와 돈 궁합 · 앞날을 풀어 드려요', askLock: '이유와 가장 좋은 때까지 알려 드려요', mAbout: '사주란?', mAboutS: '한국 문화 안내',
   todayTitle: '오늘의 운세', storyTitle: '오늘의 이야기', timeTitle: '시간대별', bestSlot: '가장 좋음',
   lucky: '오늘의 행운', color: '색', number: '숫자', direction: '방향', doIt: '해 보세요', avoid: '조심하세요',
   lotto: '행운의 숫자로 이번 주 로또 번호 만들기 ›', areasTitle: '분야별 자세히', areasLock: '재물 · 일 · 대인 · 애정 · 건강, 다섯 분야를 모두 풀어 드려요',
