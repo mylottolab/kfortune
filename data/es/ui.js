@@ -3,7 +3,7 @@
   app: 'KoreanFortune', lang: 'ES · Español',
   tabToday: 'Hoy', tabSaju: 'Saju', tabTojeong: 'Tojeong', tabMe: 'Yo y familia',
   wTitle: 'La fortuna coreana,\ncontada de nuevo', wLead: 'Cada mañana, una frase clara sobre qué hacer hoy.', wF: ['Hoy y esta semana — gratis', 'Saju de vida y mareas de diez años', 'Tojeong: 144 hexagramas, 12 meses', 'Compatibilidad y respuestas ○△✕'], wStart: 'Empezar', wLang: 'Idioma',
-  startKicker: 'Solo una vez', startTitle: '¿Cuándo naciste?',
+  close: 'Cerrar', startKicker: 'Solo una vez', startTitle: '¿Cuándo naciste?',
   startLead: 'El Saju coreano lee cuatro pilares: el año, el mes, el día y la hora de tu nacimiento. Introdúcelos una vez y todas las lecturas los usarán.',
   startTag: 'Nuestra propia lectura nueva sobre un marco coreano de siglos: una guía que te dice qué hacer hoy',
   name: 'Tu nombre', namePh: 'p. ej. Lucía', birth: 'Fecha de nacimiento', solar: 'Solar', lunar: 'Lunar', leap: 'Mes intercalar',

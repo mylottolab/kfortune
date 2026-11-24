@@ -3,7 +3,7 @@
   app: 'KoreanFortune 韓國運勢', lang: '繁 · 繁體中文',
   tabToday: '今日', tabSaju: '八字', tabTojeong: '土亭秘訣', tabMe: '我 · 家人',
   wTitle: '在傳統框架上\n新寫的韓國運勢指南', wLead: '每天早上，用一句話告訴你今天該做什麼。', wF: ['今日 · 本週運勢 — 免費', '一生八字 · 十年大運', '土亭秘訣144卦 · 十二個月', '合婚 · 問一問 ○△✕'], wStart: '開始', wLang: '語言',
-  startKicker: '只需一次', startTitle: '請告訴我們您的出生時間',
+  close: '關閉', startKicker: '只需一次', startTitle: '請告訴我們您的出生時間',
   startLead: '四柱由出生的年、月、日、時四根柱子立成。輸入一次，所有運勢都會用到。',
   startTag: '在傳統的框架上，寫出我們自己的新解讀 —— 告訴您今天該做什麼的運勢指南',
   name: '稱呼', namePh: '例：小美', birth: '出生日期', solar: '陽曆', lunar: '農曆', leap: '閏月',

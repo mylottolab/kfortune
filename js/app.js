@@ -138,7 +138,7 @@
     var c = chartOf(p), t = todayYMD(), r = KF.daily(c, t.y, t.m, t.d), tx = dailyText(p, c, r), d = D();
     var ty = tojYear();
     var g5 = ['money', 'work', 'people', 'love', 'health'].map(function (k) { return '<div><small>' + esc(d.areaName[k]) + '</small><b>' + r.scores[k] + '</b></div>'; }).join('');
-    return '<div class="top"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div><a class="pill" href="#about" style="display:flex;align-items:center">' + esc(U('lang')) + '</a></div>' +
+    return '<div class="top"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + langPill() + '</div>' +
       '<div class="wrap"><div style="padding-top:8px"><div class="small">' + dateLine(t) + ' · <span class="serif" style="color:var(--ink)">' + r.pillar.txt + '</span>' + esc(U('dayOf')) + '</div>' +
       '<h1>' + esc(U('hello', { name: p.name })) + '<br>' + esc(tx.head) + '</h1></div>' +
       '<section class="dark" style="display:flex;flex-direction:column;gap:14px"><div class="row" style="gap:16px">' + ring(r.scores.total) +
@@ -344,10 +344,27 @@
     var list = S.profiles.map(function (p) { var c = chartOf(p);
       return '<div class="item' + (p.id === (prof() || {}).id ? ' hl' : '') + '"><div class="row" style="justify-content:space-between"><div><b>' + esc(p.name) + '</b><div class="small">' + c.solar.y + '.' + c.solar.m + '.' + c.solar.d + ' · ' + c.pillars.day.txt + '</div></div>' + miniChars(c) + '</div>' +
         '<div class="row" style="margin-top:8px;gap:8px">' + (p.id === (prof() || {}).id ? '<span class="chip">' + esc(U('current')) + '</span>' : '<button class="pill" data-use="' + p.id + '">' + esc(U('use')) + '</button>') + '<button class="pill" data-del="' + p.id + '">' + esc(U('del')) + '</button></div></div>'; }).join('');
-    return bar(U('meTitle')) + '<div class="wrap" style="padding-top:8px"><section class="list">' + list + '</section><a class="btn ghost" href="#start">' + esc(U('add')) + '</a></div>' + tab('me');
+    return bar(U('meTitle')) + '<div class="wrap" style="padding-top:8px"><section class="list">' + list + '</section><a class="btn ghost" href="#start">' + esc(U('add')) + '</a><button class="btn ghost" data-langsheet="1">🌐 ' + esc(U('langTitle')) + ' · ' + esc(U('lang')) + '</button></div>' + tab('me');
   }
 
   var F = { cal: 'solar', leap: false, gender: 'F', unknown: false };
+  // 언어 바꾸기 — 어느 화면에서든 (외국 친구와 함께 볼 때)
+  function langPill() { return '<button class="pill" data-langsheet="1" aria-haspopup="dialog" style="display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>' + esc(U('lang')) + '</button>'; }
+  function langSheet() {
+    var old = document.getElementById('lsheet'); if (old) old.remove();
+    var d = document.createElement('div'); d.className = 'sheet'; d.id = 'lsheet'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+    d.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px"><b class="serif" style="font-size:18px">' + esc(U('langTitle')) + ' · Language</b><div class="two">' +
+      LANGS.map(function (l) { return l[2] ? '<button class="choice' + (S.lang === l[0] ? ' on' : '') + '" data-pick="' + l[0] + '" lang="' + l[0] + '" style="min-height:52px;font-size:16px">' + esc(l[1]) + '</button>'
+        : '<div class="choice" style="border-style:dashed;display:flex;align-items:center;justify-content:center;opacity:.6" lang="' + l[0] + '">' + esc(l[1]) + ' · ' + esc(U('soon')) + '</div>'; }).join('') +
+      '</div><button class="btn ghost" data-close="1">' + esc(U('close')) + '</button></div>';
+    document.body.appendChild(d);
+    d.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-pick]');
+      if (b) { d.remove(); if (b.dataset.pick !== S.lang) setLang(b.dataset.pick); return; }
+      if (ev.target === d || ev.target.closest('[data-close]')) d.remove();
+    });
+  }
+  window.addEventListener('hashchange', function () { var o = document.getElementById('lsheet'); if (o) o.remove(); });
   function vWelcome() {
     var langs = LANGS.filter(function (l) { return l[2]; }).map(function (l) { return '<button class="wl' + (S.lang === l[0] ? ' on' : '') + '" data-lang="' + l[0] + '" lang="' + l[0] + '">' + esc(l[1]) + '</button>'; }).join('');
     return '<div class="welcome"><div class="wtop"><img src="icons/icon.svg?v=2" width="112" height="112" alt="" style="border-radius:26px">' +
@@ -358,7 +375,7 @@
   }
   function vStart() {
     var opts = PLACES.map(function (x, i) { return '<option value="' + i + '">' + esc(S.lang === 'ko' ? x[0] : x[1]) + ' (UTC' + (x[2] >= 0 ? '+' : '') + (x[2] / 60) + ')</option>'; }).join('');
-    return '<div class="wrap" style="padding-top:calc(24px + env(safe-area-inset-top,0px));gap:16px">' + (S.profiles.length ? '<a class="back" href="#home" aria-label="back" style="margin-left:-12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>' : '<div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>') +
+    return '<div class="wrap" style="padding-top:calc(24px + env(safe-area-inset-top,0px));gap:16px">' + (S.profiles.length ? '<a class="back" href="#home" aria-label="back" style="margin-left:-12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>' : '<div class="row" style="justify-content:space-between"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + langPill() + '</div>') +
       '<div><div style="font-size:12px;color:var(--red);font-weight:700;letter-spacing:1px">' + esc(U('startKicker')) + '</div><h1>' + esc(U('startTitle')) + '</h1><p class="small" style="font-size:13px;margin:6px 0 4px">' + esc(U('startLead')) + '</p><p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--red);font-weight:700">' + esc(U('startTag')) + '</p></div>' +
       '<form id="f" style="display:flex;flex-direction:column;gap:14px" novalidate>' +
       '<label class="f">' + esc(U('name')) + '<input class="in" id="nm" maxlength="20" placeholder="' + esc(U('namePh')) + '" required></label>' +
@@ -400,6 +417,7 @@
     setEnt: function (e) { if (PRO) return; e = e || {}; if (JSON.stringify(e) === JSON.stringify(S.ent)) return; S.ent = e; ls('kf_ent', S.ent); var h = (location.hash || '').slice(1).split('?')[0]; if (h !== 'start' && h !== 'restore') render(); } };
   app.addEventListener('click', function (e) {
     var sn = e.target.closest('[data-seen]'); if (sn) ls('kf_seen', 1);
+    if (e.target.closest('[data-langsheet]')) { langSheet(); return; }
     var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
     if (t.dataset.gt) { G.type = t.dataset.gt; return render(); }
     if (t.dataset.go) { G.other = t.dataset.go; return render(); }

@@ -3,7 +3,7 @@
   app: 'KoreanFortune 韓国運勢', lang: 'JA · 日本語',
   tabToday: '今日', tabSaju: '四柱', tabTojeong: '土亭秘訣', tabMe: '私・家族',
   wTitle: '伝統の型に、\n新しく書いた韓国の運勢', wLead: '毎朝、今日すべきことを一行でお伝えします。', wF: ['今日・今週の運勢 — 無料', '生涯の四柱 · 10年大運', '土亭秘訣144卦 · 12か月', '相性 · 質問に○△✕'], wStart: 'はじめる', wLang: '言語',
-  startKicker: '最初の一度だけ', startTitle: '生まれた時を教えてください',
+  close: '閉じる', startKicker: '最初の一度だけ', startTitle: '生まれた時を教えてください',
   startLead: '四柱は、生まれた年・月・日・時の四つの柱で立てます。一度入力すれば、すべての占いに使われます。',
   startTag: '伝統の型の上に、私たちだけの新しい解釈 — 今日なにをすればよいかを教える運勢の指針',
   name: 'お名前', namePh: '例：みな', birth: '生年月日', solar: '新暦', lunar: '旧暦', leap: '閏月',

@@ -3,7 +3,7 @@
   app: '한국전통운세', lang: 'KO · 한국어',
   tabToday: '오늘', tabSaju: '사주', tabTojeong: '토정비결', tabMe: '나 · 가족',
   wTitle: '전통의 틀 위에 새로 쓴\n한국 운세 지침', wLead: '매일 아침 무엇을 하면 좋을지, 한 줄로 알려 드립니다.', wF: ['오늘·이번 주 운세 — 무료', '평생 사주 · 10년 대운', '토정비결 144괘 · 열두 달', '궁합 · 물어보세요 ○△✕'], wStart: '시작하기', wLang: '언어',
-  startKicker: '처음 한 번만', startTitle: '태어난 때를 알려 주세요',
+  close: '닫기', startKicker: '처음 한 번만', startTitle: '태어난 때를 알려 주세요',
   startLead: '사주는 태어난 해·달·날·시, 네 기둥으로 세웁니다. 한 번 넣으면 모든 운세에 쓰여요.',
   startTag: '전통의 틀 위에 우리만의 새로운 해석 — 오늘 무엇을 할지 알려 드리는 운세 지침',
   name: '부를 이름', namePh: '예: 민지', birth: '생년월일', solar: '양력', lunar: '음력', leap: '윤달',

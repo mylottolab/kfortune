@@ -3,7 +3,7 @@
   app: 'KoreanFortune', lang: 'EN · English',
   tabToday: 'Today', tabSaju: 'Saju', tabTojeong: 'Tojeong', tabMe: 'Me & Family',
   wTitle: 'Korean fortune,\nretold for today', wLead: 'Each morning, one clear line on what to do today.', wF: ['Today & this week — free', 'Life Saju & ten-year tides', 'Tojeong: 144 hexagrams, 12 months', 'Compatibility & quick ○△✕ answers'], wStart: 'Get started', wLang: 'Language',
-  startKicker: 'Just once', startTitle: 'When were you born?',
+  close: 'Close', startKicker: 'Just once', startTitle: 'When were you born?',
   startLead: 'Korean Saju reads four pillars — the year, month, day and hour of your birth. Enter them once and every reading uses them.',
   startTag: 'Our own new reading on a centuries-old Korean frame — a fortune guide that tells you what to do today',
   name: 'Your name', namePh: 'e.g. Mina', birth: 'Date of birth', solar: 'Solar', lunar: 'Lunar', leap: 'Leap month',
