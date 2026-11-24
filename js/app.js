@@ -32,6 +32,8 @@
   function cap(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function prof() { return S.profiles.filter(function (p) { return p.id === S.active; })[0] || S.profiles[0]; }
+  // 스토어 앱 안에서는 복권(로또) 링크를 보이지 않음 — 연령 제한 활동 홍보로 볼 수 있어서
+  var IN_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !!window.KFNative;
   function isSub() { return S.ent.sub && S.ent.sub >= todayStr(); }
   // 산 것은 "누구의 사주인지"(생년월일시 요약)로 기억합니다 — 다른 기기에서 같은 사람을 다시 입력해도 열림
   function bkey(p) { var z = function (n) { return ('0' + n).slice(-2); };
@@ -186,7 +188,7 @@
       '<div style="align-items:center;border:0;background:none"><span class="serif" style="font-weight:900;font-size:26px;color:var(--indigo);height:40px;display:flex;align-items:center">' + L.nums.join(' · ') + '</span><span class="mut">' + esc(U('number')) + '</span><b>' + esc(d.elName[L.el]) + '</b></div>' +
       '<div style="align-items:center;border:0;background:none"><span class="serif" style="font-weight:900;font-size:26px;color:var(--indigo);height:40px;display:flex;align-items:center">' + { E: '東', S: '南', C: '中', W: '西', N: '北' }[L.dir] + '</span><span class="mut">' + esc(U('direction')) + '</span><b>' + esc(d.dirName[L.dir]) + '</b></div></div>' +
       '<div style="font-size:14px;line-height:1.7"><b style="color:var(--wood)">' + esc(U('doIt')) + '</b> · ' + esc(tx.doo) + '<br><b style="color:var(--red)">' + esc(U('avoid')) + '</b> · ' + esc(tx.dont) + '</div>' +
-      '<a href="https://mylottolab.github.io/my-lotto-lab/main_page.html" target="_blank" rel="noopener" style="font-size:13px">' + esc(U('lotto')) + '</a></section>' +
+      (IN_APP ? '' : '<a href="https://mylottolab.github.io/my-lotto-lab/main_page.html" target="_blank" rel="noopener" style="font-size:13px">' + esc(U('lotto')) + '</a>') + '</section>' +
       '<section class="card' + (locked ? ' lock' : '') + '"><h2 style="font-size:17px;margin-bottom:10px">' + esc(U('areasTitle')) + '</h2><div class="' + (locked ? 'blur' : '') + '" ' + (locked ? 'aria-hidden="true"' : '') + '>' + areas + '</div>' +
       (locked ? '<div class="over">' + esc(U('areasLock')) + payBtn(p, U('subscribeAll')) + '</div><div style="height:60px"></div>' : '') + '</section>' +
       '<p class="note">' + esc(d.note) + '</p></div>' + tab('home');
