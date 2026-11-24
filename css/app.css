@@ -89,3 +89,6 @@ input.in,select.in{height:48px;border-radius:12px;border:1px solid var(--line2);
 .welcome .wls{display:flex;flex-wrap:wrap;gap:8px}
 .wl{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #4A4239;background:transparent;color:#CFC6B8;font:500 14px var(--sans)}
 .wl.on{border-color:var(--gold);color:#141210;background:var(--gold);font-weight:700}
+[dir=rtl] .back svg path[d^="M15"]{transform:scaleX(-1);transform-origin:center}
+[dir=rtl] .back svg{transform:scaleX(-1)}
+[dir=rtl] .back svg path{transform:none}
