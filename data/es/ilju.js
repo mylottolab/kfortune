@@ -1,4 +1,4 @@
-/* K-Saju — 60 pilares del día (Español) · orden 甲子(0) … 癸亥(59) */
+/* KoreanFortune — 60 pilares del día (Español) · orden 甲子(0) … 癸亥(59) */
 (function () {
 var I = [
 { t: 'Un gran árbol junto a un río de invierno', p: ['Un gran árbol (甲) se alza sobre aguas hondas de invierno (子). Lleno de agua, el árbol está quieto por fuera mientras por dentro se prepara para la primavera. {name}, piensas a fondo, aprendes rápido y ves la próxima estación antes que nadie.', 'Un árbol junto al agua fría no muestra fácilmente su corazón. Ten cerca gente cálida y trabajos soleados, y las ideas que guardas se extenderán en grandes ramas.'] },

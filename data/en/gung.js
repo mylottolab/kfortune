@@ -1,4 +1,4 @@
-/* K-Saju — Compatibility & Ask a question (English) */
+/* KoreanFortune — Compatibility & Ask a question (English) */
 (function () {
 var en = (window.KF_TXT = window.KF_TXT || {}).en = (window.KF_TXT.en || {});
 en.gung = {

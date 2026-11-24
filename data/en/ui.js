@@ -1,6 +1,6 @@
 /* UI strings (English) */
 (window.KF_TXT = window.KF_TXT || {}).en = Object.assign((window.KF_TXT || {}).en || {}, { ui: {
-  app: 'K-Saju', lang: 'EN · English',
+  app: 'KoreanFortune', lang: 'EN · English',
   tabToday: 'Today', tabSaju: 'Saju', tabTojeong: 'Tojeong', tabMe: 'Me & Family',
   startKicker: 'Just once', startTitle: 'When were you born?',
   startLead: 'Korean Saju reads four pillars — the year, month, day and hour of your birth. Enter them once and every reading uses them.',

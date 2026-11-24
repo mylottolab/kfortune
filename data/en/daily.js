@@ -1,4 +1,4 @@
-/* K-Saju — daily & weekly text library (English). Same structure as data/ko/daily.js */
+/* KoreanFortune — daily & weekly text library (English). Same structure as data/ko/daily.js */
 (window.KF_TXT = window.KF_TXT || {}).en = Object.assign((window.KF_TXT || {}).en || {}, { daily: {
   p1: '{name}, your Day Master is {meName} — {meImg}. {meLine} Today {day}, and for you this energy is “{ten}.”',
   me: [
@@ -130,5 +130,5 @@
     flat: 'This week flows evenly without big ups and downs. Building a little every day is this week’s luck.'
   },
   wd: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  note: 'A new reading by K-Saju on the frame of traditional Korean Saju. Enjoy it as guidance, and make important decisions for yourself.'
+  note: 'A new reading by KoreanFortune on the frame of traditional Korean Saju. Enjoy it as guidance, and make important decisions for yourself.'
 }});

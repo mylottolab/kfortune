@@ -1,6 +1,6 @@
 /* 画面の文字（日本語） */
 (window.KF_TXT = window.KF_TXT || {}).ja = Object.assign((window.KF_TXT || {}).ja || {}, { ui: {
-  app: 'K-Saju 韓国伝統占い', lang: 'JA · 日本語',
+  app: 'KoreanFortune 韓国運勢', lang: 'JA · 日本語',
   tabToday: '今日', tabSaju: '四柱', tabTojeong: '土亭秘訣', tabMe: '私・家族',
   startKicker: '最初の一度だけ', startTitle: '生まれた時を教えてください',
   startLead: '四柱は、生まれた年・月・日・時の四つの柱で立てます。一度入力すれば、すべての占いに使われます。',

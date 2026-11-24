@@ -1,4 +1,4 @@
-/* K-Saju — life reading library (English). Composition function lives in data/ko/saju.js */
+/* KoreanFortune — life reading library (English). Composition function lives in data/ko/saju.js */
 (window.KF_TXT = window.KF_TXT || {}).en = Object.assign((window.KF_TXT || {}).en || {}, { saju: Object.assign(((window.KF_TXT || {}).en || {}).saju || {}, {
   dm: [
     ['At the center of you, {name}, stands Gap Wood (甲木) — a great tree growing straight toward the sky. A great tree sways in the wind but does not break, and it rarely leaves the ground where it has rooted. Once you choose a direction you go all the way, and people gather in your shade.',

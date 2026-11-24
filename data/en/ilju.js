@@ -1,4 +1,4 @@
-/* K-Saju — 60 day pillars (English) · order 甲子(0) … 癸亥(59) */
+/* KoreanFortune — 60 day pillars (English) · order 甲子(0) … 癸亥(59) */
 (function () {
 var I = [
 { t: 'A great tree by a winter river', p: ['A great tree (甲) stands over deep winter water (子). Full of water, the tree is still on the outside while preparing for spring within. {name}, you think deeply, learn fast, and see the next season before others do.', 'A tree by cold water doesn’t show its heart easily. Keep warm people and sunny work nearby, and the thoughts you hold will spread into great branches.'] },

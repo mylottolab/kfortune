@@ -1,4 +1,4 @@
-/* K-Saju — Tojeong Bigyeol, 144 hexagramas (nuestra nueva lectura, Español). Usa KF_TOJ_BUILD de data/ko/toj.js para que las puntuaciones coincidan en todos los idiomas. */
+/* KoreanFortune — Tojeong Bigyeol, 144 hexagramas (nuestra nueva lectura, Español). Usa KF_TOJ_BUILD de data/ko/toj.js para que las puntuaciones coincidan en todos los idiomas. */
 (function () {
 var UP = [
   { h: '天行健步', hk: 'El Cielo avanza con paso firme', lv: 3, y: 'Este año la energía del Cielo (乾) tira de ti hacia delante. Es buen año para empezar las cosas grandes que venías aplazando, y el camino se abre tanto como tu determinación. Pero cuanto más alto el cielo, más fuerte el viento: que la confianza no te vuelva sordo a los demás.' },

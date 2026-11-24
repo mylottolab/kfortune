@@ -1,6 +1,6 @@
 /* 介面文字（繁體中文） */
 (window.KF_TXT = window.KF_TXT || {})['zh-Hant'] = Object.assign((window.KF_TXT || {})['zh-Hant'] || {}, { ui: {
-  app: 'K-Saju 韓國傳統運勢', lang: '繁 · 繁體中文',
+  app: 'KoreanFortune 韓國運勢', lang: '繁 · 繁體中文',
   tabToday: '今日', tabSaju: '八字', tabTojeong: '土亭秘訣', tabMe: '我 · 家人',
   startKicker: '只需一次', startTitle: '請告訴我們您的出生時間',
   startLead: '四柱由出生的年、月、日、時四根柱子立成。輸入一次，所有運勢都會用到。',

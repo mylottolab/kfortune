@@ -1,4 +1,4 @@
-/* K-Saju — 결제 (웹: KG이니시스 카드 · PayPal) · 구매 확인 · 복원
+/* KoreanFortune — 결제 (웹: KG이니시스 카드 · PayPal) · 구매 확인 · 복원
    서버: 로또앱 서버의 /api/fortune/* (같은 이니시스 상점 · 같은 PayPal 계정) */
 (function () {
   'use strict';

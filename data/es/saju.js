@@ -1,4 +1,4 @@
-/* K-Saju — lectura de vida (Español). La función de composición está en data/ko/saju.js */
+/* KoreanFortune — lectura de vida (Español). La función de composición está en data/ko/saju.js */
 (window.KF_TXT = window.KF_TXT || {}).es = Object.assign((window.KF_TXT || {}).es || {}, { saju: Object.assign(((window.KF_TXT || {}).es || {}).saju || {}, {
   dm: [
     ['En tu centro, {name}, se alza la Madera Gap (甲木): un gran árbol que crece recto hacia el cielo. Un gran árbol se mece con el viento pero no se quiebra, y rara vez abandona la tierra donde echó raíces. Cuando eliges una dirección, llegas hasta el final, y la gente se reúne a tu sombra.',
