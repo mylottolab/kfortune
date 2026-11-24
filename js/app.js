@@ -3,7 +3,7 @@
   'use strict';
   var KF = window.KF;
   var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 1], ['zh-Hans', '简体中文', 1], ['zh-Hant', '繁體中文', 1], ['es', 'Español', 1],
-    ['vi', 'Tiếng Việt', 0], ['th', 'ไทย', 0], ['id', 'Bahasa Indonesia', 0], ['de', 'Deutsch', 0], ['fr', 'Français', 0], ['ar', 'العربية', 0]];
+    ['vi', 'Tiếng Việt', 0], ['th', 'ไทย', 0], ['id', 'Bahasa Indonesia', 0], ['de', 'Deutsch', 1], ['fr', 'Français', 0], ['ar', 'العربية', 0]];
   var PLACES = [
     ['서울', 'Seoul', 540, 126.98], ['부산', 'Busan', 540, 129.08], ['대구', 'Daegu', 540, 128.6], ['인천', 'Incheon', 540, 126.7], ['광주', 'Gwangju', 540, 126.85],
     ['대전', 'Daejeon', 540, 127.38], ['울산', 'Ulsan', 540, 129.31], ['수원', 'Suwon', 540, 127.03], ['춘천', 'Chuncheon', 540, 127.73], ['강릉', 'Gangneung', 540, 128.9],
@@ -24,7 +24,7 @@
   if (PRO) S.ent = { sub: '2099-12-31' };
   function save() { ls('kf_lang', S.lang); ls('kf_profiles', S.profiles); ls('kf_active', S.active); }
   function pickLang() { var n = (navigator.language || 'ko').toLowerCase(); if (n.indexOf('ko') === 0) return 'ko'; if (n.indexOf('ja') === 0) return 'ja';
-    if (n.indexOf('zh') === 0) return /tw|hk|hant|mo/.test(n) ? 'zh-Hant' : 'zh-Hans'; if (n.indexOf('es') === 0) return 'es'; return 'en'; }
+    if (n.indexOf('zh') === 0) return /tw|hk|hant|mo/.test(n) ? 'zh-Hant' : 'zh-Hans'; var two = n.slice(0, 2); if (['es', 'de', 'fr', 'id', 'th', 'vi', 'ar'].indexOf(two) >= 0) return two; if (two === 'in') return 'id'; return 'en'; }
   function TX() { return (window.KF_TXT && (window.KF_TXT[S.lang] || window.KF_TXT.ko)) || {}; }
   function U(k, vars) { var t = TX().ui || {}, v = t[k]; if (v == null) v = ((window.KF_TXT.ko || {}).ui || {})[k]; if (v == null) return k; return fill(v, vars); }
   function D() { return TX().daily || window.KF_TXT.ko.daily; }
@@ -62,7 +62,7 @@
     var keys = ['money', 'work', 'people', 'love', 'health'], cx = 150, cy = 150, R = 100, an = D().areaName;
     var pt = function (i, r) { var a = (-90 + 72 * i) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
     var poly = function (r) { return keys.map(function (k, i) { return pt(i, r).map(function (v) { return v.toFixed(1); }).join(','); }).join(' '); };
-    var s = '<svg width="300" height="270" viewBox="0 0 300 270" role="img" aria-label="' + keys.map(function (k) { return an[k] + ' ' + sc[k]; }).join(', ') + '">';
+    var s = '<svg width="340" height="270" viewBox="-20 0 340 270" style="max-width:100%;height:auto" role="img" aria-label="' + keys.map(function (k) { return an[k] + ' ' + sc[k]; }).join(', ') + '">';
     s += '<polygon points="' + poly(100) + '" fill="none" stroke="#D8CBB6"/><polygon points="' + poly(50) + '" fill="none" stroke="#E5DACA"/>';
     keys.forEach(function (k, i) { var p = pt(i, 100); s += '<line x1="150" y1="150" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#E5DACA"/>'; });
     s += '<polygon points="' + keys.map(function (k, i) { return pt(i, sc[k]).map(function (v) { return v.toFixed(1); }).join(','); }).join(' ') + '" fill="#23406A" fill-opacity=".18" stroke="#23406A" stroke-width="2"/>';
