@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["th"].ui, {"shop": "ซื้อ", "print": "พิมพ์ · PDF", "share": "แชร์", "copied": "คัดลอกแล้ว วางใน LINE, KakaoTalk หรือแชตที่ต้องการได้เลย", "themeL": "การแสดงผล", "themeN": ["อัตโนมัติ", "กลางวัน", "กลางคืน"], "shareFrom": "ดวงของฉันจาก KoreanFortune", "printApp": "ในแอปใช้ «แชร์» หรือพิมพ์ / บันทึก PDF ได้ที่ koreanfortune.kr"});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["th"].ui, {"tojPick": "ดูโทจองของปีอื่น", "tojBuyY": "ปลดล็อกโทจองปี {y}", "tojFutureNote": "ปีข้างหน้าต้องปลดล็อกทีละปี แพ็กเกจ 1 ปีรวมโทจองของปีนี้แล้ว"});

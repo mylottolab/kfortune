@@ -48,3 +48,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["ru"].ui, {"shop": "Купить", "print": "Печать · PDF", "share": "Поделиться", "copied": "Скопировано. Вставьте в WhatsApp, Telegram, KakaoTalk или любой чат.", "themeL": "Экран", "themeN": ["Авто", "День", "Ночь"], "shareFrom": "Моё прочтение в KoreanFortune", "printApp": "В приложении используйте «Поделиться» — печать и PDF доступны на koreanfortune.kr."});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["ru"].ui, {"tojPick": "Тоджон на другой год", "tojBuyY": "Открыть Тоджон {y}", "tojFutureNote": "Будущие годы открываются по одному. Годовой пропуск включает Тоджон этого года."});

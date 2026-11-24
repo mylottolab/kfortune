@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["ja"].ui, {"shop": "購入", "print": "印刷・PDF", "share": "共有", "copied": "コピーしました。カカオトークやメッセンジャーなどに貼り付けてください。", "themeL": "表示", "themeN": ["自動", "昼", "夜"], "shareFrom": "KoreanFortuneで見た私の運勢", "printApp": "アプリでは「共有」をお使いください。印刷・PDF保存はホームページ（koreanfortune.kr）でできます。"});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["ja"].ui, {"tojPick": "ほかの年の土亭秘訣を見る", "tojBuyY": "{y}年の土亭秘訣を開く", "tojFutureNote": "先の年は、その年の土亭秘訣を個別に開きます。1年利用券には今年の土亭秘訣が含まれます。"});

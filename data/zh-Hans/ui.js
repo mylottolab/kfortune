@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["zh-Hans"].ui, {"shop": "购买", "print": "打印·PDF", "share": "分享", "copied": "已复制。请粘贴到微信、KakaoTalk 等任意聊天中。", "themeL": "显示", "themeN": ["自动", "日间", "夜间"], "shareFrom": "我在 KoreanFortune 看到的运势", "printApp": "在应用内请用「分享」；打印或保存 PDF 可在网站 koreanfortune.kr 进行。"});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["zh-Hans"].ui, {"tojPick": "查看其他年份的土亭秘诀", "tojBuyY": "解锁 {y} 年土亭秘诀", "tojFutureNote": "未来年份需单独解锁当年的土亭秘诀。一年使用券包含今年的土亭秘诀。"});

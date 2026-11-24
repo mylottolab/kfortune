@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["id"].ui, {"shop": "Beli", "print": "Cetak · PDF", "share": "Bagikan", "copied": "Disalin. Tempel ke WhatsApp, KakaoTalk, atau chat mana pun.", "themeL": "Tampilan", "themeN": ["Otomatis", "Siang", "Malam"], "shareFrom": "Ramalanku dari KoreanFortune", "printApp": "Di aplikasi gunakan Bagikan — atau cetak / simpan PDF di koreanfortune.kr."});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["id"].ui, {"tojPick": "Lihat Tojeong tahun lain", "tojBuyY": "Buka Tojeong {y}", "tojFutureNote": "Tahun mendatang dibuka satu per satu. Paket 1 tahun sudah termasuk Tojeong tahun ini."});

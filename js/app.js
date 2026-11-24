@@ -40,7 +40,7 @@
   function bkey(p) { var z = function (n) { return ('0' + n).slice(-2); };
     return (p.cal === 'lunar' ? 'l' + (p.leap ? 1 : 0) : 's0') + ':' + p.y + z(p.m) + z(p.d) + ':' + (p.hh == null ? 'xx' : z(p.hh) + z(p.mm || 0)) + ':' + (p.gender || 'X'); }
   function hasSaju(p) { var a = S.ent.saju || []; return subOn(p) || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
-  function hasToj(p, y) { var a = (S.ent.toj || {})[y] || []; return subOn(p) || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
+  function hasToj(p, y) { var a = (S.ent.toj || {})[y] || []; return (y === tojYear() && subOn(p)) || a.indexOf(bkey(p)) >= 0 || a.indexOf(p.id) >= 0; }
   // 1년 이용권은 등록한 사람(본인 포함 4명)에게만 — 한 번 등록하면 바꾸지 않음
   function people() { return S.ent.people || []; }
   function peopleMax() { return S.ent.peopleMax || 4; }
@@ -265,7 +265,9 @@
   }
 
   function vTojeong(lastYear) {
-    var p = prof(), c = chartOf(p), y = tojYear() - (lastYear === true ? 1 : 0), bl = KF.solarToLunar(c.solar.y, c.solar.m, c.solar.d);
+    var T0 = tojYear(), qy = Number((/(?:^|&)y=(\d{4})/.exec(R.q || '') || [])[1]);
+    var y = lastYear === true ? T0 - 1 : (qy >= T0 && qy <= T0 + TOJ_AHEAD ? qy : T0);
+    var p = prof(), c = chartOf(p), bl = KF.solarToLunar(c.solar.y, c.solar.m, c.solar.d);
     var g = KF.tojeong(bl, y), tj = (TX().toj || (window.KF_TXT.ko || {}).toj || {})[g.code], mn = U('monthNames');
     var isLast = lastYear === true, locked = !isLast && !hasToj(p, y);
     var ms = tj && tj.m ? tj.m.map(function (x) { return x.s; }) : monthScores(c, y);
@@ -274,14 +276,20 @@
       return '<div class="item"><div style="display:flex;justify-content:space-between"><b class="serif">' + esc(n) + '</b><span class="mut" style="font-size:13px">' + ms[i] + '</span></div>' + (tj && tj.m ? '<div style="margin-top:4px;font-size:14px;line-height:1.7">' + esc(tj.m[i].t) + '</div>' : '') + '</div>'; }).join('');
     var digit = function (v, l) { return '<span style="width:42px;height:54px;border:1px solid #6E6458;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 24px var(--serif)">' + v + '<small style="font:400 9px var(--sans);color:#B9AE9E">' + esc(l) + '</small></span>'; };
     return bar(U('tojTitle', { y: y, gz: g.yearPillar.ko }), esc(p.name) + ' · ' + esc(U('tojSub'))) +
-      '<div class="wrap" style="padding-top:8px"><section class="ink" style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="display:flex;gap:8px">' + digit(g.upper, U('up')) + digit(g.middle, U('mid')) + digit(g.lower, U('low')) + '</div>' +
-      '<div style="font-size:12px;color:#B9AE9E">' + esc(U('gwae', { code: g.code })) + '</div>' +
+      '<div class="wrap" style="padding-top:8px">' + (isLast ? '' : yearPicker(T0, y)) + '<section class="ink" style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="display:flex;gap:8px">' + digit(g.upper, U('up')) + digit(g.middle, U('mid')) + digit(g.lower, U('low')) + '</div>' +
+      '<div style="font-size:12px;color:#B9AE9E">' + esc(U('gwae', { code: (g.upper - 1) * 18 + (g.middle - 1) * 3 + g.lower, raw: g.code })) + '</div>' +
       (tj ? '<div class="serif" style="font-weight:900;font-size:28px;letter-spacing:5px;line-height:1.5;color:var(--gold)">' + esc(tj.h[0]) + '<br>' + esc(tj.h[1]) + '</div><div style="font-size:14px;line-height:1.6;color:#E6DED1">' + esc(tj.hk) + '</div>' : '<div style="color:#B9AE9E">' + esc(U('soonOpen')) + '</div>') + '</section>' +
       (tj ? '<article class="story"><h2 style="margin-bottom:10px">' + esc(U('tojYear')) + '</h2>' + tj.y.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</article>' : '') +
       '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('tojMonths')) + '</h2>' + bars(ms, U('monthShort'), null, hi, lo, -1) + '</section>' +
-      '<section class="list">' + months + (locked ? payBtn(p, U('tojMore')) : '') +
-      (isLast ? '' : '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: y - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a>') + '</section>' +
+      '<section class="list">' + months + (locked ? (y === T0 ? payBtn(p, U('tojMore')) : '<button class="btn" data-buytoj="' + y + '">' + esc(U('tojBuyY', { y: y })) + '</button><div class="small" style="text-align:center">' + esc(U('tojFutureNote')) + '</div>') : '') +
+      (isLast ? '' : '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: T0 - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a>') + '</section>' +
       '<section class="item" style="background:var(--soft);font-size:12.5px;line-height:1.7">' + esc(U('tojAbout')) + '</section></div>' + tab('tojeong');
+  }
+  var TOJ_AHEAD = 9;   // 올해 + 앞으로 9년까지 볼 수 있음(앞날의 해는 그해 것을 따로 결제)
+  function yearPicker(T0, y) {
+    var o = '';
+    for (var k = 0; k <= TOJ_AHEAD; k++) { var yy = T0 + k; o += '<a class="yr' + (yy === y ? ' on' : '') + '" href="#tojeong' + (k ? '?y=' + yy : '') + '"' + (yy === y ? ' aria-current="true"' : '') + '>' + yy + '</a>'; }
+    return '<div class="small" style="margin-bottom:-6px">' + esc(U('tojPick')) + '</div><nav class="yrs" aria-label="' + esc(U('tojPick')) + '">' + o + '</nav>';
   }
   function monthScores(c, y) { // 음력 달마다 월건 간지로 점수
     var tp = KF.pillar(y - 4), out = [];
@@ -448,6 +456,7 @@
     applyTheme();
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
+    var yon = app.querySelector('.yrs .on'); if (yon && yon.parentNode.scrollTo) yon.parentNode.scrollLeft = yon.offsetLeft - 60;
     var f = document.getElementById('f'); if (f) f.addEventListener('submit', submitStart);
     if (window.KF_PAY && KF_PAY.after) KF_PAY.after(h);
     // 결과 화면: 출력·PDF · 공유
@@ -503,7 +512,7 @@
     if (e.target.closest('[data-theme-toggle]')) { var o = ['auto', 'light', 'dark']; S.theme = o[(o.indexOf(S.theme || 'auto') + 1) % 3]; ls('kf_theme', S.theme); render(); return; }
     if (e.target.closest('[data-print]')) { doPrint(); return; }
     if (e.target.closest('[data-share]')) { doShare(); return; }
-    var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
+    var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-buytoj],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
     if (t.dataset.gt) { G.type = t.dataset.gt; return render(); }
     if (t.dataset.go) { G.other = t.dataset.go; return render(); }
     if (t.dataset.q) { Q.kind = t.dataset.q; Q.shown = false; if (Q.kind === 'match') { location.hash = '#gung'; return; } return render(); }
@@ -516,6 +525,7 @@
     else if (t.dataset.use) { S.active = t.dataset.use; save(); render(); }
     else if (t.dataset.del) { S.profiles = S.profiles.filter(function (p) { return p.id !== t.dataset.del; }); if (S.active === t.dataset.del) S.active = (S.profiles[0] || {}).id; save(); render(); }
     else if (t.dataset.buy && window.KF_PAY) window.KF_PAY.buy(t.dataset.buy, prof(), tojYear());
+    else if (t.dataset.buytoj && window.KF_PAY) window.KF_PAY.buy('toj', prof(), Number(t.dataset.buytoj));
   });
   function keepQ() { var qd = document.getElementById('qd'); if (qd) Q.date = qd.value; render(); }
   function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;

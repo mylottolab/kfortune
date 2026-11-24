@@ -23,7 +23,7 @@
   sajuTitle: '사주팔자 · 평생 풀이', pillarsH: ['時 시주', '日 일주 · 나', '月 월주', '年 연주'], tapHint: '글자를 누르면 뜻과 읽는 법이 나와요',
   fiveTitle: '오행', none: '없음', daeunTitle: '10년마다 바뀌는 큰 흐름 · 대운', now: '지금', age: '{n}세',
   deeper: '더 깊이 보기', openSaju: '평생 사주 전체 풀이 열기', openSajuS: '한 번 열면 평생 다시 볼 수 있어요 · 1년 이용권이면 무료',
-  tojTitle: '{y} {gz}년 토정비결', tojSub: '음력 생일로 뽑은 한 해의 괘', gwae: '144괘 중 {code}괘', up: '상괘', mid: '중괘', low: '하괘',
+  tojTitle: '{y} {gz}년 토정비결', tojSub: '음력 생일로 뽑은 한 해의 괘', gwae: '{raw}괘 · 144괘 중 {code}번째', up: '상괘', mid: '중괘', low: '하괘',
   tojYear: '한 해 총평', tojMonths: '열두 달 운세 흐름', tojMore: '나머지 달 더 보기', tojLast: '작년({y}) 토정비결 · 맞았는지 돌아보기', free: '무료',
   tojAbout: '토정비결이란? 조선 중기 토정 이지함(1517~1578) 선생이 지었다고 전하는 한 해 운세서입니다. 음력 생년월일로 세 자리 수를 얻어 144괘 중 하나를 뽑고, 정월부터 섣달까지 달마다의 운을 봅니다.',
   monthShort: ['정', '이', '삼', '사', '오', '유', '칠', '팔', '구', '시', '동', '섣'],
@@ -48,3 +48,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["ko"].ui, {"shop": "구매", "print": "출력·PDF", "share": "공유하기", "copied": "복사했어요. 카카오톡·부름누름·바로너·가림콜·단톡방 등 원하는 곳에 붙여 넣으세요.", "themeL": "화면 밝기", "themeN": ["자동", "낮", "밤"], "shareFrom": "한국전통운세에서 본 나의 운세", "printApp": "앱에서는 「공유하기」로 보내거나, 홈페이지(koreanfortune.kr)에서 출력·PDF 저장을 할 수 있어요."});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["ko"].ui, {"tojPick": "다른 해의 토정비결 보기", "tojBuyY": "{y}년 토정비결 열기", "tojFutureNote": "앞날의 해는 그해 토정비결을 따로 열어야 합니다. 1년 이용권에는 올해 토정비결이 들어 있어요."});

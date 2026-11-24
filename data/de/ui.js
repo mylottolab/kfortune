@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["de"].ui, {"shop": "Kaufen", "print": "Drucken · PDF", "share": "Teilen", "copied": "Kopiert. Füge es in WhatsApp, KakaoTalk oder einen anderen Chat ein.", "themeL": "Anzeige", "themeN": ["Auto", "Tag", "Nacht"], "shareFrom": "Meine Deutung von KoreanFortune", "printApp": "In der App „Teilen“ nutzen – drucken oder als PDF speichern geht auf koreanfortune.kr."});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["de"].ui, {"tojPick": "Tojeong für ein anderes Jahr", "tojBuyY": "Tojeong {y} freischalten", "tojFutureNote": "Künftige Jahre werden einzeln freigeschaltet. Der Jahrespass enthält das Tojeong dieses Jahres."});

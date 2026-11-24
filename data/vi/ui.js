@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["vi"].ui, {"shop": "Mua", "print": "In · PDF", "share": "Chia sẻ", "copied": "Đã sao chép. Dán vào Zalo, KakaoTalk hoặc bất kỳ cuộc trò chuyện nào.", "themeL": "Hiển thị", "themeN": ["Tự động", "Ngày", "Đêm"], "shareFrom": "Lời giải của tôi từ KoreanFortune", "printApp": "Trong ứng dụng hãy dùng Chia sẻ — hoặc in / lưu PDF tại koreanfortune.kr."});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["vi"].ui, {"tojPick": "Xem Tojeong năm khác", "tojBuyY": "Mở Tojeong năm {y}", "tojFutureNote": "Các năm sau được mở riêng từng năm. Gói 1 năm đã gồm Tojeong năm nay."});

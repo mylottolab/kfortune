@@ -50,3 +50,6 @@
 
 /* 출력 · 공유 · 구매 · 밤 모드 */
 Object.assign(window.KF_TXT["ar"].ui, {"shop": "شراء", "print": "طباعة · PDF", "share": "مشاركة", "copied": "تم النسخ. الصقه في واتساب أو KakaoTalk أو أي محادثة.", "themeL": "العرض", "themeN": ["تلقائي", "نهار", "ليل"], "shareFrom": "قراءتي من KoreanFortune", "printApp": "في التطبيق استخدم «مشاركة»، أو اطبع / احفظ PDF على koreanfortune.kr."});
+
+/* 토정비결 앞날의 해 */
+Object.assign(window.KF_TXT["ar"].ui, {"tojPick": "توجونغ لسنة أخرى", "tojBuyY": "افتح توجونغ {y}", "tojFutureNote": "تُفتح السنوات القادمة كل سنة على حدة. تشمل باقة السنة توجونغ هذا العام."});
