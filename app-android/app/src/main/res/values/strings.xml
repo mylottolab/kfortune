@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KFortune</string>
+    <string name="title_activity_main">KFortune</string>
+    <string name="package_name">com.weaveapp.kfortune</string>
+    <string name="custom_url_scheme">com.weaveapp.kfortune</string>
+</resources>

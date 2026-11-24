@@ -57,7 +57,16 @@
   // 가격 표시
   var PRICES = ls('kf_prices');
   // ── 앱(구글 플레이) 안에서: 결제는 구글 플레이로만 ──
-  var NATIVE = window.KFNative || null, GP = { sub: 'kf_year', saju: 'kf_saju', toj: 'kf_toj' }, NPRICE = {};
+  var GP = { sub: 'kf_year', saju: 'kf_saju', toj: 'kf_toj' }, NPRICE = {}, SEEN = {};
+  var NATIVE = window.KFNative || null;
+  (function () {   // 안드로이드 앱(Capacitor) — 플러그인 KFBilling
+    var C = window.Capacitor;
+    if (NATIVE || !C || !C.isNativePlatform || !C.isNativePlatform() || C.getPlatform() !== 'android') return;
+    var P = C.registerPlugin ? C.registerPlugin('KFBilling') : (C.Plugins || {}).KFBilling; if (!P) return;
+    NATIVE = { ready: function () { return P.ready(); }, buy: function (s, u) { return P.buy({ sku: s, accountId: u }); }, consume: function (t) { return P.consume({ token: t }); } };
+    P.addListener('native', function (d) { onNative(d && d.json); });
+    P.addListener('prices', function (d) { onPrices(d && d.prices); });
+  })();
   function fmt(k) { if (NATIVE && NPRICE[GP[k]]) return NPRICE[GP[k]]; var p = PRICES && PRICES[k]; if (!p) return '—'; return A.lang() === 'ko' ? '₩' + p.krw.toLocaleString('ko-KR') : '$' + p.usd; }
   function fillPrices() { document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = fmt(el.dataset.price); }); }
   function loadPrices() { return api('/products').then(function (d) { PRICES = d; ls('kf_prices', d); fillPrices(); }).catch(function () {}); }
@@ -155,6 +164,7 @@
   function onNative(r) {
     if (typeof r === 'string') { try { r = JSON.parse(r); } catch (e) { return; } }
     if (!r || r.status !== 'ok') { if (r && r.status === 'error') toast(t('fail')); return; }
+    if (SEEN[r.purchaseToken]) return; SEEN[r.purchaseToken] = 1;
     var pend = ls('kf_pending') || {};
     if (pend.productId && pend.productId !== r.productId) pend = {};
     toast(t('wait'));
@@ -165,7 +175,7 @@
         var tt = document.getElementById('kftoast'); if (tt) tt.hidden = true;
         sync(); location.hash = '#paid?ok=1&oid=' + encodeURIComponent(r.orderId || '');
       })
-      .catch(function () { toast(t('fail')); });   // 소비하지 않음 → 다음에 앱을 켤 때 다시 확인
+      .catch(function () { delete SEEN[r.purchaseToken]; toast(t('fail')); });   // 소비하지 않음 → 다음에 앱을 켤 때 다시 확인
   }
   function onPrices(m) { if (typeof m === 'string') { try { m = JSON.parse(m); } catch (e) { return; } } NPRICE = m || {}; fillPrices(); }
   function toast(msg) {

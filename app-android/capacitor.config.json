@@ -1,0 +1,29 @@
+{
+  "appId": "com.weaveapp.kfortune",
+  "appName": "KFortune",
+  "webDir": "www",
+  "server": {
+    "url": "https://koreanfortune.kr/",
+    "androidScheme": "https",
+    "allowNavigation": [
+      "koreanfortune.kr",
+      "*.koreanfortune.kr"
+    ],
+    "errorPath": "offline.html"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false,
+    "appendUserAgent": "KFortuneApp/1.0",
+    "adjustMarginsForEdgeToEdge": "force"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 900,
+      "launchAutoHide": true,
+      "backgroundColor": "#141210",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_INSIDE"
+    }
+  }
+}

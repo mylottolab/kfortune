@@ -1,0 +1,6 @@
+// Capacitor 7.4.2 · splash-screen 7.0.1 — npm 없이 열리도록 프로젝트 안에 넣어 두었습니다.
+include ':capacitor-android'
+project(':capacitor-android').projectDir = new File('./capacitor-android')
+
+include ':capacitor-splash-screen'
+project(':capacitor-splash-screen').projectDir = new File('./capacitor-splash-screen')
