@@ -219,10 +219,10 @@
       '<article class="story"><p>' + fill(Array.isArray(txt) ? txt.join('</p><p>') : txt, { name: esc(p.name) }) + '</p></article></div>' + tab('saju');
   }
 
-  function vTojeong() {
-    var p = prof(), c = chartOf(p), y = tojYear(), bl = KF.solarToLunar(c.solar.y, c.solar.m, c.solar.d);
+  function vTojeong(lastYear) {
+    var p = prof(), c = chartOf(p), y = tojYear() - (lastYear === true ? 1 : 0), bl = KF.solarToLunar(c.solar.y, c.solar.m, c.solar.d);
     var g = KF.tojeong(bl, y), tj = (TX().toj || (window.KF_TXT.ko || {}).toj || {})[g.code], mn = U('monthNames');
-    var locked = !hasToj(p, y), last = KF.tojeong(bl, y - 1);
+    var isLast = lastYear === true, locked = !isLast && !hasToj(p, y);
     var ms = tj && tj.m ? tj.m.map(function (x) { return x.s; }) : monthScores(c, y);
     var hi = ms.indexOf(Math.max.apply(null, ms)), lo = ms.indexOf(Math.min.apply(null, ms));
     var months = mn.map(function (n, i) { var free = i < 3 || !locked; if (!free) return '';
@@ -235,7 +235,7 @@
       (tj ? '<article class="story"><h2 style="margin-bottom:10px">' + esc(U('tojYear')) + '</h2>' + tj.y.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</article>' : '') +
       '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('tojMonths')) + '</h2>' + bars(ms, mn.map(function (x) { return x.slice(0, 1); }), null, hi, lo, -1) + '</section>' +
       '<section class="list">' + months + (locked ? '<a class="btn" href="#pay">' + esc(U('tojMore')) + '</a>' : '') +
-      '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: y - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a></section>' +
+      (isLast ? '' : '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: y - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a>') + '</section>' +
       '<section class="item" style="background:var(--soft);font-size:12.5px;line-height:1.7">' + esc(U('tojAbout')) + '</section></div>' + tab('tojeong');
   }
   function monthScores(c, y) { // 음력 달마다 월건 간지로 점수
@@ -307,7 +307,7 @@
   function render() {
     var h = (location.hash || '#home').slice(1);
     if (!S.profiles.length && h !== 'about') h = 'start';
-    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: vTojeong, 'tojeong-last': vTojeong, pay: vPay, about: vAbout, me: vMe, start: vStart }[h] || vHome;
+    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, pay: vPay, about: vAbout, me: vMe, start: vStart }[h] || vHome;
     document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
@@ -327,7 +327,7 @@
   function setLang(l) {
     S.lang = l; save();
     if (window.KF_TXT[l] || l === 'ko') return render();
-    var files = ['ui', 'daily', 'saju', 'toj'], n = files.length;
+    var files = ['ui', 'daily', 'saju', 'ilju', 'toj'], n = files.length;
     window.KF_TXT[l] = window.KF_TXT[l] || {};
     files.forEach(function (f) { var s = document.createElement('script'); s.src = 'data/' + l + '/' + f + '.js?v=' + (window.KF_VER || 1); s.onload = s.onerror = function () { if (--n === 0) render(); }; document.head.appendChild(s); });
   }
