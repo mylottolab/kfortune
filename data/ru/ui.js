@@ -51,3 +51,5 @@ Object.assign(window.KF_TXT["ru"].ui, {"shop": "Купить", "print": "Печ�
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["ru"].ui, {"tojPick": "Тоджон на другой год", "tojBuyY": "Открыть Тоджон {y}", "tojFutureNote": "Будущие годы открываются по одному. Годовой пропуск включает Тоджон этого года."});
+
+Object.assign(window.KF_TXT["ru"].ui, { getApp: "Скачать приложение" });

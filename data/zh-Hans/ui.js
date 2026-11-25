@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["zh-Hans"].ui, {"shop": "购买", "print": "打印·
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["zh-Hans"].ui, {"tojPick": "查看其他年份的土亭秘诀", "tojBuyY": "解锁 {y} 年土亭秘诀", "tojFutureNote": "未来年份需单独解锁当年的土亭秘诀。一年使用券包含今年的土亭秘诀。"});
+
+Object.assign(window.KF_TXT["zh-Hans"].ui, { getApp: "下载应用" });

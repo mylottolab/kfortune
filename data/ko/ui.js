@@ -51,3 +51,5 @@ Object.assign(window.KF_TXT["ko"].ui, {"shop": "구매", "print": "출력·PDF",
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["ko"].ui, {"tojPick": "다른 해의 토정비결 보기", "tojBuyY": "{y}년 토정비결 열기", "tojFutureNote": "앞날의 해는 그해 토정비결을 따로 열어야 합니다. 1년 이용권에는 올해 토정비결이 들어 있어요."});
+
+Object.assign(window.KF_TXT["ko"].ui, { getApp: "앱으로 받기" });

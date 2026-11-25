@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["id"].ui, {"shop": "Beli", "print": "Cetak · PDF", 
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["id"].ui, {"tojPick": "Lihat Tojeong tahun lain", "tojBuyY": "Buka Tojeong {y}", "tojFutureNote": "Tahun mendatang dibuka satu per satu. Paket 1 tahun sudah termasuk Tojeong tahun ini."});
+
+Object.assign(window.KF_TXT["id"].ui, { getApp: "Unduh aplikasinya" });

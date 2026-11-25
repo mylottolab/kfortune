@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["en"].ui, {"shop": "Buy", "print": "Print · PDF", "
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["en"].ui, {"tojPick": "See Tojeong for another year", "tojBuyY": "Unlock Tojeong for {y}", "tojFutureNote": "Future years are unlocked one year at a time. The 1-year pass includes this year’s Tojeong."});
+
+Object.assign(window.KF_TXT["en"].ui, { getApp: "Get the app" });

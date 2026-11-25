@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["vi"].ui, {"shop": "Mua", "print": "In · PDF", "sha
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["vi"].ui, {"tojPick": "Xem Tojeong năm khác", "tojBuyY": "Mở Tojeong năm {y}", "tojFutureNote": "Các năm sau được mở riêng từng năm. Gói 1 năm đã gồm Tojeong năm nay."});
+
+Object.assign(window.KF_TXT["vi"].ui, { getApp: "Tải ứng dụng" });

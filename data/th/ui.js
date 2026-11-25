@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["th"].ui, {"shop": "ซื้อ", "print": "พิ�
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["th"].ui, {"tojPick": "ดูโทจองของปีอื่น", "tojBuyY": "ปลดล็อกโทจองปี {y}", "tojFutureNote": "ปีข้างหน้าต้องปลดล็อกทีละปี แพ็กเกจ 1 ปีรวมโทจองของปีนี้แล้ว"});
+
+Object.assign(window.KF_TXT["th"].ui, { getApp: "ดาวน์โหลดแอป" });

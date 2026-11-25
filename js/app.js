@@ -170,6 +170,13 @@
     return '<div class="mini">' + o + '</div>';
   }
 
+  /* 웹에서만: 앱 받기 (앱 안에서는 보이지 않음) */
+  var STORES = [['Google Play', 'https://play.google.com/store/apps/details?id=com.weaveapp.kfortune']];
+  function storeRow() {
+    if (IN_APP || !STORES.length) return '';
+    return '<div class="card" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><b style="font-size:14px;flex:1;min-width:140px">📱 ' + esc(U('getApp')) + '</b>' +
+      STORES.map(function (x) { return '<a class="buy" href="' + x[1] + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join('') + '</div>';
+  }
   function vHome() {
     var p = prof(); if (!p) return vStart();
     var c = chartOf(p), t = todayYMD(), r = KF.daily(c, t.y, t.m, t.d), tx = dailyText(p, c, r), d = D();
@@ -187,7 +194,7 @@
       tile('#week', '七日', U('mWeek'), '', 1) + tile('#year', '歲運', U('mYear'), U('mYearS'), 1) +
       tile('#gung', '宮合', U('mGung'), U('mGungS2')) + tile('#about', '文', U('mAbout'), U('mAboutS'), 2) +
       '</section>' +
-      '<a class="card row" href="#ask" style="gap:14px;color:var(--ink);border:2px solid var(--red)"><span class="serif" style="font-weight:900;font-size:30px;color:var(--red)">問</span><span style="flex:1"><b style="font-size:15px">' + esc(U('mAsk')) + '</b><br><span class="small">' + esc(U('mAskS')) + '</span></span><span style="color:var(--red);font-weight:700">›</span></a><p class="note">' + esc(d.note) + '</p></div>' + tab('home');
+      '<a class="card row" href="#ask" style="gap:14px;color:var(--ink);border:2px solid var(--red)"><span class="serif" style="font-weight:900;font-size:30px;color:var(--red)">問</span><span style="flex:1"><b style="font-size:15px">' + esc(U('mAsk')) + '</b><br><span class="small">' + esc(U('mAskS')) + '</span></span><span style="color:var(--red);font-weight:700">›</span></a>' + storeRow() + '<p class="note">' + esc(d.note) + '</p></div>' + tab('home');
   }
   function tile(h, han, b, s, col) { return '<a class="tile" href="' + h + '"><span class="h"' + (col === 1 ? ' style="color:var(--indigoT)"' : col === 2 ? ' style="color:var(--mute)"' : '') + '>' + han + '</span><b>' + esc(b) + '</b><small>' + esc(s) + '</small></a>'; }
   function tojYear() { var t = todayYMD(); return t.m >= 11 ? t.y + 1 : t.y; }   // 11월부터 새해 것

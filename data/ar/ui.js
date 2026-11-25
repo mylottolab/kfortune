@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["ar"].ui, {"shop": "شراء", "print": "طباعة 
 
 /* 토정비결 앞날의 해 */
 Object.assign(window.KF_TXT["ar"].ui, {"tojPick": "توجونغ لسنة أخرى", "tojBuyY": "افتح توجونغ {y}", "tojFutureNote": "تُفتح السنوات القادمة كل سنة على حدة. تشمل باقة السنة توجونغ هذا العام."});
+
+Object.assign(window.KF_TXT["ar"].ui, { getApp: "حمّل التطبيق" });
