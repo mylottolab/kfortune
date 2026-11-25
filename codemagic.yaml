@@ -34,6 +34,13 @@ workflows:
         script: |
           sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" ios/App/App.xcodeproj/project.pbxproj
           grep -m1 CURRENT_PROJECT_VERSION ios/App/App.xcodeproj/project.pbxproj
+      - name: 점검 (프로젝트 · 패키지 확인)
+        script: |
+          pwd; ls; ls ios/App
+          xcodebuild -version
+          xcodebuild -list -project ios/App/App.xcodeproj
+          xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App 2>&1 | tail -40
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -showBuildSettings 2>&1 | tail -40
       - name: 앱 만들기 (.ipa)
         script: |
           xcode-project build-ipa \
