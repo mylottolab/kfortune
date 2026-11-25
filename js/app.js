@@ -171,7 +171,7 @@
   }
 
   /* 웹에서만: 앱 받기 (앱 안에서는 보이지 않음) */
-  var STORES = [['Google Play', 'https://play.google.com/store/apps/details?id=com.weaveapp.kfortune']];
+  var STORES = [['Google Play', 'https://play.google.com/store/apps/details?id=com.weaveapp.kfortune'], ['App Store', 'https://apps.apple.com/app/id6838980794']];
   function storeRow() {
     if (IN_APP || !STORES.length) return '';
     return '<div class="card" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><b style="font-size:14px;flex:1;min-width:140px">📱 ' + esc(U('getApp')) + '</b>' +
