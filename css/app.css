@@ -188,3 +188,4 @@ body{min-height:0!important}
 }
 
 .tnow{border:2px solid var(--wood)!important}.tnowb{display:inline-block;padding:1px 8px;border-radius:9px;background:var(--wood);color:#fff;font:700 11px var(--sans);vertical-align:2px}
+.trange{margin-top:2px;letter-spacing:.01em}

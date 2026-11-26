@@ -285,13 +285,14 @@
     var tl = todayYMD(), lt = null; try { lt = KF.solarToLunar(tl.y, tl.m, tl.d); } catch (e) {}
     var md = function (o) { return X('md', { m: o.m, d: o.d }); }, starts = [];
     try { for (var k = 1; k <= 12; k++) starts.push(KF.lunarToSolar(y, k, 1, false)); starts.push(KF.lunarToSolar(y + 1, 1, 1, false)); } catch (e) { starts = []; }
-    var endOf = function (i) { var a = starts[i + 1], dt = new Date(Date.UTC(a.y, a.m - 1, a.d) - 864e5); return { m: dt.getUTCMonth() + 1, d: dt.getUTCDate() }; };
+    var endOf = function (i) { var a = starts[i + 1], dt = new Date(Date.UTC(a.y, a.m - 1, a.d) - 864e5); return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() }; };
+    var ymd = function (o) { return X('ymd', { y: o.y, m: o.m, d: o.d }); };
     var nowI = lt && lt.y === y ? lt.m - 1 : -1;
     var seolNote = (!isLast && lt && lt.y === y - 1 && y === T0) ? '<a class="card" href="#tojeong-last" style="display:block;border:2px solid var(--gold);color:var(--ink);font-size:14px;line-height:1.7">' +
       esc(X('tojBefore', { y: y, py: y - 1, mon: mn[lt.m - 1], seol: starts.length ? md(starts[0]) : '' })) + ' <b style="color:var(--wood)">' + esc(X('tojBeforeGo', { py: y - 1, mon: mn[lt.m - 1] })) + ' →</b></a>' : '';
     var months = mn.map(function (n, i) { var free = i < 3 || !locked; if (!free) return '';
       return '<div class="item' + (i === nowI ? ' tnow' : '') + '"' + (i === nowI ? ' id="tnow"' : '') + '><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span><b class="serif">' + esc(n) + '</b>' + (i === nowI ? ' <span class="tnowb">' + esc(X('tojNow')) + '</span>' : '') +
-        (starts.length ? ' <span class="small">' + esc(X('tojRange', { a: md(starts[i]), b: md(endOf(i)) })) + '</span>' : '') + '</span><span class="mut" style="font-size:13px">' + ms[i] + '</span></div>' + (tj && tj.m ? '<div style="margin-top:4px;font-size:14px;line-height:1.7">' + esc(tj.m[i].t) + '</div>' : '') + '</div>'; }).join('');
+        '</span><span class="mut" style="font-size:13px">' + ms[i] + '</span></div>' + (starts.length ? '<div class="small trange">' + esc(X('tojRange', { a: ymd(starts[i]), b: ymd(endOf(i)) })) + '</div>' : '') + (tj && tj.m ? '<div style="margin-top:4px;font-size:14px;line-height:1.7">' + esc(tj.m[i].t) + '</div>' : '') + '</div>'; }).join('');
     var digit = function (v, l) { return '<span style="width:42px;height:54px;border:1px solid #6E6458;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 24px var(--serif)">' + v + '<small style="font:400 9px var(--sans);color:#B9AE9E">' + esc(l) + '</small></span>'; };
     return bar(U('tojTitle', { y: y, gz: g.yearPillar.ko }), esc(p.name) + ' · ' + esc(U('tojSub'))) +
       '<div class="wrap" style="padding-top:8px">' + (isLast ? '' : yearPicker(T0, y)) + seolNote + '<section class="ink" style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="display:flex;gap:8px">' + digit(g.upper, U('up')) + digit(g.middle, U('mid')) + digit(g.lower, U('low')) + '</div>' +
@@ -299,7 +300,7 @@
       (tj ? '<div class="serif" style="font-weight:900;font-size:28px;letter-spacing:5px;line-height:1.5;color:var(--gold)">' + esc(tj.h[0]) + '<br>' + esc(tj.h[1]) + '</div><div style="font-size:14px;line-height:1.6;color:#E6DED1">' + esc(tj.hk) + '</div>' : '<div style="color:#B9AE9E">' + esc(U('soonOpen')) + '</div>') + '</section>' +
       (tj ? '<article class="story"><h2 style="margin-bottom:10px">' + esc(U('tojYear')) + '</h2>' + tj.y.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</article>' : '') +
       '<section class="card svgwrap" style="flex-direction:column;padding:14px 6px 10px"><h2 style="font-size:16px;margin:0 8px 6px">' + esc(U('tojMonths')) + '</h2>' + bars(ms, U('monthShort'), null, hi, lo, -1) + '</section>' +
-      '<section class="list">' + months + (locked ? (y === T0 ? payBtn(p, U('tojMore')) : '<button class="btn" data-buytoj="' + y + '">' + esc(U('tojBuyY', { y: y })) + '</button><div class="small" style="text-align:center">' + esc(U('tojFutureNote')) + '</div>') : '') +
+      '<section class="list"><div class="small" style="padding:0 4px">' + esc(X('tojLunar')) + '</div>' + months + (locked ? (y === T0 ? payBtn(p, U('tojMore')) : '<button class="btn" data-buytoj="' + y + '">' + esc(U('tojBuyY', { y: y })) + '</button><div class="small" style="text-align:center">' + esc(U('tojFutureNote')) + '</div>') : '') +
       (isLast ? '' : '<a class="item" href="#tojeong-last" style="display:flex;justify-content:space-between;align-items:center;color:var(--ink)"><span><b>' + esc(U('tojLast', { y: T0 - 1 })) + '</b></span><b style="color:var(--wood)">' + esc(U('free')) + '</b></a>') + '</section>' +
       '<section class="item" style="background:var(--soft);font-size:12.5px;line-height:1.7">' + esc(U('tojAbout')) + '</section></div>' + tab('tojeong');
   }

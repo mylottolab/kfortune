@@ -131,3 +131,4 @@ window.KF_TXT["zh-Hant"].extra = {
 
 /* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
 Object.assign(window.KF_TXT["zh-Hant"].extra, {"md": "{m}/{d}", "tojRange": "國曆 {a}–{b}", "tojNow": "本月", "tojBefore": "還沒到春節。{y}年土亭秘訣從春節（國曆{seol}）開始，現在按農曆仍是{py}年{mon}。本月運勢請看{py}年土亭秘訣（免費）。", "tojBeforeGo": "看{py}年{mon}"});
+Object.assign(window.KF_TXT["zh-Hant"].extra, {"ymd": "{y}年{m}月{d}日", "tojRange": "國曆 {a} ~ {b}", "tojLunar": "※ 正月到臘月十二個月都是農曆月，每月下方註明國曆日期。"});
