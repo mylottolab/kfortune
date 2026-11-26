@@ -131,3 +131,4 @@ window.KF_TXT["ar"].extra = {
 
 /* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
 Object.assign(window.KF_TXT["ar"].extra, {"md": "{d}/{m}", "tojRange": "شمسي {a}–{b}", "tojNow": "هذا الشهر", "tojBefore": "لم يحلّ سولال (رأس السنة القمرية) بعد. يبدأ توجونغ {y} من سولال ({seol})، وبحسب التقويم القمري ما زلنا في {mon} من {py}. اقرأ هذا الشهر في توجونغ {py} مجانًا.", "tojBeforeGo": "اقرأ {mon} من {py}"});
+Object.assign(window.KF_TXT["ar"].extra, {"ymd": "{d}/{m}/{y}", "tojRange": "ميلادي: {a} – {b}", "tojLunar": "الشهور الاثنا عشر كلها شهور قمرية، وتحت كل شهر تاريخه الميلادي."});

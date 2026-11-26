@@ -50,3 +50,4 @@ window.KF_TXT.ko.extra = {
 
 /* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
 Object.assign(window.KF_TXT["ko"].extra, {"md": "{m}.{d}", "tojRange": "양력 {a}~{b}", "tojNow": "이번 달", "tojBefore": "아직 설 전입니다. {y}년 토정비결은 설날(양력 {seol})부터이고, 지금은 음력으로 {py}년 {mon}입니다. 이달 운은 {py}년 토정비결에서 보세요 — 무료입니다.", "tojBeforeGo": "{py}년 {mon} 풀이 보기"});
+Object.assign(window.KF_TXT["ko"].extra, {"ymd": "{y}년 {m}월 {d}일", "tojRange": "서기 {a} ~ {b}", "tojLunar": "※ 정월부터 섣달까지 열두 달은 모두 음력입니다. 달마다 아래에 서기(양력) 날짜를 적었습니다."});

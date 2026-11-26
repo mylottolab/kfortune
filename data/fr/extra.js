@@ -131,3 +131,4 @@ window.KF_TXT["fr"].extra = {
 
 /* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
 Object.assign(window.KF_TXT["fr"].extra, {"md": "{d}/{m}", "tojRange": "solaire {a}–{b}", "tojNow": "ce mois-ci", "tojBefore": "Seollal (Nouvel An lunaire) n’est pas encore arrivé. Le Tojeong {y} commence à Seollal ({seol}) ; selon le calendrier lunaire, nous sommes encore au {mon} de {py}. Lisez ce mois dans le Tojeong {py} : c’est gratuit.", "tojBeforeGo": "Lire le {mon} de {py}"});
+Object.assign(window.KF_TXT["fr"].extra, {"ymd": "{d}/{m}/{y}", "tojRange": "Calendrier grégorien : {a} – {b}", "tojLunar": "Les douze mois sont des mois lunaires. Les dates du calendrier grégorien figurent sous chaque mois."});
