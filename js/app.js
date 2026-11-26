@@ -31,7 +31,12 @@
     ['perth', '퍼스', 'Perth', 'Australia/Perth', 115.86], ['auckland', '오클랜드', 'Auckland', 'Pacific/Auckland', 174.76]];
   // 예전에 저장한 번호(옛 목록 순서) → 새 id. 국내 13개 도시는 모두 「대한민국」
   var OLD_PLACE = ['kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'pyongyang', 'tokyo', 'osaka', 'beijing', 'shanghai', 'hongkong', 'taipei', 'singapore', 'hanoi', 'hcmc', 'bangkok', 'jakarta', 'manila', 'sydney', 'dubai', 'london', 'paris', 'berlin', 'madrid', 'newyork', 'la', 'mexico', 'saopaulo'];
-  function placeOf(p) { var id = typeof p.place === 'number' ? OLD_PLACE[p.place] : p.place; for (var i = 0; i < PLACES.length; i++) if (PLACES[i][0] === id) return PLACES[i]; return PLACES[0]; }
+  // 예전에 국내 다른 도시로 입력해 둔 분은 그 도시 경도를 그대로 써서, 이미 본 사주가 바뀌지 않게 합니다(화면에는 「대한민국」)
+  var OLD_KR_LON = [126.98, 129.08, 128.6, 126.7, 126.85, 127.38, 129.31, 127.03, 127.73, 128.9, 127.15, 127.49, 126.53];
+  function placeOf(p) { var id = typeof p.place === 'number' ? OLD_PLACE[p.place] : p.place, r = PLACES[0];
+    for (var i = 0; i < PLACES.length; i++) if (PLACES[i][0] === id) { r = PLACES[i]; break; }
+    if (typeof p.place === 'number' && p.place > 0 && p.place < 13) r = r.slice(0, 4).concat([OLD_KR_LON[p.place]]);
+    return r; }
   // 그 시각 그곳의 UTC 차이(분) — 서머타임 · 옛 표준시(예: 서울 1954~61년 +8:30) 포함
   function tzOffset(zone, ms) {
     try { var f = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'longOffset' }).formatToParts(new Date(ms)).filter(function (x) { return x.type === 'timeZoneName'; })[0].value;
