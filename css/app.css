@@ -191,3 +191,5 @@ body{min-height:0!important}
 .tnow{border:2px solid var(--wood)!important}.tnowb{display:inline-block;padding:1px 8px;border-radius:9px;background:var(--wood);color:#fff;font:700 11px var(--sans);vertical-align:2px}
 .trange{margin-top:2px;letter-spacing:.01em}
 .plsug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--card);border:1px solid var(--line2);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:flex;flex-direction:column;max-height:300px;overflow:auto}.plsug button{all:unset;padding:10px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--line);color:var(--ink)}.plsug button:hover,.plsug button:focus{background:var(--soft)}
+.top .brand b{white-space:nowrap}
+@media (max-width:400px){.top .brand b{display:none}}

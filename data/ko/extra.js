@@ -53,3 +53,5 @@ Object.assign(window.KF_TXT["ko"].extra, {"md": "{m}.{d}", "tojRange": "양력 {
 Object.assign(window.KF_TXT["ko"].extra, {"ymd": "{y}년 {m}월 {d}일", "tojRange": "서기 {a} ~ {b}", "tojLunar": "※ 정월부터 섣달까지 열두 달은 모두 음력입니다. 달마다 아래에 서기(양력) 날짜를 적었습니다."});
 Object.assign(window.KF_TXT["ko"].extra, {"placeHint2": "도시나 주 · 도 이름을 넣고 목록에서 고르세요. 해외는 영어로 입력하세요 (예: Fresno, California, Kazan). 그날 그곳의 시계와 해 시각으로 계산해요.", "placeErr": "태어난 곳을 목록에서 골라 주세요.", "plProv": "주 · 도 전체"});
 Object.assign(window.KF_TXT["ko"].extra, {"placeHint2": "태어난 도시 · 군의 지금 이름을 넣고 목록에서 고르세요 (예: 부산, 창원, 홍성). 해외는 영어로 (예: Fresno, California). 그날 그곳의 시계와 해 시각으로 계산해요."});
+Object.assign(window.KF_TXT["ko"].extra, {"whoTitle": "누구의 운세를 볼까요?", "whoNew": "+ 다른 사람 보기 (새로 입력)", "whoCodeT": "{name}님의 다시 보기 코드", "whoCopy": "복사", "whoCodeNote": "이 코드를 적어 두거나 사진으로 남겨 두세요. 다른 기기나 나중에도 코드만 넣으면 다시 볼 수 있어요. 이름은 코드에 들어 있지 않아요.", "whoForget": "이 기기에서 {name}님 지우기", "whoForgetQ": "{name}님 정보를 이 기기에서 지울까요? 코드를 적어 두셨으면 언제든 다시 불러올 수 있어요.", "whoForgetOk": "지우기", "whoLoad": "코드로 다시 불러오기", "whoLoadGo": "불러오기", "whoBad": "코드가 맞지 않아요. 다시 확인해 주세요.", "whoNoName": "불러온 사람"});
+Object.assign(window.KF_TXT["ko"].extra, {"whoBtn": "다른 사람"});

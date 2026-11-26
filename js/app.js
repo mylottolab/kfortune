@@ -190,8 +190,9 @@
   }
   function acts(compact) {
     var h = (location.hash || '').slice(1).split('?')[0];
-    return '<div class="acts"><button class="ib" data-theme-toggle="1" aria-label="' + esc(U('themeL')) + '" title="' + esc(U('themeL') + ' · ' + U('themeN')[['auto', 'light', 'dark'].indexOf(S.theme || 'auto')]) + '">' + themeIcon() + '</button>' +
-      (compact ? '<button class="ib" data-langsheet="1" aria-haspopup="dialog" aria-label="' + esc(U('langTitle')) + '">' + GLOBE + '</button>' : langPill()) +
+    var pp = S.profiles.length ? prof() : null;
+    return '<div class="acts">' + (pp ? (compact ? '<button class="ib" data-whosheet="1" aria-haspopup="dialog" aria-label="' + esc(X('whoBtn')) + '" title="' + esc(X('whoBtn')) + '">' + '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.2c2.4.2 4 1.7 4.5 4.3"/></svg>' + '</button>' : '<button class="pill" data-whosheet="1" aria-haspopup="dialog" style="display:flex;align-items:center;gap:6px">' + '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.2c2.4.2 4 1.7 4.5 4.3"/></svg>' + esc(X('whoBtn')) + '</button>') : '') + '<button class="ib" data-theme-toggle="1" aria-label="' + esc(U('themeL')) + '" title="' + esc(U('themeL') + ' · ' + U('themeN')[['auto', 'light', 'dark'].indexOf(S.theme || 'auto')]) + '">' + themeIcon() + '</button>' +
+      '<button class="ib" data-langsheet="1" aria-haspopup="dialog" aria-label="' + esc(U('langTitle')) + '" title="' + esc(U('lang')) + '">' + GLOBE + '</button>' +
       (isSub() || h === 'pay' ? '' : '<a class="buy" href="#pay">' + esc(U('shop')) + '</a>') + '</div>';
   }
   function applyTheme() {
@@ -467,6 +468,87 @@
       if (ev.target === d || ev.target.closest('[data-close]')) d.remove();
     });
   }
+
+  /* ── 다른 사람 보기 · 다시 보기 코드 ── */
+  // 코드 = 생년월일시 · 성별 · 태어난 곳을 숫자 하나로 묶어 32진수 11글자(이름은 넣지 않음)
+  var B32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  function placeCode(p) {
+    var pl = p.place;
+    if (pl == null) return [0, 0];
+    if (typeof pl === 'number') return [3, pl];
+    if (typeof pl === 'string') { for (var i = 0; i < PLACES.length; i++) if (PLACES[i][0] === pl) return [0, i]; return [0, 0]; }
+    if (pl.k === 'k' && pl.i != null) return [1, pl.i];
+    if (pl.k === 'w' && pl.i != null) return [2, pl.i];
+    for (var j = 0; j < KR_CITIES.length; j++) if (Math.abs(KR_CITIES[j][2] - pl.x) < 1e-6 && pl.n.indexOf(KR_CITIES[j][0]) === 0) return [1, j];
+    return null;
+  }
+  function whoCode(p) {
+    var pc = placeCode(p); if (!pc || p.y < 1900 || p.y > 2155) return '';
+    var t = p.hh == null ? 24 : p.hh, v = p.y - 1900;
+    v = v * 13 + p.m; v = v * 32 + p.d; v = v * 25 + t; v = v * 60 + (p.hh == null ? 0 : (p.mm || 0));
+    v = v * 2 + (p.cal === 'lunar' ? 1 : 0); v = v * 2 + (p.leap ? 1 : 0); v = v * 2 + (p.gender === 'M' ? 1 : 0); v = v * 4 + pc[0]; v = v * 16384 + pc[1];
+    v = v * 32 + (v % 31);
+    var o = ''; for (var k = 0; k < 11; k++) { o = B32[v % 32] + o; v = Math.floor(v / 32); }
+    return 'KF-' + o.slice(0, 4) + '-' + o.slice(4, 8) + '-' + o.slice(8);
+  }
+  function whoDecode(str) {
+    var t = String(str || '').toUpperCase().replace(/^KF/, '').replace(/[^0-9A-Z]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+    if (t.length !== 11) return null;
+    var v = 0; for (var k = 0; k < 11; k++) { var n = B32.indexOf(t[k]); if (n < 0) return null; v = v * 32 + n; }
+    var ck = v % 32; v = Math.floor(v / 32); if (v % 31 !== ck) return null;
+    var take = function (n) { var r = v % n; v = Math.floor(v / n); return r; };
+    var idx = take(16384), kind = take(4), g = take(2), leap = take(2), cal = take(2), mm = take(60), hh = take(25), d = take(32), m = take(13), y = v + 1900;
+    if (!m || !d || m > 12) return null;
+    return { y: y, m: m, d: d, hh: hh === 24 ? null : hh, mm: hh === 24 ? null : mm, cal: cal ? 'lunar' : 'solar', leap: !!leap, gender: g ? 'M' : 'F', kind: kind, idx: idx };
+  }
+  function placeFrom(o) {   // 코드의 곳 → 프로필 place (세계 도시는 자료를 받은 뒤)
+    if (o.kind === 3) return Promise.resolve(o.idx);
+    if (o.kind === 0) return Promise.resolve((PLACES[o.idx] || PLACES[0])[0]);
+    if (o.kind === 1) { var c = KR_CITIES[o.idx]; if (!c) return Promise.resolve('kr'); return Promise.resolve({ n: c[0] + (c[1] ? ' (' + c[1] + ')' : '') + ', ' + (S.lang === 'ko' ? '대한민국' : 'South Korea'), z: 'Asia/Seoul', x: c[2], k: 'k', i: o.idx }); }
+    return (loadWorld() || Promise.resolve()).then(function () { var w = WORLD && WORLD[o.idx]; if (!w) return 'kr'; var prov = w[1] === 1;
+      return { n: prov ? w[0] + ', ' + w[3] : w[0] + (w[2] && w[2] !== w[0] && w[3] !== 'South Korea' ? ', ' + w[2] : '') + ', ' + w[3], z: w[4], x: w[5], k: 'w', i: o.idx }; });
+  }
+  function whoSheet() {
+    var old = document.getElementById('lsheet'); if (old) old.remove();
+    var p = prof(), code = p ? whoCode(p) : '';
+    var d = document.createElement('div'); d.className = 'sheet'; d.id = 'lsheet'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+    var list = S.profiles.map(function (x) { var on = p && x.id === p.id;
+      return '<button class="choice' + (on ? ' on' : '') + '" data-whopick="' + x.id + '" style="text-align:left;display:flex;justify-content:space-between;gap:8px;min-height:48px"><b>' + esc(x.name) + '</b><span class="small">' + x.y + '.' + x.m + '.' + x.d + (on ? ' · ' + esc(U('current')) : '') + '</span></button>'; }).join('');
+    d.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px;max-height:80vh;overflow:auto">' +
+      '<b class="serif" style="font-size:18px">' + esc(X('whoTitle')) + '</b>' +
+      '<div style="display:flex;flex-direction:column;gap:8px">' + list + '</div>' +
+      '<a class="btn" href="#start" data-close="1">' + esc(X('whoNew')) + '</a>' +
+      (code ? '<div class="item" style="display:flex;flex-direction:column;gap:6px"><span class="small"><b>' + esc(X('whoCodeT', { name: p.name })) + '</b></span>' +
+        '<div class="row" style="gap:8px;justify-content:space-between"><b class="serif" id="wcode" style="font-size:19px;letter-spacing:.06em;user-select:all">' + code + '</b><button class="pill" data-whocopy="1">' + esc(X('whoCopy')) + '</button></div>' +
+        '<span class="small" style="line-height:1.6">' + esc(X('whoCodeNote')) + '</span>' +
+        '<button class="pill" data-whoforget="1" style="align-self:flex-start">' + esc(X('whoForget', { name: p.name })) + '</button><div id="wforget" hidden class="small" style="line-height:1.6"><span>' + esc(X('whoForgetQ', { name: p.name })) + '</span> <button class="pill" data-whoforgetok="1" style="background:var(--red);color:#fff;border-color:var(--red)">' + esc(X('whoForgetOk')) + '</button></div></div>' : '') +
+      '<div class="item" style="display:flex;flex-direction:column;gap:8px"><b style="font-size:14px">' + esc(X('whoLoad')) + '</b>' +
+        '<input class="in" id="wcin" placeholder="KF-XXXX-XXXX-XXX" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.05em">' +
+        '<input class="in" id="wcnm" placeholder="' + esc(U('name')) + '" autocomplete="off">' +
+        '<button class="btn ghost" data-whoload="1">' + esc(X('whoLoadGo')) + '</button><span class="small" id="wcerr" hidden style="color:var(--red)">' + esc(X('whoBad')) + '</span></div>' +
+      '<button class="btn ghost" data-close="1">' + esc(U('close')) + '</button></div>';
+    document.body.appendChild(d);
+    d.addEventListener('click', function (ev) {
+      var t = ev.target.closest('[data-whopick],[data-whocopy],[data-whoforget],[data-whoforgetok],[data-whoload]');
+      if (t && t.dataset.whopick) { S.active = t.dataset.whopick; save(); d.remove(); render(); return; }
+      if (t && t.dataset.whocopy) { var c = document.getElementById('wcode').textContent; (navigator.clipboard ? navigator.clipboard.writeText(c) : Promise.reject()).then(function () { t.textContent = '✓'; }, function () { var r = document.createRange(); r.selectNodeContents(document.getElementById('wcode')); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); }); return; }
+      if (t && t.dataset.whoforget) { document.getElementById('wforget').hidden = false; return; }
+      if (t && t.dataset.whoforgetok) { var gone = p.id; S.profiles = S.profiles.filter(function (x) { return x.id !== gone; }); S.active = (S.profiles[0] || {}).id || null; save(); d.remove(); location.hash = S.profiles.length ? '#home' : '#start'; render(); return; }
+      if (t && t.dataset.whoload) {
+        var o = whoDecode(document.getElementById('wcin').value), er = document.getElementById('wcerr');
+        if (!o) { er.hidden = false; return; } er.hidden = true;
+        var nm = document.getElementById('wcnm').value.trim() || X('whoNoName');
+        placeFrom(o).then(function (pl) {
+          var np = { id: 'p' + Date.now().toString(36), name: nm.slice(0, 20), y: o.y, m: o.m, d: o.d, hh: o.hh, mm: o.mm, cal: o.cal, leap: o.leap, gender: o.gender, place: pl };
+          var same = S.profiles.filter(function (x) { return bkey(x) === bkey(np); })[0];
+          if (same) S.active = same.id; else { S.profiles.push(np); S.active = np.id; }
+          save(); d.remove(); location.hash = '#home'; render();
+        });
+        return;
+      }
+      if (ev.target === d || ev.target.closest('[data-close]')) d.remove();
+    });
+  }
   window.addEventListener('hashchange', function () { var o = document.getElementById('lsheet'); if (o) o.remove(); });
   function vWelcome() {
     var langs = LANGS.filter(function (l) { return l[2]; }).map(function (l) { return '<button class="wl' + (S.lang === l[0] ? ' on' : '') + '" data-lang="' + l[0] + '" lang="' + l[0] + '">' + esc(l[1]) + '</button>'; }).join('');
@@ -498,20 +580,20 @@
     q = fold(q.trim()); if (!q) return [];
     var out = [], seen = {};
     var krName = S.lang === 'ko' ? '대한민국' : 'South Korea';
-    KR_CITIES.forEach(function (c) { var base = c[0].replace(/(특별시|광역시|특별자치시|특별자치도|시|군|도)$/, '');
+    KR_CITIES.forEach(function (c, ci) { var base = c[0].replace(/(특별시|광역시|특별자치시|특별자치도|시|군|도)$/, '');
       if (c[0].indexOf(q) === 0 || (base.length >= 1 && q.indexOf(base) === 0 && q.length <= c[0].length)) { var n = c[0] + (c[1] ? ' (' + c[1] + ')' : '');
-        out.push({ k: 0, v: { n: n + ', ' + krName, z: 'Asia/Seoul', x: c[2] }, label: n + ' · ' + krName }); } });
+        out.push({ k: 0, v: { n: n + ', ' + krName, z: 'Asia/Seoul', x: c[2], k: 'k', i: ci }, label: n + ' · ' + krName }); } });
     if (/^(대한민국|한국|korea|south korea)/.test(q)) out.push({ k: 0, v: 'kr', label: plLabel(PLACES[0]) });
     PLACES.forEach(function (x) { if (x[0] !== 'kr' && (fold(x[1]).indexOf(q) >= 0 || fold(x[2]).indexOf(q) >= 0)) { out.push({ k: 0, v: x[0], label: plLabel(x) }); seen[fold(x[2])] = 1; } });
     if (WORLD) {
       var a = [];
       for (var i = 0; i < WORLD.length; i++) { var w = WORLD[i], prov = w[1] === 1, n = fold(w[0]), al = w[1] && w[1] !== 1 ? fold(w[1]) : '';
         var hit = n.indexOf(q) === 0 ? 3 : al.indexOf(q) === 0 ? 3 : (q.length >= 3 && n.indexOf(q) > 0) ? 1 : (!prov && q.length >= 3 && fold(w[2]).indexOf(q) === 0) ? 1 : 0;
-        if (hit) a.push([hit + (n === q ? 2 : 0) + (prov ? 0.5 : 0), w]); }
+        if (hit) a.push([hit + (n === q ? 2 : 0) + (prov ? 0.5 : 0), w, i]); }
       a.sort(function (x, y) { return y[0] - x[0] || y[1][6] - x[1][6]; });
       a.slice(0, 10).forEach(function (r) { var w = r[1], prov = w[1] === 1, kr = w[3] === 'South Korea'; if (kr && prov) return; var name = prov ? w[0] + ', ' + w[3] : w[0] + (!kr && w[2] && w[2] !== w[0] ? ', ' + w[2] : '') + ', ' + w[3];
         if (seen[fold(w[0])] && !prov) return;
-        out.push({ k: 1, v: { n: name, z: w[4], x: w[5] }, label: name + (prov ? ' · ' + X('plProv') : '') + ' (' + utcTxt(w[4]) + ')' }); });
+        out.push({ k: 1, v: { n: name, z: w[4], x: w[5], k: 'w', i: r[2] }, label: name + (prov ? ' · ' + X('plProv') : '') + ' (' + utcTxt(w[4]) + ')' }); });
     }
     return out.slice(0, 8);
   }
@@ -754,6 +836,7 @@
   app.addEventListener('click', function (e) {
     var sn = e.target.closest('[data-seen]'); if (sn) ls('kf_seen', 1);
     if (e.target.closest('[data-langsheet]')) { langSheet(); return; }
+    if (e.target.closest('[data-whosheet]')) { whoSheet(); return; }
     if (e.target.closest('[data-theme-toggle]')) { var o = ['auto', 'light', 'dark']; S.theme = o[(o.indexOf(S.theme || 'auto') + 1) % 3]; ls('kf_theme', S.theme); render(); return; }
     if (e.target.closest('[data-print]')) { doPrint(); return; }
     if (e.target.closest('[data-share]')) { doShare(); return; }
