@@ -574,7 +574,7 @@
   var WORLD = null, WORLD_LOADING = null, PLSUG = [];
   function utcTxt(z) { var o = tzOffset(z, Date.UTC(2026, 0, 15)); return o == null ? '' : 'UTC' + (o >= 0 ? '+' : '−') + Math.floor(Math.abs(o) / 60) + (Math.abs(o) % 60 ? ':' + ('0' + Math.abs(o) % 60).slice(-2) : ''); }
   function plLabel(x) { return (S.lang === 'ko' ? x[1] : x[2]) + ' (' + utcTxt(x[3]) + ')'; }
-  function loadWorld() { if (WORLD || WORLD_LOADING) return WORLD_LOADING; WORLD_LOADING = fetch('data/world_places.json?v=' + (window.KF_VER || '')).then(function (r) { return r.json(); }).then(function (d) { WORLD = d; plSearch(); }).catch(function () { WORLD_LOADING = null; }); return WORLD_LOADING; }
+  function loadWorld() { if (WORLD || WORLD_LOADING) return WORLD_LOADING; WORLD_LOADING = fetch('data/world_places.json?v=' + (window.KF_VER || '')).then(function (r) { return r.json(); }).then(function (d) { WORLD = d; }).catch(function () { WORLD_LOADING = null; }); return WORLD_LOADING; }
   function fold(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC'); }
   function plFind(q) {
     q = fold(q.trim()); if (!q) return [];
@@ -597,25 +597,66 @@
     }
     return out.slice(0, 8);
   }
-  function plSearch() {
-    var el = document.getElementById('pl'), box = document.getElementById('plsug'); if (!el || !box) return;
-    if (document.activeElement !== el) return;
-    PLSUG = plFind(el.value);
-    box.innerHTML = PLSUG.map(function (r, i) { return '<button type="button" role="option" data-plpick="' + i + '">' + esc(r.label) + '</button>'; }).join('') + (!WORLD ? '<div class="small" style="padding:8px 12px">…</div>' : '');
-    box.hidden = !PLSUG.length && WORLD != null;
+  // 적어 낸 곳 → 실제 곳 찾기. 못 찾으면 다시 묻고, 두 번 못 찾으면 큰 도시 목록에서 가장 가까운 곳을 고르게 함
+  var ABBR = { al: 'alabama', ak: 'alaska', az: 'arizona', ar: 'arkansas', ca: 'california', co: 'colorado', ct: 'connecticut', de: 'delaware', fl: 'florida', ga: 'georgia', hi: 'hawaii', id: 'idaho', il: 'illinois', in: 'indiana', ia: 'iowa', ks: 'kansas', ky: 'kentucky', la: 'louisiana', me: 'maine', md: 'maryland', ma: 'massachusetts', mi: 'michigan', mn: 'minnesota', ms: 'mississippi', mo: 'missouri', mt: 'montana', ne: 'nebraska', nv: 'nevada', nh: 'new hampshire', nj: 'new jersey', nm: 'new mexico', ny: 'new york', nc: 'north carolina', nd: 'north dakota', oh: 'ohio', ok: 'oklahoma', or: 'oregon', pa: 'pennsylvania', ri: 'rhode island', sc: 'south carolina', sd: 'south dakota', tn: 'tennessee', tx: 'texas', ut: 'utah', vt: 'vermont', va: 'virginia', wa: 'washington', wv: 'west virginia', wi: 'wisconsin', wy: 'wyoming', dc: 'district of columbia',
+    on: 'ontario', qc: 'quebec', bc: 'british columbia', ab: 'alberta', mb: 'manitoba', sk: 'saskatchewan', ns: 'nova scotia', nb: 'new brunswick', nsw: 'new south wales', vic: 'victoria', qld: 'queensland', wa_au: 'western australia', usa: 'united states', us: 'united states', uk: 'united kingdom' };
+  var PLST = { tries: 0, text: null };
+  function worldName(w) { var prov = w[1] === 1; return prov ? w[0] + ', ' + w[3] : w[0] + (w[2] && w[2] !== w[0] && w[3] !== 'South Korea' ? ', ' + w[2] : '') + ', ' + w[3]; }
+  function plResolve(text) {
+    var t = String(text || '').trim(); if (!t) return { st: 'none' };
+    if (/[가-힣]/.test(t)) {   // 한국어: 국내 시군 · 큰 도시 이름
+      var tk = t.split(/[,\s()]+/).filter(Boolean), f = plFind(tk[0]); if (!f.length) f = plFind(t);
+      if (f.length > 1 && tk.length > 1) { var ff = f.filter(function (r) { return tk.slice(1).every(function (k) { return r.label.indexOf(k.replace(/(도|특별자치도)$/, '').slice(0, 2)) >= 0; }); }); if (ff.length) f = ff; }
+      if (!f.length) return { st: 'none' };
+      if (f.length > 1 && f[0].label.split(' ·')[0] !== f[1].label.split(' ·')[0] && !(f[0].v === 'kr')) return { st: 'many', list: f.slice(0, 5) };
+      return { st: 'ok', v: f[0].v, label: f[0].label };
+    }
+    var parts = t.split(',').map(function (x) { return fold(x.trim()); }).filter(Boolean); if (!parts.length) return { st: 'none' };
+    var city = parts[0], rest = parts.slice(1).map(function (r) { return ABBR[r] || r; });
+    var okRest = function (w) { return rest.every(function (r) { var pv = fold(w[2]), co = fold(w[3]); return pv.indexOf(r) === 0 || co.indexOf(r) === 0 || pv.replace(/-do$/, '').indexOf(r) === 0 || (r === 'united states' && co.indexOf('united states') === 0); }); };
+    var big = PLACES.filter(function (x) { return fold(x[2]) === city; });
+    if (big.length && !rest.length) return { st: 'ok', v: big[0][0], label: plLabel(big[0]) };
+    if (!WORLD) return { st: 'wait' };
+    var c = [];
+    for (var i = 0; i < WORLD.length; i++) { var w = WORLD[i]; if (w[1] === 1) continue; if ((fold(w[0]) === city || (w[1] && fold(w[1]) === city)) && okRest(w)) c.push(i); }
+    if (!c.length) {   // 도시가 없으면 주 · 도 이름으로
+      for (var j = 0; j < WORLD.length; j++) { var v = WORLD[j]; if (v[1] === 1 && fold(v[0]) === (ABBR[city] || city) && (!rest.length || rest.every(function (r) { return fold(v[3]).indexOf(r) === 0 || (r === 'united states' && fold(v[3]).indexOf('united states') === 0); }))) c.push(j); }
+    }
+    if (!c.length && rest.length) {   // 작은 도시라 목록에 없으면 적어 준 주 · 도로
+      for (var k = 0; k < WORLD.length; k++) { var u = WORLD[k]; if (u[1] === 1 && fold(u[0]) === rest[0] && (rest.length < 2 || fold(u[3]).indexOf(rest[1]) === 0 || (rest[1] === 'united states' && fold(u[3]).indexOf('united states') === 0))) c.push(k); }
+    }
+    if (!c.length) return { st: 'none' };
+    c.sort(function (a, b) { return WORLD[b][6] - WORLD[a][6]; });
+    var mk = function (i) { var w = WORLD[i], prov = w[1] === 1, nm = worldName(w); return { v: { n: nm, z: w[4], x: w[5], k: 'w', i: i }, label: nm + (prov ? ' · ' + X('plProv') : '') + ' (' + utcTxt(w[4]) + ')' }; };
+    var a = WORLD[c[0]], same = c.every(function (i) { return WORLD[i][4] === a[4] && Math.abs(WORLD[i][5] - a[5]) < 1; });
+    if (c.length === 1 || same) { var r = mk(c[0]); return { st: 'ok', v: r.v, label: r.label }; }
+    return { st: 'many', list: c.slice(0, 5).map(mk) };
   }
-  function plPick(i) { var r = PLSUG[i], el = document.getElementById('pl'), hv = document.getElementById('plv'), box = document.getElementById('plsug'); if (!r || !el) return;
-    el.value = r.label; hv.value = JSON.stringify(r.v); box.hidden = true; }
-  function plChosen() {
-    var el = document.getElementById('pl'), hv = document.getElementById('plv'), v = null; try { v = JSON.parse(hv.value); } catch (e) {}
-    var lab = v == null ? '' : typeof v === 'object' ? v.n : plLabel(PLACES.filter(function (x) { return x[0] === v; })[0] || PLACES[0]);
-    if (v != null && (el.value === lab || el.value.indexOf(typeof v === 'object' ? v.n : lab) === 0)) return v;
-    var f = plFind(el.value); return f.length ? f[0].v : null;
+  function plShow(res) {   // 입력칸 밑 안내
+    var msg = document.getElementById('plmsg'), many = document.getElementById('plmany'), lst = document.getElementById('pllist'), hv = document.getElementById('plv'); if (!msg) return;
+    many.innerHTML = ''; many.hidden = true;
+    if (res.st === 'ok') { hv.value = JSON.stringify(res.v); PLST.text = document.getElementById('pl').value; msg.className = 'small plok'; msg.textContent = '✓ ' + X('plOk', { place: res.label }); msg.hidden = false; lst.hidden = true; return; }
+    hv.value = ''; PLST.text = null;
+    if (res.st === 'many') { msg.className = 'small'; msg.textContent = X('plMany'); msg.hidden = false; PLSUG = res.list;
+      many.innerHTML = res.list.map(function (r, i) { return '<button type="button" class="pill" data-plpick="' + i + '">' + esc(r.label) + '</button>'; }).join(''); many.hidden = false; return; }
+    if (res.st === 'none') { PLST.tries++; msg.className = 'small plbad'; msg.textContent = X(PLST.tries >= 2 ? 'plNoneList' : 'plNone'); msg.hidden = false; if (PLST.tries >= 2) lst.hidden = false; }
   }
-  document.addEventListener('focusin', function (e) { if (e.target && e.target.id === 'pl') { loadWorld(); e.target.select && e.target.select(); } });
-  document.addEventListener('input', function (e) { if (e.target && e.target.id === 'pl') plSearch(); });
-  document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-plpick]'); if (b) { e.preventDefault(); plPick(+b.dataset.plpick); }
-    else if (!(e.target.closest && e.target.closest('#pl'))) { var box = document.getElementById('plsug'); if (box) box.hidden = true; } });
+  function plCheck() {
+    var el = document.getElementById('pl'); if (!el) return Promise.resolve(null);
+    if (PLST.text != null && PLST.text === el.value) { try { return Promise.resolve(JSON.parse(document.getElementById('plv').value)); } catch (e) {} }
+    var res = plResolve(el.value);
+    if (res.st === 'wait') return (loadWorld() || Promise.resolve()).then(function () { return WORLD ? plCheck() : null; });
+    plShow(res); return Promise.resolve(res.st === 'ok' ? res.v : null);
+  }
+  function plPick(i) { var r = PLSUG[i]; if (!r) return; var el = document.getElementById('pl'); el.value = r.label.replace(/ \(UTC[^)]*\)$/, ''); plShow({ st: 'ok', v: r.v, label: r.label }); }
+  function plChosen() { var hv = document.getElementById('plv'); if (PLST.text == null || PLST.text !== document.getElementById('pl').value) return null; try { return JSON.parse(hv.value); } catch (e) { return null; } }
+  document.addEventListener('focusin', function (e) { if (e.target && e.target.id === 'pl') loadWorld(); });
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'pl') plCheck();
+    if (e.target && e.target.id === 'pllist' && e.target.value) { var x = PLACES.filter(function (p) { return p[0] === e.target.value; })[0]; if (x) { document.getElementById('pl').value = S.lang === 'ko' ? x[1] : x[2]; plShow({ st: 'ok', v: x[0], label: plLabel(x) }); } }
+  });
+  document.addEventListener('input', function (e) { if (e.target && e.target.id === 'pl') { var m = document.getElementById('plmsg'); if (m && PLST.text !== e.target.value) m.hidden = true; } });
+  document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-plpick]'); if (b) { e.preventDefault(); plPick(+b.dataset.plpick); } });
 
   function vStart() {
     return '<div class="wrap" style="padding-top:calc(24px + env(safe-area-inset-top,0px));gap:16px">' + (S.profiles.length ? '<a class="back" href="#home" aria-label="back" style="margin-left:-12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>' : '<div class="row" style="justify-content:space-between"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + langPill() + '</div>') +
@@ -627,19 +668,24 @@
       '<input class="in" id="bd" type="date" min="1900-01-01" max="2050-12-31" required></div>' +
       '<div style="display:flex;flex-direction:column;gap:6px"><label for="bt" style="font-size:13px;font-weight:700">' + esc(U('time')) + '</label><div class="row" style="gap:8px"><input class="in" id="bt" type="time" style="flex:1;min-width:0"><label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mute);white-space:nowrap"><input type="checkbox" id="tu" style="width:20px;height:20px">' + esc(U('timeUnknown')) + '</label></div><div class="small">' + esc(U('timeHint')) + '</div></div>' +
       '<div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700">' + esc(U('gender')) + '</div><div class="two"><button type="button" class="choice' + (F.gender === 'F' ? ' on' : '') + '" data-g="F">' + esc(U('female')) + '</button><button type="button" class="choice' + (F.gender === 'M' ? ' on' : '') + '" data-g="M">' + esc(U('male')) + '</button></div></div>' +
-      '<div style="display:flex;flex-direction:column;gap:6px"><label for="pl" style="font-size:13px;font-weight:700">' + esc(U('place')) + '</label><div style="position:relative"><input class="in" id="pl" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box" value="' + esc(plLabel(PLACES[0])) + '"><input type="hidden" id="plv" value="&quot;kr&quot;"><div id="plsug" class="plsug" role="listbox" hidden></div></div><span class="small" style="font-weight:400">' + esc(X('placeHint2')) + '</span></div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px"><label for="pl" style="font-size:13px;font-weight:700">' + esc(U('place')) + '</label>' +
+      '<span class="small" style="line-height:1.6">' + esc(X('placeAsk')) + '</span>' +
+      '<input class="in" id="pl" autocomplete="off" spellcheck="false" placeholder="' + esc(X('placePh')) + '" value="' + esc(S.lang === 'ko' ? '대한민국' : '') + '"><input type="hidden" id="plv" value="">' +
+      '<div id="plmsg" class="small" hidden></div><div id="plmany" class="plmany" hidden></div>' +
+      '<select class="in" id="pllist" hidden><option value="">' + esc(X('plListPick')) + '</option>' + PLACES.map(function (x) { return '<option value="' + x[0] + '">' + esc(plLabel(x)) + '</option>'; }).join('') + '</select></div>' +
       '<div class="small" id="err" style="color:var(--red)" hidden>' + esc(U('errDate')) + '</div>' +
       '<button class="btn" type="submit">' + esc(U('build')) + '</button><p class="note" style="padding:0">' + esc(U('privacy')) + '</p></form></div>';
   }
   function submitStart(e) {
     e.preventDefault();
+    var plv = plChosen();
+    if (plv == null) { var btn = e.target.querySelector('[type=submit]'); if (btn) btn.disabled = true; plCheck().then(function (v) { if (btn) btn.disabled = false; if (v != null) submitStart(e); else { var pe = document.getElementById('pl'); if (pe) pe.focus(); } }); return; }
     var nm = document.getElementById('nm').value.trim(), bd = document.getElementById('bd').value, bt = document.getElementById('bt').value, tu = document.getElementById('tu').checked;
     var err = document.getElementById('err'); err.textContent = U('errDate');
     if (!nm || !/^\d{4}-\d{2}-\d{2}$/.test(bd)) { err.hidden = false; return; }
     var a = bd.split('-').map(Number), hh = null, mm = null;
     if (!tu && bt) { var b = bt.split(':').map(Number); hh = b[0]; mm = b[1]; }
-    var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: plChosen() };
-    if (p.place == null) { err.textContent = X('placeErr'); err.hidden = false; return; }
+    var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: plv };
     try { chartOf(p); } catch (x) { err.hidden = false; return; }
     S.profiles.push(p); if (R.q === 'gung' && S.active) { G.other = p.id; save(); location.hash = '#gung'; return; } S.active = p.id; save(); location.hash = '#home';
   }
@@ -858,7 +904,7 @@
     else if (t.dataset.buymove && window.KF_PAY) window.KF_PAY.buy('move', prof(), Number(t.dataset.buymove));
   });
   function keepQ() { var qd = document.getElementById('qd'); if (qd) Q.date = qd.value; render(); }
-  function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl', 'plv'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;
+  function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl', 'plv', 'pllist'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;
     render(); ids.forEach(function (i) { var el = document.getElementById(i); if (el && v[i] != null) el.value = v[i]; }); if (tu) document.getElementById('tu').checked = true; }
   function setLang(l) {
     S.lang = l; save();
