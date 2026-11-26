@@ -492,7 +492,7 @@
       return '<a class="item" href="#lotto?g=' + gi + (on ? '' : '&o=' + encodeURIComponent(x.oid)) + '" style="display:flex;justify-content:space-between;color:var(--ink)"><span><b>' + esc(X('lotPack', { n: x.p.slice(3) })) + '</b> <span class="small">' + esc(String(x.at || '').slice(0, 10)) + '</span></span><b style="color:var(--red)">' + esc(X(on ? 'lotClose' : 'lotOpen')) + '</b></a>'; }).join('') + '</section>' : '';
     var shop = IN_APP ? '' : '<section class="card noprint" style="display:flex;flex-direction:column;gap:10px"><b>' + esc(X('lotMore')) + '</b>' +
       ['lot50', 'lot100'].map(function (k) { return '<button class="item row" data-buylot="' + k + '" style="justify-content:space-between;text-align:left;width:100%;font:inherit;color:var(--ink)"><span><b>' + esc(X('lotPack', { n: k.slice(3) })) + '</b><br><span class="small">' + esc(X('lotPackS', { n: k.slice(3) })) + '</span></span><b class="serif" data-price="' + k + '" style="color:var(--red)">—</b></button>'; }).join('') + '</section>';
-    return bar(X('tLotto'), esc(gname) + ' · ' + esc(p.name)) + '<div class="wrap" style="padding-top:8px"><div class="small noprint" style="margin-bottom:-6px">' + esc(X('lotGame')) + '</div><nav class="yrs noprint">' + chips + '</nav>' + main + mine + shop + '</div>' + tab('home');
+    return bar(X('tLotto'), esc(gname) + ' · ' + esc(p.name)) + '<div class="wrap" style="padding-top:8px"><div class="small noprint" style="margin-bottom:-6px">' + esc(X('lotGame')) + '</div><nav class="yrs wrapc noprint">' + chips + '</nav>' + main + mine + shop + '</div>' + tab('home');
   }
 
   // 나침반: 북이 위, 8방향 — 좋음(초록) · 보통 · 피함(붉음)

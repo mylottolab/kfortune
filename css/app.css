@@ -95,6 +95,8 @@ input.in,select.in{height:48px;border-radius:12px;border:1px solid var(--line2);
 
 /* 토정비결 해 고르기 */
 .yrs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.yrs::-webkit-scrollbar{display:none}
+.yrs.wrapc{flex-wrap:wrap;overflow:visible}.yrs.wrapc .yr{min-height:34px;padding:0 12px;font-size:13px}
+@media (hover:hover) and (pointer:fine){.yrs{flex-wrap:wrap;overflow:visible}}
 .yr{flex-shrink:0;min-height:38px;padding:0 14px;border-radius:19px;border:1px solid var(--line2);background:var(--card);color:var(--ink);display:flex;align-items:center;font:700 14px var(--sans)}
 .yr.on{background:var(--indigo);border-color:var(--indigo);color:var(--on)}
 
