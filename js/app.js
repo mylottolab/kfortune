@@ -557,7 +557,13 @@
       var best = order.filter(function (dd) { return M.dirs[dd].level === 0; });
       var ms = KF_MOVE.months(Y, me), mrow = ms.map(function (m) {
         var ok = KF_MOVE.DIRS.filter(function (dd) { var j = m.dirs[dd]; return j.good.length && !j.bad.length && !M.dirs[dd].bad.length; });
-        return '<div class="mm"><b>' + esc(X('mvMonthN', { m: m.solarMonth })) + '</b><span>' + (ok.length ? ok.map(function (dd) { return esc(dn[dd]) + (M.dirs[dd].level === 0 ? '★' : ''); }).join(' · ') : '—') + '</span></div>'; }).join('');
+        // 절기 달: 寅月은 입춘부터 — 달 이름 밑에 서기 날짜
+        var rg = '', rs = '';
+        try { var J0 = m.idx < 11 ? KF.jieOf(Y)[m.idx + 1] : KF.jieOf(Y + 1)[0], J1 = m.idx < 10 ? KF.jieOf(Y)[m.idx + 2] : KF.jieOf(Y + 1)[m.idx === 10 ? 0 : 1];
+          var kd = function (ms0) { var t = new Date(ms0 + 9 * 36e5); return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() }; }, a = kd(J0), b = kd(J1 - 864e5);
+          rg = X('tojRange', { a: X('ymd', a), b: X('ymd', b) }); rs = X('md', a) + '~' + X('md', b); } catch (e) {}
+        return '<div class="mm"><b>' + KF.BRANCHES[(m.idx + 2) % 12] + '月</b><span>' + (ok.length ? ok.map(function (dd) { return esc(dn[dd]) + (M.dirs[dd].level === 0 ? '★' : ''); }).join(' · ') : '—') + '</span>' +
+          (rg ? '<small class="mmr-l">' + esc(rg) + '</small><small class="mmr-s">' + esc(rs) + '</small>' : '') + '</div>'; }).join('');
       // 앞으로 90일: 손 없는 날 + 띠·일주와 부딪지 않음 + 그날 기운
       var days = [], base = Date.UTC(t.y, t.m - 1, t.d);
       for (var i = 1; i <= 90; i++) {
