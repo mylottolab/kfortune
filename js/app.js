@@ -4,15 +4,44 @@
   var KF = window.KF;
   var LANGS = [['ko', '한국어', 1], ['en', 'English', 1], ['ja', '日本語', 1], ['zh-Hans', '简体中文', 1], ['zh-Hant', '繁體中文', 1], ['es', 'Español', 1],
     ['vi', 'Tiếng Việt', 1], ['th', 'ไทย', 1], ['id', 'Bahasa Indonesia', 1], ['de', 'Deutsch', 1], ['fr', 'Français', 1], ['ar', 'العربية', 1], ['ru', 'Русский', 1]];
+  // 태어난 곳: [id, 한국어, English, IANA 시간대, 경도]
+  // 시각은 그날 그곳에서 실제로 쓰던 시계(서머타임 · 옛 표준시 포함)로 계산 — 브라우저의 세계 시간대 자료(Intl)
+  // 한국은 어느 도시나 같은 시간대라 「대한민국」 하나(서울 경도 기준)
   var PLACES = [
-    ['서울', 'Seoul', 540, 126.98], ['부산', 'Busan', 540, 129.08], ['대구', 'Daegu', 540, 128.6], ['인천', 'Incheon', 540, 126.7], ['광주', 'Gwangju', 540, 126.85],
-    ['대전', 'Daejeon', 540, 127.38], ['울산', 'Ulsan', 540, 129.31], ['수원', 'Suwon', 540, 127.03], ['춘천', 'Chuncheon', 540, 127.73], ['강릉', 'Gangneung', 540, 128.9],
-    ['전주', 'Jeonju', 540, 127.15], ['청주', 'Cheongju', 540, 127.49], ['제주', 'Jeju', 540, 126.53], ['평양', 'Pyongyang', 540, 125.75],
-    ['도쿄', 'Tokyo', 540, 139.69], ['오사카', 'Osaka', 540, 135.5], ['베이징', 'Beijing', 480, 116.4], ['상하이', 'Shanghai', 480, 121.47], ['홍콩', 'Hong Kong', 480, 114.17],
-    ['타이베이', 'Taipei', 480, 121.56], ['싱가포르', 'Singapore', 480, 103.82], ['하노이', 'Hanoi', 420, 105.85], ['호찌민', 'Ho Chi Minh City', 420, 106.63],
-    ['방콕', 'Bangkok', 420, 100.5], ['자카르타', 'Jakarta', 420, 106.85], ['마닐라', 'Manila', 480, 120.98], ['시드니', 'Sydney', 600, 151.2], ['두바이', 'Dubai', 240, 55.27],
-    ['런던', 'London', 0, -0.12], ['파리', 'Paris', 60, 2.35], ['베를린', 'Berlin', 60, 13.4], ['마드리드', 'Madrid', 60, -3.7], ['뉴욕', 'New York', -300, -74.0],
-    ['로스앤젤레스', 'Los Angeles', -480, -118.24], ['멕시코시티', 'Mexico City', -360, -99.13], ['상파울루', 'São Paulo', -180, -46.63]];
+    ['kr', '대한민국 (서울 기준)', 'South Korea (Seoul)', 'Asia/Seoul', 126.98], ['pyongyang', '평양', 'Pyongyang', 'Asia/Pyongyang', 125.75],
+    ['tokyo', '도쿄', 'Tokyo', 'Asia/Tokyo', 139.69], ['osaka', '오사카', 'Osaka', 'Asia/Tokyo', 135.5], ['fukuoka', '후쿠오카', 'Fukuoka', 'Asia/Tokyo', 130.4],
+    ['beijing', '베이징', 'Beijing', 'Asia/Shanghai', 116.4], ['shanghai', '상하이', 'Shanghai', 'Asia/Shanghai', 121.47], ['yanji', '옌지(연변)', 'Yanji', 'Asia/Shanghai', 129.5],
+    ['hongkong', '홍콩', 'Hong Kong', 'Asia/Hong_Kong', 114.17], ['taipei', '타이베이', 'Taipei', 'Asia/Taipei', 121.56], ['ulaanbaatar', '울란바토르', 'Ulaanbaatar', 'Asia/Ulaanbaatar', 106.9],
+    ['singapore', '싱가포르', 'Singapore', 'Asia/Singapore', 103.82], ['kualalumpur', '쿠알라룸푸르', 'Kuala Lumpur', 'Asia/Kuala_Lumpur', 101.69],
+    ['hanoi', '하노이', 'Hanoi', 'Asia/Bangkok', 105.85], ['hcmc', '호찌민', 'Ho Chi Minh City', 'Asia/Ho_Chi_Minh', 106.63], ['bangkok', '방콕', 'Bangkok', 'Asia/Bangkok', 100.5],
+    ['jakarta', '자카르타', 'Jakarta', 'Asia/Jakarta', 106.85], ['manila', '마닐라', 'Manila', 'Asia/Manila', 120.98],
+    ['delhi', '델리', 'Delhi', 'Asia/Kolkata', 77.21], ['mumbai', '뭄바이', 'Mumbai', 'Asia/Kolkata', 72.88],
+    ['almaty', '알마티', 'Almaty', 'Asia/Almaty', 76.95], ['tashkent', '타슈켄트', 'Tashkent', 'Asia/Tashkent', 69.24],
+    ['dubai', '두바이', 'Dubai', 'Asia/Dubai', 55.27], ['riyadh', '리야드', 'Riyadh', 'Asia/Riyadh', 46.72], ['istanbul', '이스탄불', 'Istanbul', 'Europe/Istanbul', 28.98],
+    ['cairo', '카이로', 'Cairo', 'Africa/Cairo', 31.24], ['nairobi', '나이로비', 'Nairobi', 'Africa/Nairobi', 36.82], ['lagos', '라고스', 'Lagos', 'Africa/Lagos', 3.38], ['johannesburg', '요하네스버그', 'Johannesburg', 'Africa/Johannesburg', 28.05],
+    ['moscow', '모스크바', 'Moscow', 'Europe/Moscow', 37.62], ['stpetersburg', '상트페테르부르크', 'Saint Petersburg', 'Europe/Moscow', 30.32], ['vladivostok', '블라디보스토크', 'Vladivostok', 'Asia/Vladivostok', 131.89],
+    ['kyiv', '키이우', 'Kyiv', 'Europe/Kiev', 30.52], ['warsaw', '바르샤바', 'Warsaw', 'Europe/Warsaw', 21.01], ['berlin', '베를린', 'Berlin', 'Europe/Berlin', 13.4],
+    ['paris', '파리', 'Paris', 'Europe/Paris', 2.35], ['london', '런던', 'London', 'Europe/London', -0.12], ['madrid', '마드리드', 'Madrid', 'Europe/Madrid', -3.7], ['rome', '로마', 'Rome', 'Europe/Rome', 12.5],
+    ['newyork', '뉴욕', 'New York', 'America/New_York', -74.0], ['toronto', '토론토', 'Toronto', 'America/Toronto', -79.38], ['chicago', '시카고', 'Chicago', 'America/Chicago', -87.63],
+    ['denver', '덴버', 'Denver', 'America/Denver', -104.99], ['la', '로스앤젤레스', 'Los Angeles', 'America/Los_Angeles', -118.24], ['seattle', '시애틀', 'Seattle', 'America/Los_Angeles', -122.33],
+    ['vancouver', '밴쿠버', 'Vancouver', 'America/Vancouver', -123.12], ['honolulu', '호놀룰루', 'Honolulu', 'Pacific/Honolulu', -157.86],
+    ['mexico', '멕시코시티', 'Mexico City', 'America/Mexico_City', -99.13], ['bogota', '보고타', 'Bogotá', 'America/Bogota', -74.07], ['lima', '리마', 'Lima', 'America/Lima', -77.04],
+    ['santiago', '산티아고', 'Santiago', 'America/Santiago', -70.67], ['buenosaires', '부에노스아이레스', 'Buenos Aires', 'America/Argentina/Buenos_Aires', -58.38], ['saopaulo', '상파울루', 'São Paulo', 'America/Sao_Paulo', -46.63],
+    ['sydney', '시드니', 'Sydney', 'Australia/Sydney', 151.2], ['melbourne', '멜버른', 'Melbourne', 'Australia/Melbourne', 144.96], ['brisbane', '브리즈번', 'Brisbane', 'Australia/Brisbane', 153.03],
+    ['perth', '퍼스', 'Perth', 'Australia/Perth', 115.86], ['auckland', '오클랜드', 'Auckland', 'Pacific/Auckland', 174.76]];
+  // 예전에 저장한 번호(옛 목록 순서) → 새 id. 국내 13개 도시는 모두 「대한민국」
+  var OLD_PLACE = ['kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'pyongyang', 'tokyo', 'osaka', 'beijing', 'shanghai', 'hongkong', 'taipei', 'singapore', 'hanoi', 'hcmc', 'bangkok', 'jakarta', 'manila', 'sydney', 'dubai', 'london', 'paris', 'berlin', 'madrid', 'newyork', 'la', 'mexico', 'saopaulo'];
+  function placeOf(p) { var id = typeof p.place === 'number' ? OLD_PLACE[p.place] : p.place; for (var i = 0; i < PLACES.length; i++) if (PLACES[i][0] === id) return PLACES[i]; return PLACES[0]; }
+  // 그 시각 그곳의 UTC 차이(분) — 서머타임 · 옛 표준시(예: 서울 1954~61년 +8:30) 포함
+  function tzOffset(zone, ms) {
+    try { var f = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'longOffset' }).formatToParts(new Date(ms)).filter(function (x) { return x.type === 'timeZoneName'; })[0].value;
+      var m = /GMT([+-])(\d{1,2})(?::?(\d{2}))?/.exec(f); if (!m) return 0; return (m[1] === '-' ? -1 : 1) * (+m[2] * 60 + +(m[3] || 0));
+    } catch (e) { return null; }
+  }
+  function wallTz(zone, y, m, d, hh, mm) {   // 그 나라 시계로 y-m-d hh:mm 일 때의 UTC 차이
+    var wall = Date.UTC(y, m - 1, d, hh, mm), o1 = tzOffset(zone, wall); if (o1 == null) return null;
+    var o2 = tzOffset(zone, wall - o1 * 60000); return o2 == null ? o1 : o2;
+  }
   var EL = ['wood', 'fire', 'earth', 'metal', 'water'];
 
   /* ── 저장 ── */
@@ -61,8 +90,12 @@
   var CACHE = {};
   function chartOf(p) {
     var k = JSON.stringify(p); if (CACHE[k]) return CACHE[k];
-    var pl = PLACES[p.place || 0];
-    var c = KF.chart({ y: p.y, m: p.m, d: p.d, hh: p.hh, mm: p.mm, cal: p.cal, leap: p.leap, gender: p.gender, tz: pl[2], lon: pl[3], dst: pl[2] === 540 ? 'kr' : false });
+    var pl = placeOf(p), sd = { y: p.y, m: p.m, d: p.d };
+    if (p.cal === 'lunar') { try { sd = KF.lunarToSolar(p.y, p.m, p.d, p.leap); } catch (e) {} }
+    var tz = wallTz(pl[3], sd.y, sd.m, sd.d, p.hh == null ? 12 : p.hh, p.hh == null ? 0 : (p.mm || 0));
+    // Intl 이 없는 아주 옛 브라우저: 예전 방식(한국 표준시 + 한국 서머타임 표)
+    var c = tz == null ? KF.chart({ y: p.y, m: p.m, d: p.d, hh: p.hh, mm: p.mm, cal: p.cal, leap: p.leap, gender: p.gender, tz: pl[0] === 'kr' ? 540 : (tzOffset(pl[3], Date.UTC(2026, 0, 1)) || 540), lon: pl[4], dst: pl[0] === 'kr' ? 'kr' : false })
+      : KF.chart({ y: p.y, m: p.m, d: p.d, hh: p.hh, mm: p.mm, cal: p.cal, leap: p.leap, gender: p.gender, tz: tz, lon: pl[4], dst: false });
     return (CACHE[k] = c);
   }
   function band(v) { return v >= 80 ? 0 : v >= 65 ? 1 : 2; }
@@ -438,7 +471,8 @@
       '<a class="btn gold" href="#start" data-seen="1">' + esc(U('wStart')) + '</a></div></div>';
   }
   function vStart() {
-    var opts = PLACES.map(function (x, i) { return '<option value="' + i + '">' + esc(S.lang === 'ko' ? x[0] : x[1]) + ' (UTC' + (x[2] >= 0 ? '+' : '') + (x[2] / 60) + ')</option>'; }).join('');
+    var opts = PLACES.map(function (x) { var o = tzOffset(x[3], Date.UTC(2026, 0, 15)), u = o == null ? '' : ' (UTC' + (o >= 0 ? '+' : '−') + Math.floor(Math.abs(o) / 60) + (Math.abs(o) % 60 ? ':' + ('0' + Math.abs(o) % 60).slice(-2) : '') + ')';
+      return '<option value="' + x[0] + '">' + esc(S.lang === 'ko' ? x[1] : x[2]) + u + '</option>'; }).join('');
     return '<div class="wrap" style="padding-top:calc(24px + env(safe-area-inset-top,0px));gap:16px">' + (S.profiles.length ? '<a class="back" href="#home" aria-label="back" style="margin-left:-12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>' : '<div class="row" style="justify-content:space-between"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + langPill() + '</div>') +
       '<div><div style="font-size:12px;color:var(--red);font-weight:700;letter-spacing:1px">' + esc(U('startKicker')) + '</div><h1>' + esc(U('startTitle')) + '</h1><p class="small" style="font-size:13px;margin:6px 0 4px">' + esc(U('startLead')) + '</p><p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--red);font-weight:700">' + esc(U('startTag')) + '</p></div>' +
       '<form id="f" style="display:flex;flex-direction:column;gap:14px" novalidate>' +
@@ -459,7 +493,7 @@
     if (!nm || !/^\d{4}-\d{2}-\d{2}$/.test(bd)) { err.hidden = false; return; }
     var a = bd.split('-').map(Number), hh = null, mm = null;
     if (!tu && bt) { var b = bt.split(':').map(Number); hh = b[0]; mm = b[1]; }
-    var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: +document.getElementById('pl').value };
+    var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: document.getElementById('pl').value };
     try { chartOf(p); } catch (x) { err.hidden = false; return; }
     S.profiles.push(p); if (R.q === 'gung' && S.active) { G.other = p.id; save(); location.hash = '#gung'; return; } S.active = p.id; save(); location.hash = '#home';
   }
