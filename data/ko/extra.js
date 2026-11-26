@@ -51,3 +51,5 @@ window.KF_TXT.ko.extra = {
 /* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
 Object.assign(window.KF_TXT["ko"].extra, {"md": "{m}.{d}", "tojRange": "양력 {a}~{b}", "tojNow": "이번 달", "tojBefore": "아직 설 전입니다. {y}년 토정비결은 설날(양력 {seol})부터이고, 지금은 음력으로 {py}년 {mon}입니다. 이달 운은 {py}년 토정비결에서 보세요 — 무료입니다.", "tojBeforeGo": "{py}년 {mon} 풀이 보기"});
 Object.assign(window.KF_TXT["ko"].extra, {"ymd": "{y}년 {m}월 {d}일", "tojRange": "서기 {a} ~ {b}", "tojLunar": "※ 정월부터 섣달까지 열두 달은 모두 음력입니다. 달마다 아래에 서기(양력) 날짜를 적었습니다."});
+Object.assign(window.KF_TXT["ko"].extra, {"placeHint2": "도시나 주 · 도 이름을 넣고 목록에서 고르세요. 해외는 영어로 입력하세요 (예: Fresno, California, Kazan). 그날 그곳의 시계와 해 시각으로 계산해요.", "placeErr": "태어난 곳을 목록에서 골라 주세요.", "plProv": "주 · 도 전체"});
+Object.assign(window.KF_TXT["ko"].extra, {"placeHint2": "태어난 도시 · 군의 지금 이름을 넣고 목록에서 고르세요 (예: 부산, 창원, 홍성). 해외는 영어로 (예: Fresno, California). 그날 그곳의 시계와 해 시각으로 계산해요."});
