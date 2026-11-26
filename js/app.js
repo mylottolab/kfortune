@@ -27,7 +27,7 @@
   function pickLang() { var n = (navigator.language || 'ko').toLowerCase(); if (n.indexOf('ko') === 0) return 'ko'; if (n.indexOf('ja') === 0) return 'ja';
     if (n.indexOf('zh') === 0) return /tw|hk|hant|mo/.test(n) ? 'zh-Hant' : 'zh-Hans'; var two = n.slice(0, 2); if (['es', 'de', 'fr', 'id', 'th', 'vi', 'ar', 'ru'].indexOf(two) >= 0) return two; if (two === 'in') return 'id'; return 'en'; }
   function TX() { return (window.KF_TXT && (window.KF_TXT[S.lang] || window.KF_TXT.ko)) || {}; }
-  function U(k, vars) { var t = TX().ui || {}, v = t[k]; if (v == null) v = ((window.KF_TXT.ko || {}).ui || {})[k]; if (v == null) return k; return fill(v, vars); }
+  function U(k, vars) { var t = TX().ui || {}, v = t[k]; if (v == null) v = (TX().extra || {})[k]; if (v == null) v = ((window.KF_TXT.ko || {}).ui || {})[k]; if (v == null) v = ((window.KF_TXT.ko || {}).extra || {})[k]; if (v == null) return k; return fill(v, vars); }
   function D() { return TX().daily || window.KF_TXT.ko.daily; }
   function fill(s, vars) { if (typeof s !== 'string' || !vars) return s; return s.replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; }); }
   function cap(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
@@ -194,8 +194,10 @@
       tile('#week', '七日', U('mWeek'), '', 1) + tile('#year', '歲運', U('mYear'), U('mYearS'), 1) +
       tile('#gung', '宮合', U('mGung'), U('mGungS2')) + tile('#about', '文', U('mAbout'), U('mAboutS'), 2) +
       '</section>' +
+      '<div class="two"' + (lottoOn() ? '' : ' style="grid-template-columns:1fr"') + '>' + xcard('#move', '移', X('tMove'), X('tMoveS')) + (lottoOn() ? xcard('#lotto', '福', X('tLotto'), X('tLottoS')) : '') + '</div>' +
       '<a class="card row" href="#ask" style="gap:14px;color:var(--ink);border:2px solid var(--red)"><span class="serif" style="font-weight:900;font-size:30px;color:var(--red)">問</span><span style="flex:1"><b style="font-size:15px">' + esc(U('mAsk')) + '</b><br><span class="small">' + esc(U('mAskS')) + '</span></span><span style="color:var(--red);font-weight:700">›</span></a>' + storeRow() + '<p class="note">' + esc(d.note) + '</p></div>' + tab('home');
   }
+  function xcard(h, han, b, s) { return '<a class="card row" href="' + h + '" style="gap:10px;color:var(--ink);padding:12px"><span class="serif" style="font-weight:900;font-size:26px;color:var(--wood)">' + han + '</span><span style="flex:1;min-width:0"><b style="font-size:14px">' + esc(b) + '</b><br><span class="small">' + esc(s) + '</span></span></a>'; }
   function tile(h, han, b, s, col) { return '<a class="tile" href="' + h + '"><span class="h"' + (col === 1 ? ' style="color:var(--indigoT)"' : col === 2 ? ' style="color:var(--mute)"' : '') + '>' + han + '</span><b>' + esc(b) + '</b><small>' + esc(s) + '</small></a>'; }
   function tojYear() { var t = todayYMD(); return t.m >= 11 ? t.y + 1 : t.y; }   // 11월부터 새해 것
 
@@ -452,22 +454,143 @@
     S.profiles.push(p); if (R.q === 'gung' && S.active) { G.other = p.id; save(); location.hash = '#gung'; return; } S.active = p.id; save(); location.hash = '#home';
   }
 
+  /* ── 행운의 번호 · 이사 방향 · 삼재 ── */
+  var LOTTO_IN_APP = true;    // 애플 승인 뒤 true — 앱에서도 10줄 무료(묶음 구매는 웹만)
+  function X(k, vars) { var a = [TX().extra, (window.KF_TXT.en || {}).extra, (window.KF_TXT.ko || {}).extra]; for (var i = 0; i < 3; i++) if (a[i] && a[i][k] != null) return fill(a[i][k], vars); return k; }
+  function qv(k) { var m = new RegExp('(?:^|&)' + k + '=([^&]*)').exec(R.q || ''); return m ? decodeURIComponent(m[1]) : null; }
+  function paidAny() { var e = S.ent || {}; if (PRO || isSub() || (e.saju || []).length || (e.lot || []).length) return true;
+    var has = function (o) { return Object.keys(o || {}).some(function (k) { return (o[k] || []).length; }); }; return has(e.toj) || has(e.move); }
+  function hasMove(p, Y) { var a = (S.ent.move || {})[Y] || []; return subOn(p) || a.indexOf(bkey(p)) >= 0; }
+  function lottoOn() { return !IN_APP || LOTTO_IN_APP; }
+  var LDEF = { ko: 0, ja: 6, de: 3, fr: 3, es: 3 };
+  function balls(s) { var b = function (n, k) { return '<span class="ball' + (k ? ' bn' : '') + '" data-e="' + KF_LOTTO.elOf(n) + '">' + n + '</span>'; };
+    return '<span class="balls">' + s.main.map(function (n) { return b(n); }).join('') + (s.bonus ? '<i>+</i>' + s.bonus.map(function (n) { return b(n, 1); }).join('') : '') + '</span>'; }
+  function lrows(arr) { return '<div class="lrows">' + arr.map(function (s, i) { return '<div class="lrow"><span class="ln">' + (i + 1) + '</span>' + balls(s) + '</div>'; }).join('') + '</div>'; }
+  function vLotto() {
+    var p = prof(); if (!p) return vStart(); if (!lottoOn()) return vHome();
+    var c = chartOf(p), L = S.lang, d = D(), t = todayYMD(), q = qv('g'), saved = ls('kf_lg');
+    var gi = q != null ? +q : saved != null ? +saved : LDEF[L] != null ? LDEF[L] : 1; if (!(gi >= 0 && gi < KF_LOTTO.GAMES.length)) gi = 0; ls('kf_lg', gi);
+    var g = KF_LOTTO.GAMES[gi], gname = g.flag + ' ' + KF_LOTTO.name(gi, L), le = KF_LOTTO.luckEls(c), paid = paidAny();
+    var DG = { 0: '3·8', 1: '2·7', 2: '5·0', 3: '4·9', 4: '1·6' };
+    var chips = KF_LOTTO.GAMES.map(function (x, i) { return '<a class="yr' + (i === gi ? ' on' : '') + '" href="#lotto?g=' + i + '">' + x.flag + ' ' + esc(KF_LOTTO.name(i, L)) + '</a>'; }).join('');
+    var packs = (S.ent.lot || []).filter(function (x) { return x.bkey === bkey(p) && x.g === gi; }), oid = qv('o');
+    var open = packs.filter(function (x) { return x.oid === oid; })[0];
+    var head = function (n) { return '<div class="phead"><b class="serif">' + esc(X('lotPrintH', { name: p.name, game: gname })) + '</b><span class="small">' + X('lotPrintS', { date: dateLine(t) }) + (n ? ' · ' + n : '') + '</span></div>'; };
+    var why = '<p class="small" style="line-height:1.7;margin:0">' + esc(X('lotWhy', { name: p.name, e1: d.elName[le[0]], e2: d.elName[le[1]], d: DG[le[0]] + ' · ' + DG[le[1]] })) + '</p>';
+    var main;
+    if (open) {
+      var n = +open.p.slice(3), arr = KF_LOTTO.sets(c, gi, n, open.oid);
+      main = '<section class="card p1 lotsheet' + (n > 50 ? ' n100' : ' n50') + '">' + head(X('lotPack', { n: n })) + lrows(arr) + '<p class="pnote">' + esc(X('lotNote')) + '</p></section>' +
+        '<a class="btn ghost noprint" href="#lotto?g=' + gi + '">' + esc(X('lotClose')) + '</a>';
+    } else {
+      main = '<section class="card p1 lotsheet n10">' + head() + '<h2 style="font-size:16px;margin:6px 0">' + esc(X('lotToday', { n: paid ? 10 : 1 })) + '</h2>' + why +
+        lrows(KF_LOTTO.sets(c, gi, paid ? 10 : 1, bkey(p) + '|' + todayStr())) + '<p class="pnote">' + esc(X('lotNote')) + '</p></section>' +
+        (paid ? '' : '<section class="card" style="display:flex;flex-direction:column;gap:10px;border:2px solid var(--gold)"><b>' + esc(X('lotFreeLock')) + '</b><span class="small">' + esc(X('lotFreeLockS')) + '</span>' + payBtn(p, U('subscribeAll')) + '</section>');
+    }
+    var mine = packs.length ? '<section class="list"><h2 style="font-size:16px">' + esc(X('lotMine')) + '</h2>' + packs.map(function (x) {
+      var on = open && x.oid === open.oid;
+      return '<a class="item" href="#lotto?g=' + gi + (on ? '' : '&o=' + encodeURIComponent(x.oid)) + '" style="display:flex;justify-content:space-between;color:var(--ink)"><span><b>' + esc(X('lotPack', { n: x.p.slice(3) })) + '</b> <span class="small">' + esc(String(x.at || '').slice(0, 10)) + '</span></span><b style="color:var(--red)">' + esc(X(on ? 'lotClose' : 'lotOpen')) + '</b></a>'; }).join('') + '</section>' : '';
+    var shop = IN_APP ? '' : '<section class="card noprint" style="display:flex;flex-direction:column;gap:10px"><b>' + esc(X('lotMore')) + '</b>' +
+      ['lot50', 'lot100'].map(function (k) { return '<button class="item row" data-buylot="' + k + '" style="justify-content:space-between;text-align:left;width:100%;font:inherit;color:var(--ink)"><span><b>' + esc(X('lotPack', { n: k.slice(3) })) + '</b><br><span class="small">' + esc(X('lotPackS', { n: k.slice(3) })) + '</span></span><b class="serif" data-price="' + k + '" style="color:var(--red)">—</b></button>'; }).join('') + '</section>';
+    return bar(X('tLotto'), esc(gname) + ' · ' + esc(p.name)) + '<div class="wrap" style="padding-top:8px"><div class="small noprint" style="margin-bottom:-6px">' + esc(X('lotGame')) + '</div><nav class="yrs noprint">' + chips + '</nav>' + main + mine + shop + '</div>' + tab('home');
+  }
+
+  // 나침반: 북이 위, 8방향 — 좋음(초록) · 보통 · 피함(붉음)
+  function compass(M, show, dn, xs) {
+    var cx = 150, cy = 150, R1 = 138, R0 = 54, o = '<svg viewBox="0 0 300 300" width="100%" style="max-width:300px" role="img" aria-label="compass">';
+    var pt = function (r, a) { a = (a - 90) * Math.PI / 180; return (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy + r * Math.sin(a)).toFixed(1); };
+    KF_MOVE.DIRS.forEach(function (dd, i) {
+      var a = i * 45, j = M.dirs[dd], lv = show(dd);
+      var fillc = lv === 0 ? 'var(--wood-bg)' : lv === 2 ? 'var(--fire-bg)' : 'var(--card)', ink = lv === 0 ? 'var(--wood)' : lv === 2 ? 'var(--red)' : 'var(--mute)';
+      o += '<path d="M' + pt(R0, a - 22.5) + ' L' + pt(R1, a - 22.5) + ' A' + R1 + ' ' + R1 + ' 0 0 1 ' + pt(R1, a + 22.5) + ' L' + pt(R0, a + 22.5) + ' A' + R0 + ' ' + R0 + ' 0 0 0 ' + pt(R0, a - 22.5) + 'Z" style="fill:' + fillc + ';stroke:var(--line2)" stroke-width="1"/>';
+      var p1 = pt(112, a).split(' '), p2 = pt(80, a).split(' ');
+      o += '<text x="' + p1[0] + '" y="' + p1[1] + '" text-anchor="middle" dominant-baseline="middle" style="fill:' + ink + ';font:700 ' + (dn[dd].length > 6 ? 10.5 : 14) + 'px var(--sans)">' + esc(dn[dd]) + '</text>';
+      o += '<text x="' + p2[0] + '" y="' + p2[1] + '" text-anchor="middle" dominant-baseline="middle" style="fill:var(--ink);font:900 15px var(--serif)">' + esc(xs[j.star].slice(0, 2)) + '</text>';
+    });
+    o += '<circle cx="150" cy="150" r="' + (R0 - 4) + '" style="fill:var(--inkbg)"/><text x="150" y="150" text-anchor="middle" dominant-baseline="middle" style="fill:var(--gold);font:900 18px var(--serif)">' + esc(xs[M.center].slice(0, 2)) + '</text>';
+    return o + '</svg>';
+  }
+  function moveCtx(p) {
+    var c = chartOf(p), by = c.solar.y; if (c.utc < KF.jieOf(by)[1]) by -= 1;
+    return { c: c, me: KF_MOVE.star(by) };
+  }
+  function samjaeCard(c, Y) {
+    var b = c.pillars.year.b, k = KF_MOVE.samjae(b, Y), an = X('animals'), y0 = k >= 0 ? Y - k : Y;
+    if (k < 0) { while (KF_MOVE.samjae(b, y0) !== 0) y0++; }
+    var sy = [y0, y0 + 1, y0 + 2], sb = sy.map(function (yy) { return KF.BRANCHES[((yy - 4) % 12 + 12) % 12]; }), s0 = ((y0 - 4) % 12 + 12) % 12;
+    var grp = [6, 10, 14].map(function (i) { return KF.BRANCHES[(s0 + i) % 12]; }).join('');   // 申子辰 · 亥卯未 · 寅午戌 · 巳酉丑
+    return '<section class="card" style="display:flex;flex-direction:column;gap:8px' + (k >= 0 ? ';border:2px solid var(--red)' : '') + '"><div class="row" style="justify-content:space-between"><h2 style="font-size:16px">' + esc(X('tSamjae')) + ' · ' + Y + '</h2><b class="serif" style="color:' + (k >= 0 ? 'var(--red)' : 'var(--wood)') + '">' + esc(k >= 0 ? X('samjaeIn')[k] : X('samjaeNo')) + '</b></div>' +
+      '<p class="small" style="margin:0;line-height:1.7">' + esc(X('samjaeWhy', { br: an[b], grp: grp, a: sy[0] + '(' + sb[0] + ')', b: sy[1] + '(' + sb[1] + ')', c: sy[2] + '(' + sb[2] + ')' })) + '</p>' +
+      (k >= 0 ? '<p style="margin:0;font-size:14px;line-height:1.7">' + esc(X('samjaeTip')[k]) + '</p>' : '<p class="small" style="margin:0">' + esc(X('samjaeNext', { y: y0 })) + '</p>') + '</section>';
+  }
+  function vMove() {
+    var p = prof(); if (!p) return vStart();
+    var t = todayYMD(), Y0 = KF_MOVE.ipchunYear(t.y, t.m, t.d), Y = +qv('y') === Y0 + 1 ? Y0 + 1 : Y0;
+    var mc = moveCtx(p), c = mc.c, me = mc.me, M = KF_MOVE.year(Y, me), open = hasMove(p, Y), xs = X('stars'), dn = X('dirs'), W = X('why'), an = X('animals'), lvT = X('lv');
+    var COMMON = ['ohwang', 'amgeom', 'pa', 'daejang', 'samsal'];
+    var vars = function (j) { return { me: xs[me], st: xs[j.star], br: KF.BRANCHES[M.yb] + '·' + an[M.yb] }; };
+    var picker = '<nav class="yrs noprint">' + [Y0, Y0 + 1].map(function (yy) { return '<a class="yr' + (yy === Y ? ' on' : '') + '" href="#move' + (yy === Y0 ? '' : '?y=' + yy) + '">' + yy + '</a>'; }).join('') + '</nav>';
+    var common = KF_MOVE.DIRS.filter(function (dd) { return M.dirs[dd].bad.some(function (b) { return COMMON.indexOf(b) >= 0; }); }).map(function (dd) {
+      return '<div class="mvrow"><b class="mvd bad">' + esc(dn[dd]) + '</b><div>' + M.dirs[dd].bad.filter(function (b) { return COMMON.indexOf(b) >= 0; }).map(function (b) { return '<div>' + esc(fill(W[b], vars(M.dirs[dd]))) + '</div>'; }).join('') + '</div></div>'; }).join('');
+    var head = '<div class="phead"><b class="serif">' + esc(X('mvPrintH', { name: p.name, y: Y })) + '</b><span class="small">' + dateLine(t) + ' · KoreanFortune</span></div>';
+    var top = '<div class="mvtop"><div class="svgwrap mvc">' + compass(M, function (dd) { return open ? M.dirs[dd].level : (M.dirs[dd].bad.some(function (b) { return COMMON.indexOf(b) >= 0; }) ? 2 : 1); }, dn, xs) + '</div>' +
+      '<div class="mvme"><b>' + esc(X('mvMe', { name: p.name, star: xs[me] })) + '</b><p class="small" style="margin:4px 0 0;line-height:1.6">' + esc(X('mvMeWhy')) + '</p><p class="small" style="margin:4px 0 0">' + esc(X('mvYearS', { y: Y })) + '</p></div></div>';
+    var body;
+    if (!open) {
+      body = '<section class="card"><h2 style="font-size:16px">' + esc(X('mvCommon')) + '</h2><p class="small" style="margin:2px 0 8px">' + esc(X('mvCommonS')) + '</p>' + common + '</section>';
+    } else {
+      var order = KF_MOVE.DIRS.slice().sort(function (a, b) { var A = M.dirs[a], B = M.dirs[b]; return A.level - B.level || (B.good.indexOf('saenggi') >= 0) - (A.good.indexOf('saenggi') >= 0); });
+      var rows = order.map(function (dd) { var j = M.dirs[dd], v = vars(j), rs = j.bad.map(function (b) { return W[b]; });
+        if (!j.bad.length) rs = rs.concat(j.good.length ? j.good.map(function (g) { return W[g]; }) : [W.clash]);
+        var eff = j.level === 0 ? '<div class="eff">→ ' + esc(X('starEff')[j.star]) + '</div>' : '';
+        return '<div class="mvrow"><b class="mvd ' + ['good', 'mid', 'bad'][j.level] + '">' + esc(dn[dd]) + '<small>' + esc(lvT[j.level]) + '</small></b><div>' + rs.map(function (r) { return '<div>' + esc(fill(r, v)) + '</div>'; }).join('') + eff + '</div></div>'; }).join('');
+      var best = order.filter(function (dd) { return M.dirs[dd].level === 0; });
+      var ms = KF_MOVE.months(Y, me), mrow = ms.map(function (m) {
+        var ok = KF_MOVE.DIRS.filter(function (dd) { var j = m.dirs[dd]; return j.good.length && !j.bad.length && !M.dirs[dd].bad.length; });
+        return '<div class="mm"><b>' + esc(X('mvMonthN', { m: m.solarMonth })) + '</b><span>' + (ok.length ? ok.map(function (dd) { return esc(dn[dd]) + (M.dirs[dd].level === 0 ? '★' : ''); }).join(' · ') : '—') + '</span></div>'; }).join('');
+      // 앞으로 90일: 손 없는 날 + 띠·일주와 부딪지 않음 + 그날 기운
+      var days = [], base = Date.UTC(t.y, t.m - 1, t.d);
+      for (var i = 1; i <= 90; i++) {
+        var dt = new Date(base + i * 864e5), y = dt.getUTCFullYear(), m = dt.getUTCMonth() + 1, dd = dt.getUTCDate(), l;
+        try { l = KF.solarToLunar(y, m, dd); } catch (e) { continue; }
+        if ([9, 10, 19, 20, 29, 30].indexOf(l.d) < 0) continue;
+        var r = KF.daily(c, y, m, dd), pb = r.pillar.b, md = function (a, n) { return ((a % n) + n) % n; };
+        if (md(pb - c.pillars.year.b, 12) === 6 || md(pb - c.pillars.day.b, 12) === 6) continue;
+        days.push({ y: y, m: m, d: dd, wd: (dt.getUTCDay() + 6) % 7, l: l, s: r.scores.total, mb: KF.monthPillarAt(y, m, dd).b });
+      }
+      days = days.sort(function (a, b) { return b.s - a.s; }).slice(0, 8).sort(function (a, b) { return (a.y * 400 + a.m * 31 + a.d) - (b.y * 400 + b.m * 31 + b.d); });
+      var drow = days.map(function (x) {
+        var yy = KF_MOVE.ipchunYear(x.y, x.m, x.d), YM = KF_MOVE.year(yy, me), mo = KF_MOVE.months(yy, me)[((x.mb - 2) % 12 + 12) % 12];
+        var ok = KF_MOVE.DIRS.filter(function (k) { var j = mo.dirs[k]; return j.good.length && !j.bad.length && !YM.dirs[k].bad.length; }).map(function (k) { return dn[k]; });
+        return '<div class="dd"><b>' + dateLine({ y: x.y, m: x.m, d: x.d, wd: x.wd }) + '</b><span class="small">' + esc(X('mvLunar', { m: x.l.m, d: x.l.d })) + ' · ' + esc(X('mvSon')) + ' · ' + esc(X('mvScore', { s: x.s })) + '</span><span class="small">' + esc(X('mvDayDirs', { d: ok.length ? ok.join(' · ') : '—' })) + '</span></div>'; }).join('');
+      body = '<section class="card mvbest"><h2 style="font-size:16px">' + esc(X('mvBest')) + ' · <span style="color:var(--wood)">' + (best.length ? best.map(function (dd) { return esc(dn[dd]); }).join(' · ') : '—') + '</span></h2>' + (best.length ? '' : '<p class="small">' + esc(X('mvNone')) + '</p>') + '</section>' +
+        '<section class="card"><h2 style="font-size:16px;margin-bottom:6px">' + esc(X('mvPersonal')) + '</h2>' + rows + '</section>' +
+        '<section class="card"><h2 style="font-size:16px">' + esc(X('mvMonths')) + '</h2><p class="small" style="margin:2px 0 8px">' + esc(X('mvMonthsS')) + '</p><div class="mms">' + mrow + '</div></section>' +
+        '<section class="card"><h2 style="font-size:16px">' + esc(X('mvDays')) + '</h2><p class="small" style="margin:2px 0 8px">' + esc(X('mvDaysS', { name: p.name })) + '</p><div class="dds">' + drow + '</div></section>';
+    }
+    var lock = open ? '' : '<section class="card noprint" style="display:flex;flex-direction:column;gap:10px;border:2px solid var(--gold)"><b>' + esc(X('mvLock')) + '</b><span class="small">' + esc(X('mvLockS')) + '</span>' +
+      payBtn(p, U('subscribeAll')) + (IN_APP ? '' : '<button class="btn line" data-buymove="' + Y + '">' + esc(X('mvBuy', { y: Y })) + ' · <span data-price="move">—</span></button>') + '</section>';
+    return bar(X('mvYear', { y: Y }), esc(p.name)) + '<div class="wrap" style="padding-top:8px">' + picker +
+      '<div class="p1 mvsheet">' + head + top + body + '<p class="pnote">' + esc(X('mvNote')) + '</p></div>' + lock + '<div class="noprint">' + samjaeCard(c, Y0) + '</div></div>' + tab('home');
+  }
+
   /* ── 라우터 ── */
   var R = { q: '' };
   function render() {
     var h = (location.hash || '#home').slice(1), hq = h.split('?'); h = hq[0]; R.q = hq[1] || '';
     if (h !== 'ask') { Q.kind = null; Q.shown = false; }
     if (!S.profiles.length && h !== 'about') h = (h === 'start' || ls('kf_seen')) ? 'start' : 'welcome';
-    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, welcome: vWelcome, pay: vPay, paid: function () { return window.KF_PAY ? KF_PAY.vPaid(R.q) : vHome(); }, restore: function () { return window.KF_PAY ? KF_PAY.vRestore() : vPay(); }, about: vAbout, gung: vGung, ask: vAsk, me: vMe, start: vStart }[h] || vHome;
+    var v = { home: vHome, today: vToday, week: vWeek, saju: vSaju, year: vYear, tojeong: function () { return vTojeong(); }, 'tojeong-last': function () { return vTojeong(true); }, welcome: vWelcome, pay: vPay, paid: function () { return window.KF_PAY ? KF_PAY.vPaid(R.q) : vHome(); }, restore: function () { return window.KF_PAY ? KF_PAY.vRestore() : vPay(); }, about: vAbout, gung: vGung, ask: vAsk, me: vMe, start: vStart, lotto: vLotto, move: vMove }[h] || vHome;
     document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
     applyTheme();
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
+    app.classList.toggle('hasp1', !!app.querySelector('.p1'));
     var yon = app.querySelector('.yrs .on'); if (yon && yon.parentNode.scrollTo) yon.parentNode.scrollLeft = yon.offsetLeft - 60;
     var f = document.getElementById('f'); if (f) f.addEventListener('submit', submitStart);
     if (window.KF_PAY && KF_PAY.after) KF_PAY.after(h);
     // 결과 화면: 출력·PDF · 공유
-    var RES = { today: 1, week: 1, saju: 1, year: 1, tojeong: 1, 'tojeong-last': 1, gung: !!G.other, ask: Q.shown };
+    var RES = { today: 1, week: 1, saju: 1, year: 1, tojeong: 1, 'tojeong-last': 1, gung: !!G.other, ask: Q.shown, lotto: lottoOn(), move: 1 };
     var w = RES[h] && app.querySelector('.wrap');
     if (w) { var d = document.createElement('div'); d.className = 'two noprint'; d.innerHTML = '<button class="btn ghost" data-print="1">🖨 ' + esc(U('print')) + '</button><button class="btn ghost" data-share="1">↗ ' + esc(U('share')) + '</button>'; w.appendChild(d); }
   }
@@ -519,7 +642,7 @@
     if (e.target.closest('[data-theme-toggle]')) { var o = ['auto', 'light', 'dark']; S.theme = o[(o.indexOf(S.theme || 'auto') + 1) % 3]; ls('kf_theme', S.theme); render(); return; }
     if (e.target.closest('[data-print]')) { doPrint(); return; }
     if (e.target.closest('[data-share]')) { doShare(); return; }
-    var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-buytoj],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
+    var t = e.target.closest('[data-cal],[data-g],[data-lang],[data-use],[data-del],[data-buy],[data-buytoj],[data-buylot],[data-buymove],[data-gt],[data-go],[data-q],[data-qw],[data-qgo],[data-qreset]'); if (!t) return;
     if (t.dataset.gt) { G.type = t.dataset.gt; return render(); }
     if (t.dataset.go) { G.other = t.dataset.go; return render(); }
     if (t.dataset.q) { Q.kind = t.dataset.q; Q.shown = false; if (Q.kind === 'match') { location.hash = '#gung'; return; } return render(); }
@@ -533,6 +656,8 @@
     else if (t.dataset.del) { S.profiles = S.profiles.filter(function (p) { return p.id !== t.dataset.del; }); if (S.active === t.dataset.del) S.active = (S.profiles[0] || {}).id; save(); render(); }
     else if (t.dataset.buy && window.KF_PAY) window.KF_PAY.buy(t.dataset.buy, prof(), tojYear());
     else if (t.dataset.buytoj && window.KF_PAY) window.KF_PAY.buy('toj', prof(), Number(t.dataset.buytoj));
+    else if (t.dataset.buylot && window.KF_PAY) window.KF_PAY.buy(t.dataset.buylot, prof(), null, +(ls('kf_lg') || 0));
+    else if (t.dataset.buymove && window.KF_PAY) window.KF_PAY.buy('move', prof(), Number(t.dataset.buymove));
   });
   function keepQ() { var qd = document.getElementById('qd'); if (qd) Q.date = qd.value; render(); }
   function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;
@@ -540,7 +665,7 @@
   function setLang(l) {
     S.lang = l; save();
     if (window.KF_TXT[l] || l === 'ko') return render();
-    var files = ['ui', 'daily', 'saju', 'ilju', 'toj', 'gung'], n = files.length;
+    var files = ['ui', 'daily', 'saju', 'ilju', 'toj', 'gung', 'extra'], n = files.length;
     window.KF_TXT[l] = window.KF_TXT[l] || {};
     files.forEach(function (f) { var s = document.createElement('script'); s.src = 'data/' + l + '/' + f + '.js?v=' + (window.KF_VER || 1); s.onload = s.onerror = function () { if (--n === 0) render(); }; document.head.appendChild(s); });
   }

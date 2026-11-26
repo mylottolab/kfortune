@@ -129,9 +129,58 @@ input.in,select.in{height:48px;border-radius:12px;border:1px solid var(--line2);
 :root,:root[data-theme=dark]{--paper:#fff;--card:#fff;--line:#ddd;--line2:#ccc;--ink:#111;--mute:#555;--soft:#f4f4f4;color-scheme:light}
 html,body{background:#fff!important}
 .tab,.acts,.back,.noprint,.btn,.sheet,#kftoast,.lock .over{display:none!important}
-.app{padding-bottom:0;max-width:none}
+.app{padding-bottom:0;max-width:none;min-height:0!important}
+body{min-height:0!important}
 .card,.item,.story,section{break-inside:avoid}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .app::after{content:'KoreanFortune · 한국전통운세 · koreanfortune.kr';display:block;text-align:center;font-size:11px;color:#777;margin-top:16px}
 @page{margin:14mm}
+}
+
+/* 행운의 번호 · 이사 방향 */
+.balls{display:inline-flex;gap:4px;flex-wrap:wrap;align-items:center}
+.ball{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 13px var(--sans);border:1px solid var(--line2)}
+.ball[data-e="0"]{background:var(--wood-bg);color:var(--wood)}.ball[data-e="1"]{background:var(--fire-bg);color:var(--fire)}.ball[data-e="2"]{background:var(--earth-bg);color:var(--earth)}.ball[data-e="3"]{background:var(--metal-bg);color:var(--metal)}.ball[data-e="4"]{background:var(--water-bg);color:var(--water)}
+.ball.bn{box-shadow:0 0 0 2px var(--gold)}
+.balls i{font-style:normal;color:var(--mute);margin:0 1px}
+.lrows{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.lrow{display:flex;align-items:center;gap:8px}.ln{width:22px;flex:none;text-align:right;color:var(--mute);font-size:12px}
+.lotsheet.n50 .lrows,.lotsheet.n100 .lrows{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:6px 14px}
+.phead{display:none}
+.pnote{font-size:11.5px;color:var(--mute);line-height:1.6;margin:10px 0 0}
+.mvsheet{display:flex;flex-direction:column;gap:14px}
+.mvtop{display:flex;flex-direction:column;align-items:center;gap:10px}.mvc{width:100%;display:flex;justify-content:center}
+.mvme{font-size:14px;line-height:1.6}
+.mvrow{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.65}
+.mvd{font:700 15px var(--serif);display:flex;flex-direction:column}.mvd small{font:600 11px var(--sans)}
+.mvd.good{color:var(--wood)}.mvd.bad{color:var(--red)}.mvd.mid{color:var(--mute)}
+.eff{color:var(--wood);font-weight:600}
+.mms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.mm{display:flex;gap:8px;font-size:13.5px;padding:6px 8px;background:var(--soft);border-radius:8px}.mm b{min-width:38px;flex:none}
+.dds{display:flex;flex-direction:column;gap:6px}.dd{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:var(--soft);border-radius:10px;font-size:14px}
+@media print{
+.hasp1 .wrap>:not(.p1),.hasp1 .bar{display:none!important}
+.hasp1 .wrap{padding:0}
+.phead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:2px solid #111;padding-bottom:4px;margin-bottom:6px}
+.phead b{font-size:13pt}
+.p1.card,.p1 .card{border:0;padding:0;background:none}
+.lotsheet h2{font-size:12pt!important}
+.lotsheet.n50 .lrows{grid-template-columns:repeat(2,1fr);gap:2px 18px}
+.lotsheet.n100 .lrows{grid-template-columns:repeat(3,1fr);gap:1px 10px}
+.lotsheet.n50 .lrows,.lotsheet.n100 .lrows{margin-top:4px}
+.lotsheet.n50 .ball,.lotsheet.n100 .ball{width:19px;height:19px;font-size:8.5px}
+.lotsheet.n50 .balls,.lotsheet.n100 .balls{gap:2px}
+.lotsheet.n50 .ln,.lotsheet.n100 .ln{font-size:7.5px;width:16px}
+.lotsheet.n50 .lrow,.lotsheet.n100 .lrow{gap:4px}
+.lotsheet.n50 .pnote,.lotsheet.n100 .pnote{font-size:7.5pt;margin-top:4px}
+.mvsheet{gap:5px;font-size:9pt}
+.mvsheet h2{font-size:10.5pt!important;margin:0!important}
+.mvsheet .small{font-size:8pt!important;margin:0!important}
+.mvtop{flex-direction:row;align-items:center;gap:14px}.mvc{width:auto}.mvc svg{width:150px!important}
+.mvme{font-size:9pt;line-height:1.45}
+.mvrow{padding:2px 0;font-size:8pt;line-height:1.38;grid-template-columns:42px 1fr;gap:6px}
+.mvd{font-size:10pt}.mvd small{font-size:7pt}
+.mms{grid-template-columns:repeat(6,1fr);gap:3px}.mm{flex-direction:column;gap:0;font-size:8pt;padding:2px 4px}
+.dds{display:grid;grid-template-columns:repeat(2,1fr);gap:3px}.dd{padding:3px 6px;font-size:8.5pt;gap:0}
+.mvsheet .pnote{font-size:7.5pt;margin:2px 0 0}
+.mvbest h2{font-size:11pt!important}
 }

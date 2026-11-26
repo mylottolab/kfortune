@@ -104,7 +104,7 @@
   });
 
   // 가격 표시
-  var PRICES = ls('kf_prices');
+  var PRICES = ls('kf_prices'); if (PRICES && !PRICES.move) PRICES = null;   // 새 상품이 없는 옛 가격표는 다시 받기
   // ── 앱(구글 플레이) 안에서: 결제는 구글 플레이로만 ──
   var GP = { sub: 'kf_year', saju: 'kf_saju', toj: 'kf_toj' }, NPRICE = {}, SEEN = {};
   var NATIVE = window.KFNative || null;
@@ -155,23 +155,24 @@
   // ── 결제 시트 ──
   var sheet = null;
   function closeSheet() { if (sheet) { sheet.remove(); sheet = null; } }
-  function buy(kind, p, year) {
-    if (NATIVE) return nativeBuy(kind, p, year);
+  function buy(kind, p, year, game) {
+    if (NATIVE) { if (!GP[kind]) return; return nativeBuy(kind, p, year); }   // 이사 · 행운의 번호 묶음은 웹 결제만
     if (!p && kind !== 'sub') { location.hash = '#start'; return; }
     closeSheet();
     var KR = A.lang() === 'ko';
-    var U = A.U, label = kind === 'sub' ? U('payYear') : kind === 'saju' ? U('paySaju') : U('payToj', { y: year });
+    var U = A.U, label = kind === 'sub' ? U('payYear') : kind === 'saju' ? U('paySaju') : kind === 'move' ? U('payMove', { y: year }) : /^lot/.test(kind) ? U('payLot', { n: kind.slice(3), game: (window.KF_LOTTO && KF_LOTTO.name(game)) || '' }) : U('payToj', { y: year });
+    var PK = PRICES && PRICES[kind]; if (!PK) loadPrices().then(function () { if (sheet && PRICES && PRICES[kind]) { closeSheet(); buy(kind, p, year, game); } });
     var who = kind === 'sub' ? '' : '<div class="small">' + esc(t('forWho', { name: p.name })) + '</div>';
     sheet = document.createElement('div'); sheet.className = 'sheet'; sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
     sheet.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px">' +
       '<div class="row" style="justify-content:space-between"><b class="serif" style="font-size:18px">' + esc(label) + '</b><b class="serif" style="font-size:18px">' + esc(fmt(kind)) + '</b></div>' + who +
       '<label for="pe" style="font-size:13px;font-weight:700">' + esc(t('email')) + '</label><input class="in" id="pe" type="email" autocomplete="email" inputmode="email" value="' + esc(ls('kf_email') || '') + '">' +
       '<div class="small" id="pm" hidden style="color:var(--red)"></div>' +
-      (KR ? '<button class="btn" id="pcard">' + esc(t('card')) + ' · ' + (PRICES ? '₩' + PRICES[kind].krw.toLocaleString('ko-KR') : '') + '</button>' +
-        '<div class="small" style="text-align:center">' + esc(t('or')) + ' · ' + esc(t('paypal')) + (PRICES ? ' $' + PRICES[kind].usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>'
+      (KR ? '<button class="btn" id="pcard">' + esc(t('card')) + ' · ' + (PK ? '₩' + PK.krw.toLocaleString('ko-KR') : '') + '</button>' +
+        '<div class="small" style="text-align:center">' + esc(t('or')) + ' · ' + esc(t('paypal')) + (PK ? ' $' + PK.usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>'
       : '<div class="item" style="font-size:13px;line-height:1.6;border-color:var(--gold)">🌏 ' + esc(PP_NOTE[A.lang()] || PP_NOTE.en) + '</div>' +
-        '<div class="small" style="text-align:center;font-weight:700">' + esc(t('paypal')) + (PRICES ? ' · $' + PRICES[kind].usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>' +
-        '<div class="small" style="text-align:center">' + esc(t('or')) + '</div><button class="btn ghost" id="pcard">' + esc(t('card')) + ' · ' + (PRICES ? '₩' + PRICES[kind].krw.toLocaleString('ko-KR') : '') + '</button>') +
+        '<div class="small" style="text-align:center;font-weight:700">' + esc(t('paypal')) + (PK ? ' · $' + PK.usd : '') + '</div><div id="ppbox" style="min-height:48px"></div>' +
+        '<div class="small" style="text-align:center">' + esc(t('or')) + '</div><button class="btn ghost" id="pcard">' + esc(t('card')) + ' · ' + (PK ? '₩' + PK.krw.toLocaleString('ko-KR') : '') + '</button>') +
       '<div class="small" style="line-height:1.6">' + esc(t('refund')) + ' <a href="terms.html" target="_blank" rel="noopener">' + esc(A.U('terms')) + '</a></div>' +
       '<button class="btn ghost" id="pclose">' + esc(t('close')) + '</button></div>';
     document.body.appendChild(sheet);
@@ -181,7 +182,7 @@
       var em = sheet.querySelector('#pe').value.trim();
       if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(em)) { msg(t('emailErr')); sheet.querySelector('#pe').focus(); return null; }
       ls('kf_email', em);
-      return { uid: uid, product: kind, bkey: p ? A.bkey(p) : null, year: kind === 'toj' ? year : null, email: em, name: p ? p.name : '', lang: A.lang() };
+      return { uid: uid, product: kind, bkey: p ? A.bkey(p) : null, year: kind === 'toj' || kind === 'move' ? year : null, game: /^lot/.test(kind) ? game : null, email: em, name: p ? p.name : '', lang: A.lang() };
     };
     function msg(s) { var m = sheet && sheet.querySelector('#pm'); if (m) { m.textContent = s; m.hidden = !s; } }
     sheet.querySelector('#pcard').onclick = function () {
@@ -222,7 +223,7 @@
   function vPaid(q) {
     var P = {}; String(q || '').split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) P[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
     var ok = P.ok === '1', last = ls('kf_last') || {};
-    var go = last.kind === 'saju' ? '#saju' : last.kind === 'toj' ? '#tojeong' : '#home';
+    var go = last.kind === 'saju' ? '#saju' : last.kind === 'toj' ? '#tojeong' : last.kind === 'move' ? '#move' : /^lot/.test(last.kind || '') ? '#lotto' : '#home';
     if (ok) sync();
     return '<div class="wrap" style="padding-top:48px;display:flex;flex-direction:column;gap:14px;text-align:center">' +
       '<div class="serif" style="font-size:44px;font-weight:900;color:' + (ok ? 'var(--indigo)' : 'var(--red)') + '">' + (ok ? '○' : '✕') + '</div>' +
@@ -275,7 +276,7 @@
   function after(h) {
     if (h === 'pay' && NATIVE) { var nt = document.querySelector('.wrap .item'); if (nt) nt.textContent = IOS ? (IOS_T[A.lang()] || IOS_T.en)[0] : t('appNote'); }
     if (h === 'restore' && IOS) { var gg = document.querySelector('#rf p.small'); if (gg) gg.textContent = (IOS_T[A.lang()] || IOS_T.en)[1]; }
-    if (h === 'pay') { fillPrices(); if (!PRICES) loadPrices(); }
+    if (h === 'pay' || h === 'move' || h === 'lotto') { fillPrices(); if (!PRICES) loadPrices(); }
     if (h === 'restore') {
       var f = document.getElementById('rf'); if (!f) return;
       f.addEventListener('submit', function (e) {
