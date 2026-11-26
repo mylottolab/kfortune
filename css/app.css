@@ -186,3 +186,5 @@ body{min-height:0!important}
 .mvsheet .pnote{font-size:7.5pt;margin:2px 0 0}
 .mvbest h2{font-size:11pt!important}
 }
+
+.tnow{border:2px solid var(--wood)!important}.tnowb{display:inline-block;padding:1px 8px;border-radius:9px;background:var(--wood);color:#fff;font:700 11px var(--sans);vertical-align:2px}

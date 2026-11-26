@@ -128,3 +128,6 @@ window.KF_TXT["zh-Hans"].extra = {
  "mvPrintH": "{name}的{y}年搬家方位 · 吉日",
  "compassN": "北"
 };
+
+/* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
+Object.assign(window.KF_TXT["zh-Hans"].extra, {"md": "{m}/{d}", "tojRange": "公历 {a}–{b}", "tojNow": "本月", "tojBefore": "还没到春节。{y}年土亭秘诀从春节（公历{seol}）开始，现在按农历仍是{py}年{mon}。本月运势请看{py}年土亭秘诀（免费）。", "tojBeforeGo": "看{py}年{mon}"});

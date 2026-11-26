@@ -281,11 +281,20 @@
     var isLast = lastYear === true, locked = !isLast && !hasToj(p, y);
     var ms = tj && tj.m ? tj.m.map(function (x) { return x.s; }) : monthScores(c, y);
     var hi = ms.indexOf(Math.max.apply(null, ms)), lo = ms.indexOf(Math.min.apply(null, ms));
+    // 토정비결의 달은 음력 — 달마다 양력 날짜를 붙이고, 지금 달에 표시(설 전 양력 1월은 아직 지난해 동짓달 · 섣달)
+    var tl = todayYMD(), lt = null; try { lt = KF.solarToLunar(tl.y, tl.m, tl.d); } catch (e) {}
+    var md = function (o) { return X('md', { m: o.m, d: o.d }); }, starts = [];
+    try { for (var k = 1; k <= 12; k++) starts.push(KF.lunarToSolar(y, k, 1, false)); starts.push(KF.lunarToSolar(y + 1, 1, 1, false)); } catch (e) { starts = []; }
+    var endOf = function (i) { var a = starts[i + 1], dt = new Date(Date.UTC(a.y, a.m - 1, a.d) - 864e5); return { m: dt.getUTCMonth() + 1, d: dt.getUTCDate() }; };
+    var nowI = lt && lt.y === y ? lt.m - 1 : -1;
+    var seolNote = (!isLast && lt && lt.y === y - 1 && y === T0) ? '<a class="card" href="#tojeong-last" style="display:block;border:2px solid var(--gold);color:var(--ink);font-size:14px;line-height:1.7">' +
+      esc(X('tojBefore', { y: y, py: y - 1, mon: mn[lt.m - 1], seol: starts.length ? md(starts[0]) : '' })) + ' <b style="color:var(--wood)">' + esc(X('tojBeforeGo', { py: y - 1, mon: mn[lt.m - 1] })) + ' →</b></a>' : '';
     var months = mn.map(function (n, i) { var free = i < 3 || !locked; if (!free) return '';
-      return '<div class="item"><div style="display:flex;justify-content:space-between"><b class="serif">' + esc(n) + '</b><span class="mut" style="font-size:13px">' + ms[i] + '</span></div>' + (tj && tj.m ? '<div style="margin-top:4px;font-size:14px;line-height:1.7">' + esc(tj.m[i].t) + '</div>' : '') + '</div>'; }).join('');
+      return '<div class="item' + (i === nowI ? ' tnow' : '') + '"' + (i === nowI ? ' id="tnow"' : '') + '><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span><b class="serif">' + esc(n) + '</b>' + (i === nowI ? ' <span class="tnowb">' + esc(X('tojNow')) + '</span>' : '') +
+        (starts.length ? ' <span class="small">' + esc(X('tojRange', { a: md(starts[i]), b: md(endOf(i)) })) + '</span>' : '') + '</span><span class="mut" style="font-size:13px">' + ms[i] + '</span></div>' + (tj && tj.m ? '<div style="margin-top:4px;font-size:14px;line-height:1.7">' + esc(tj.m[i].t) + '</div>' : '') + '</div>'; }).join('');
     var digit = function (v, l) { return '<span style="width:42px;height:54px;border:1px solid #6E6458;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 24px var(--serif)">' + v + '<small style="font:400 9px var(--sans);color:#B9AE9E">' + esc(l) + '</small></span>'; };
     return bar(U('tojTitle', { y: y, gz: g.yearPillar.ko }), esc(p.name) + ' · ' + esc(U('tojSub'))) +
-      '<div class="wrap" style="padding-top:8px">' + (isLast ? '' : yearPicker(T0, y)) + '<section class="ink" style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="display:flex;gap:8px">' + digit(g.upper, U('up')) + digit(g.middle, U('mid')) + digit(g.lower, U('low')) + '</div>' +
+      '<div class="wrap" style="padding-top:8px">' + (isLast ? '' : yearPicker(T0, y)) + seolNote + '<section class="ink" style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="display:flex;gap:8px">' + digit(g.upper, U('up')) + digit(g.middle, U('mid')) + digit(g.lower, U('low')) + '</div>' +
       '<div style="font-size:12px;color:#B9AE9E">' + esc(U('gwae', { code: (g.upper - 1) * 18 + (g.middle - 1) * 3 + g.lower, raw: g.code })) + '</div>' +
       (tj ? '<div class="serif" style="font-weight:900;font-size:28px;letter-spacing:5px;line-height:1.5;color:var(--gold)">' + esc(tj.h[0]) + '<br>' + esc(tj.h[1]) + '</div><div style="font-size:14px;line-height:1.6;color:#E6DED1">' + esc(tj.hk) + '</div>' : '<div style="color:#B9AE9E">' + esc(U('soonOpen')) + '</div>') + '</section>' +
       (tj ? '<article class="story"><h2 style="margin-bottom:10px">' + esc(U('tojYear')) + '</h2>' + tj.y.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</article>' : '') +
@@ -586,6 +595,7 @@
     try { app.innerHTML = v(); } catch (x) { console.error(x); app.innerHTML = '<div class="wrap" style="padding-top:40px"><p>' + esc(x.message) + '</p><a class="btn" href="#me">' + esc(U('meTitle')) + '</a></div>'; }
     window.scrollTo(0, 0);
     app.classList.toggle('hasp1', !!app.querySelector('.p1'));
+    if (h === 'tojeong-last') { var tn = document.getElementById('tnow'); if (tn) setTimeout(function () { tn.scrollIntoView({ block: 'center' }); }, 60); }
     var yon = app.querySelector('.yrs .on'); if (yon && yon.parentNode.scrollTo) yon.parentNode.scrollLeft = yon.offsetLeft - 60;
     var f = document.getElementById('f'); if (f) f.addEventListener('submit', submitStart);
     if (window.KF_PAY && KF_PAY.after) KF_PAY.after(h);

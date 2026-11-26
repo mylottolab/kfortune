@@ -128,3 +128,6 @@ window.KF_TXT["th"].extra = {
  "mvPrintH": "ทิศย้ายบ้าน {y} ของ{name} · วันดี",
  "compassN": "เหนือ"
 };
+
+/* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
+Object.assign(window.KF_TXT["th"].extra, {"md": "{d}/{m}", "tojRange": "สุริยคติ {a}–{b}", "tojNow": "เดือนนี้", "tojBefore": "ยังไม่ถึงซอลลัล (ตรุษเกาหลี) โทจอง {y} เริ่มที่ซอลลัล ({seol}) ตามจันทรคติตอนนี้ยังเป็น{mon}ของปี {py} ดูดวงเดือนนี้ในโทจอง {py} ได้ฟรี", "tojBeforeGo": "ดู{mon} ปี {py}"});
