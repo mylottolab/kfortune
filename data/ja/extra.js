@@ -128,3 +128,6 @@ window.KF_TXT["ja"].extra = {
  "mvPrintH": "{name}さんの{y}年 引越しの方位・吉日",
  "compassN": "北"
 };
+
+/* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
+Object.assign(window.KF_TXT["ja"].extra, {"md": "{m}/{d}", "tojRange": "新暦 {a}〜{b}", "tojNow": "今月", "tojBefore": "まだ旧正月前です。{y}年の土亭秘訣は旧正月（新暦{seol}）から始まり、今は旧暦で{py}年の{mon}です。今月の運は{py}年の土亭秘訣でご覧ください（無料）。", "tojBeforeGo": "{py}年 {mon}を見る"});

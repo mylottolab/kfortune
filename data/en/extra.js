@@ -45,3 +45,6 @@ window.KF_TXT.en.extra = {
   payMove: 'Moving direction {y} · good days', payLot: 'Lucky numbers {n} lines · {game}',
   mvPrintH: '{name}’s moving direction {y} · good days', compassN: 'N'
 };
+
+/* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
+Object.assign(window.KF_TXT["en"].extra, {"md": "{m}/{d}", "tojRange": "solar {a}–{b}", "tojNow": "this month", "tojBefore": "Seollal (Lunar New Year) has not come yet. The {y} Tojeong starts on Seollal ({seol}); by the lunar calendar it is still {mon} of {py}. Read this month in the {py} Tojeong — it is free.", "tojBeforeGo": "Read {mon} of {py}"});

@@ -128,3 +128,6 @@ window.KF_TXT["vi"].extra = {
  "mvPrintH": "Hướng chuyển nhà {y} của {name} · ngày tốt",
  "compassN": "Bắc"
 };
+
+/* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
+Object.assign(window.KF_TXT["vi"].extra, {"md": "{d}/{m}", "tojRange": "dương lịch {a}–{b}", "tojNow": "tháng này", "tojBefore": "Chưa đến Tết (Seollal). Thổ Đình {y} bắt đầu từ Tết ({seol}); theo âm lịch hiện vẫn là {mon} năm {py}. Hãy xem tháng này trong Thổ Đình {py} — miễn phí.", "tojBeforeGo": "Xem {mon} năm {py}"});

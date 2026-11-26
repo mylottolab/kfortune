@@ -128,3 +128,6 @@ window.KF_TXT["es"].extra = {
  "mvPrintH": "Dirección de mudanza {y} de {name} · días buenos",
  "compassN": "N"
 };
+
+/* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
+Object.assign(window.KF_TXT["es"].extra, {"md": "{d}/{m}", "tojRange": "solar {a}–{b}", "tojNow": "este mes", "tojBefore": "Aún no ha llegado Seollal (Año Nuevo lunar). El Tojeong {y} empieza en Seollal ({seol}); según el calendario lunar todavía es {mon} de {py}. Lee este mes en el Tojeong {py}: es gratis.", "tojBeforeGo": "Leer {mon} de {py}"});
