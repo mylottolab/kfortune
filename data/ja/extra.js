@@ -133,3 +133,5 @@ window.KF_TXT["ja"].extra = {
 Object.assign(window.KF_TXT["ja"].extra, {"md": "{m}/{d}", "tojRange": "新暦 {a}〜{b}", "tojNow": "今月", "tojBefore": "まだ旧正月前です。{y}年の土亭秘訣は旧正月（新暦{seol}）から始まり、今は旧暦で{py}年の{mon}です。今月の運は{py}年の土亭秘訣でご覧ください（無料）。", "tojBeforeGo": "{py}年 {mon}を見る"});
 Object.assign(window.KF_TXT["ja"].extra, {"ymd": "{y}年{m}月{d}日", "tojRange": "新暦 {a}〜{b}", "tojLunar": "※ 正月から十二月まで、十二か月はすべて旧暦です。各月の下に新暦の日付を記しました。"});
 Object.assign(window.KF_TXT["ja"].extra, {"placeHint2": "都市名か州・県名を入力して一覧から選んでください。海外は英語で入力してください（例：Fresno, California）。その日その場所の時計と太陽時で計算します。", "placeErr": "出生地を一覧から選んでください。", "plProv": "州・県全体"});
+Object.assign(window.KF_TXT["ja"].extra, {"whoTitle": "誰の運勢を見ますか？", "whoNew": "＋ ほかの人を見る（新しく入力）", "whoCodeT": "{name}さんの再表示コード", "whoCopy": "コピー", "whoCodeNote": "このコードをメモするか写真に残してください。別の端末でも後からでも、コードを入れればまた見られます。名前はコードに含まれません。", "whoForget": "この端末から{name}さんを消す", "whoForgetQ": "{name}さんの情報をこの端末から消しますか？コードがあればいつでも呼び戻せます。", "whoForgetOk": "消す", "whoLoad": "コードで呼び出す", "whoLoadGo": "呼び出す", "whoBad": "コードが正しくありません。もう一度ご確認ください。", "whoNoName": "呼び出した人"});
+Object.assign(window.KF_TXT["ja"].extra, {"whoBtn": "ほかの人"});

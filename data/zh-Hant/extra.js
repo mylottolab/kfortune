@@ -133,3 +133,5 @@ window.KF_TXT["zh-Hant"].extra = {
 Object.assign(window.KF_TXT["zh-Hant"].extra, {"md": "{m}/{d}", "tojRange": "國曆 {a}–{b}", "tojNow": "本月", "tojBefore": "還沒到春節。{y}年土亭秘訣從春節（國曆{seol}）開始，現在按農曆仍是{py}年{mon}。本月運勢請看{py}年土亭秘訣（免費）。", "tojBeforeGo": "看{py}年{mon}"});
 Object.assign(window.KF_TXT["zh-Hant"].extra, {"ymd": "{y}年{m}月{d}日", "tojRange": "國曆 {a} ~ {b}", "tojLunar": "※ 正月到臘月十二個月都是農曆月，每月下方註明國曆日期。"});
 Object.assign(window.KF_TXT["zh-Hant"].extra, {"placeHint2": "輸入城市或省/州名並從清單中選擇。海外請用英文輸入（例：Fresno, California）。依當天當地的時鐘與太陽時計算。", "placeErr": "請從清單中選擇出生地。", "plProv": "整個省/州"});
+Object.assign(window.KF_TXT["zh-Hant"].extra, {"whoTitle": "要看誰的運勢？", "whoNew": "+ 看其他人（重新輸入）", "whoCodeT": "{name}的查看碼", "whoCopy": "複製", "whoCodeNote": "請記下或拍下這個碼。在任何裝置、任何時候輸入它都能再次查看。碼裡不含姓名。", "whoForget": "從此裝置刪除{name}", "whoForgetQ": "要從此裝置刪除{name}的資訊嗎？有查看碼就能隨時找回。", "whoForgetOk": "刪除", "whoLoad": "用查看碼找回", "whoLoadGo": "找回", "whoBad": "查看碼不正確，請再確認。", "whoNoName": "找回的人"});
+Object.assign(window.KF_TXT["zh-Hant"].extra, {"whoBtn": "其他人"});
