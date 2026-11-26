@@ -132,3 +132,4 @@ window.KF_TXT["vi"].extra = {
 /* 토정비결: 음력 달 · 양력 날짜 · 설 전 안내 */
 Object.assign(window.KF_TXT["vi"].extra, {"md": "{d}/{m}", "tojRange": "dương lịch {a}–{b}", "tojNow": "tháng này", "tojBefore": "Chưa đến Tết (Seollal). Thổ Đình {y} bắt đầu từ Tết ({seol}); theo âm lịch hiện vẫn là {mon} năm {py}. Hãy xem tháng này trong Thổ Đình {py} — miễn phí.", "tojBeforeGo": "Xem {mon} năm {py}"});
 Object.assign(window.KF_TXT["vi"].extra, {"ymd": "{d}/{m}/{y}", "tojRange": "Dương lịch: {a} – {b}", "tojLunar": "Cả mười hai tháng đều là tháng âm lịch. Ngày dương lịch ghi dưới mỗi tháng."});
+Object.assign(window.KF_TXT["vi"].extra, {"placeHint2": "Nhập tên thành phố hoặc tỉnh/bang rồi chọn trong danh sách (vd. Hanoi, Da Nang). Chúng tôi tính theo giờ đồng hồ và giờ mặt trời của ngày và nơi đó.", "placeErr": "Vui lòng chọn nơi sinh trong danh sách.", "plProv": "cả tỉnh/bang"});

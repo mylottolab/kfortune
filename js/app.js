@@ -33,7 +33,8 @@
   var OLD_PLACE = ['kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'kr', 'pyongyang', 'tokyo', 'osaka', 'beijing', 'shanghai', 'hongkong', 'taipei', 'singapore', 'hanoi', 'hcmc', 'bangkok', 'jakarta', 'manila', 'sydney', 'dubai', 'london', 'paris', 'berlin', 'madrid', 'newyork', 'la', 'mexico', 'saopaulo'];
   // 예전에 국내 다른 도시로 입력해 둔 분은 그 도시 경도를 그대로 써서, 이미 본 사주가 바뀌지 않게 합니다(화면에는 「대한민국」)
   var OLD_KR_LON = [126.98, 129.08, 128.6, 126.7, 126.85, 127.38, 129.31, 127.03, 127.73, 128.9, 127.15, 127.49, 126.53];
-  function placeOf(p) { var id = typeof p.place === 'number' ? OLD_PLACE[p.place] : p.place, r = PLACES[0];
+  function placeOf(p) { if (p.place && typeof p.place === 'object') return ['geo', p.place.n, p.place.n, p.place.z, p.place.x];
+    var id = typeof p.place === 'number' ? OLD_PLACE[p.place] : p.place, r = PLACES[0];
     for (var i = 0; i < PLACES.length; i++) if (PLACES[i][0] === id) { r = PLACES[i]; break; }
     if (typeof p.place === 'number' && p.place > 0 && p.place < 13) r = r.slice(0, 4).concat([OLD_KR_LON[p.place]]);
     return r; }
@@ -439,7 +440,7 @@
     return bar(U('aboutTitle')) + '<div class="wrap" style="padding-top:8px"><section class="card" style="display:flex;flex-direction:column;gap:10px"><h2>四柱八字</h2><p style="margin:0;font-size:14.5px;line-height:1.8">' + esc(U('aboutBody')) + '</p>' +
       '<div class="three" style="text-align:center"><div style="background:var(--soft);border:0"><b class="serif" style="font-size:22px">天干</b><span class="mut">' + esc(U('stemsL')) + '</span></div><div style="background:var(--soft);border:0"><b class="serif" style="font-size:22px">地支</b><span class="mut">' + esc(U('branchesL')) + '</span></div><div style="background:var(--soft);border:0"><b class="serif" style="font-size:22px">五行</b><span class="mut">' + esc(U('fiveL')) + '</span></div></div>' +
       '<div class="serif" style="display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:20px;padding:4px 6px">' + five + '</div><div class="small" style="text-align:center">' + esc(U('cycle')) + '</div></section>' +
-      '<section class="card" style="display:flex;flex-direction:column;gap:10px"><h2 style="font-size:17px">' + esc(U('langTitle')) + '</h2><div class="two">' + langs + '</div><div class="small">' + esc(U('hanjaNote')) + '</div></section></div>' + tab('home');
+      '<section class="card" style="display:flex;flex-direction:column;gap:10px"><h2 style="font-size:17px">' + esc(U('langTitle')) + '</h2><div class="two">' + langs + '</div><div class="small">' + esc(U('hanjaNote')) + '</div></section><p class="small" style="text-align:center;opacity:.7">World city data: simplemaps.com (CC BY 4.0) · city-timezones (MIT)</p></div>' + tab('home');
   }
 
   function vMe() {
@@ -475,9 +476,66 @@
       '<div class="wbot"><div class="wlh">' + esc(U('wLang')) + '</div><div class="wls">' + langs + '</div>' +
       '<a class="btn gold" href="#start" data-seen="1">' + esc(U('wStart')) + '</a></div></div>';
   }
+  /* ── 태어난 곳 찾기: 도시나 주(도) 이름 → 시간대 · 경도 ── */
+  // 국내 시 · 군 (지금 이름) — 시청 · 군청 경도. 입력한 곳의 해 시각을 그대로 씀
+  var KR_CITIES = ('서울특별시:126.98,부산광역시:129.08,대구광역시:128.60,인천광역시:126.71,광주광역시:126.85,대전광역시:127.38,울산광역시:129.31,세종특별자치시:127.29,' +
+    '수원시 경기:127.03,성남시 경기:127.13,고양시 경기:126.83,용인시 경기:127.18,부천시 경기:126.77,안산시 경기:126.83,안양시 경기:126.95,남양주시 경기:127.22,화성시 경기:126.83,평택시 경기:127.11,의정부시 경기:127.05,시흥시 경기:126.80,파주시 경기:126.78,김포시 경기:126.72,광명시 경기:126.86,광주시 경기:127.26,군포시 경기:126.94,하남시 경기:127.21,오산시 경기:127.08,이천시 경기:127.44,안성시 경기:127.28,의왕시 경기:126.97,양주시 경기:127.05,구리시 경기:127.13,포천시 경기:127.20,동두천시 경기:127.06,과천시 경기:126.99,여주시 경기:127.64,양평군 경기:127.49,가평군 경기:127.51,연천군 경기:127.07,' +
+    '춘천시 강원:127.73,원주시 강원:127.92,강릉시 강원:128.88,동해시 강원:129.11,태백시 강원:128.99,속초시 강원:128.59,삼척시 강원:129.17,홍천군 강원:127.89,횡성군 강원:127.98,영월군 강원:128.46,평창군 강원:128.39,정선군 강원:128.66,철원군 강원:127.31,화천군 강원:127.71,양구군 강원:127.99,인제군 강원:128.17,고성군 강원:128.47,양양군 강원:128.62,' +
+    '청주시 충북:127.49,충주시 충북:127.93,제천시 충북:128.19,보은군 충북:127.73,옥천군 충북:127.57,영동군 충북:127.78,증평군 충북:127.58,진천군 충북:127.44,괴산군 충북:127.79,음성군 충북:127.69,단양군 충북:128.37,' +
+    '천안시 충남:127.11,공주시 충남:127.12,보령시 충남:126.61,아산시 충남:127.00,서산시 충남:126.45,논산시 충남:127.10,계룡시 충남:127.25,당진시 충남:126.65,금산군 충남:127.49,부여군 충남:126.91,서천군 충남:126.69,청양군 충남:126.80,홍성군 충남:126.66,예산군 충남:126.85,태안군 충남:126.30,' +
+    '전주시 전북:127.15,군산시 전북:126.74,익산시 전북:126.96,정읍시 전북:126.86,남원시 전북:127.39,김제시 전북:126.88,완주군 전북:127.16,진안군 전북:127.43,무주군 전북:127.66,장수군 전북:127.52,임실군 전북:127.28,순창군 전북:127.14,고창군 전북:126.70,부안군 전북:126.73,' +
+    '목포시 전남:126.39,여수시 전남:127.66,순천시 전남:127.49,나주시 전남:126.71,광양시 전남:127.70,담양군 전남:126.99,곡성군 전남:127.29,구례군 전남:127.46,고흥군 전남:127.28,보성군 전남:127.08,화순군 전남:126.99,장흥군 전남:126.91,강진군 전남:126.77,해남군 전남:126.60,영암군 전남:126.70,무안군 전남:126.48,함평군 전남:126.52,영광군 전남:126.51,장성군 전남:126.78,완도군 전남:126.76,진도군 전남:126.26,신안군 전남:126.35,' +
+    '포항시 경북:129.34,경주시 경북:129.22,김천시 경북:128.11,안동시 경북:128.73,구미시 경북:128.34,영주시 경북:128.62,영천시 경북:128.94,상주시 경북:128.16,문경시 경북:128.19,경산시 경북:128.74,의성군 경북:128.70,청송군 경북:129.06,영양군 경북:129.11,영덕군 경북:129.37,청도군 경북:128.73,고령군 경북:128.26,성주군 경북:128.28,칠곡군 경북:128.40,예천군 경북:128.45,봉화군 경북:128.73,울진군 경북:129.40,울릉군 경북:130.91,군위군 대구:128.57,달성군 대구:128.45,기장군 부산:129.22,울주군 울산:129.24,강화군 인천:126.49,옹진군 인천:126.64,' +
+    '창원시 경남:128.68,진주시 경남:128.11,통영시 경남:128.43,사천시 경남:128.06,김해시 경남:128.89,밀양시 경남:128.75,거제시 경남:128.62,양산시 경남:129.04,의령군 경남:128.26,함안군 경남:128.41,창녕군 경남:128.49,고성군 경남:128.32,남해군 경남:127.89,하동군 경남:127.75,산청군 경남:127.87,함양군 경남:127.73,거창군 경남:127.91,합천군 경남:128.17,' +
+    '제주시 제주:126.53,서귀포시 제주:126.56,' +
+    '경기도:127.01,강원특별자치도:127.73,충청북도:127.49,충청남도:126.67,전북특별자치도:127.15,전라북도:127.15,전라남도:126.46,경상북도:128.73,경상남도:128.68,제주특별자치도:126.53').split(',').map(function (t) { var a = t.split(':'), nm = a[0].split(' '); return [nm[0], nm[1] || '', +a[1]]; });
+  var WORLD = null, WORLD_LOADING = null, PLSUG = [];
+  function utcTxt(z) { var o = tzOffset(z, Date.UTC(2026, 0, 15)); return o == null ? '' : 'UTC' + (o >= 0 ? '+' : '−') + Math.floor(Math.abs(o) / 60) + (Math.abs(o) % 60 ? ':' + ('0' + Math.abs(o) % 60).slice(-2) : ''); }
+  function plLabel(x) { return (S.lang === 'ko' ? x[1] : x[2]) + ' (' + utcTxt(x[3]) + ')'; }
+  function loadWorld() { if (WORLD || WORLD_LOADING) return WORLD_LOADING; WORLD_LOADING = fetch('data/world_places.json?v=' + (window.KF_VER || '')).then(function (r) { return r.json(); }).then(function (d) { WORLD = d; plSearch(); }).catch(function () { WORLD_LOADING = null; }); return WORLD_LOADING; }
+  function fold(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC'); }
+  function plFind(q) {
+    q = fold(q.trim()); if (!q) return [];
+    var out = [], seen = {};
+    var krName = S.lang === 'ko' ? '대한민국' : 'South Korea';
+    KR_CITIES.forEach(function (c) { var base = c[0].replace(/(특별시|광역시|특별자치시|특별자치도|시|군|도)$/, '');
+      if (c[0].indexOf(q) === 0 || (base.length >= 1 && q.indexOf(base) === 0 && q.length <= c[0].length)) { var n = c[0] + (c[1] ? ' (' + c[1] + ')' : '');
+        out.push({ k: 0, v: { n: n + ', ' + krName, z: 'Asia/Seoul', x: c[2] }, label: n + ' · ' + krName }); } });
+    if (/^(대한민국|한국|korea|south korea)/.test(q)) out.push({ k: 0, v: 'kr', label: plLabel(PLACES[0]) });
+    PLACES.forEach(function (x) { if (x[0] !== 'kr' && (fold(x[1]).indexOf(q) >= 0 || fold(x[2]).indexOf(q) >= 0)) { out.push({ k: 0, v: x[0], label: plLabel(x) }); seen[fold(x[2])] = 1; } });
+    if (WORLD) {
+      var a = [];
+      for (var i = 0; i < WORLD.length; i++) { var w = WORLD[i], prov = w[1] === 1, n = fold(w[0]), al = w[1] && w[1] !== 1 ? fold(w[1]) : '';
+        var hit = n.indexOf(q) === 0 ? 3 : al.indexOf(q) === 0 ? 3 : (q.length >= 3 && n.indexOf(q) > 0) ? 1 : (!prov && q.length >= 3 && fold(w[2]).indexOf(q) === 0) ? 1 : 0;
+        if (hit) a.push([hit + (n === q ? 2 : 0) + (prov ? 0.5 : 0), w]); }
+      a.sort(function (x, y) { return y[0] - x[0] || y[1][6] - x[1][6]; });
+      a.slice(0, 10).forEach(function (r) { var w = r[1], prov = w[1] === 1, kr = w[3] === 'South Korea'; if (kr && prov) return; var name = prov ? w[0] + ', ' + w[3] : w[0] + (!kr && w[2] && w[2] !== w[0] ? ', ' + w[2] : '') + ', ' + w[3];
+        if (seen[fold(w[0])] && !prov) return;
+        out.push({ k: 1, v: { n: name, z: w[4], x: w[5] }, label: name + (prov ? ' · ' + X('plProv') : '') + ' (' + utcTxt(w[4]) + ')' }); });
+    }
+    return out.slice(0, 8);
+  }
+  function plSearch() {
+    var el = document.getElementById('pl'), box = document.getElementById('plsug'); if (!el || !box) return;
+    if (document.activeElement !== el) return;
+    PLSUG = plFind(el.value);
+    box.innerHTML = PLSUG.map(function (r, i) { return '<button type="button" role="option" data-plpick="' + i + '">' + esc(r.label) + '</button>'; }).join('') + (!WORLD ? '<div class="small" style="padding:8px 12px">…</div>' : '');
+    box.hidden = !PLSUG.length && WORLD != null;
+  }
+  function plPick(i) { var r = PLSUG[i], el = document.getElementById('pl'), hv = document.getElementById('plv'), box = document.getElementById('plsug'); if (!r || !el) return;
+    el.value = r.label; hv.value = JSON.stringify(r.v); box.hidden = true; }
+  function plChosen() {
+    var el = document.getElementById('pl'), hv = document.getElementById('plv'), v = null; try { v = JSON.parse(hv.value); } catch (e) {}
+    var lab = v == null ? '' : typeof v === 'object' ? v.n : plLabel(PLACES.filter(function (x) { return x[0] === v; })[0] || PLACES[0]);
+    if (v != null && (el.value === lab || el.value.indexOf(typeof v === 'object' ? v.n : lab) === 0)) return v;
+    var f = plFind(el.value); return f.length ? f[0].v : null;
+  }
+  document.addEventListener('focusin', function (e) { if (e.target && e.target.id === 'pl') { loadWorld(); e.target.select && e.target.select(); } });
+  document.addEventListener('input', function (e) { if (e.target && e.target.id === 'pl') plSearch(); });
+  document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-plpick]'); if (b) { e.preventDefault(); plPick(+b.dataset.plpick); }
+    else if (!(e.target.closest && e.target.closest('#pl'))) { var box = document.getElementById('plsug'); if (box) box.hidden = true; } });
+
   function vStart() {
-    var opts = PLACES.map(function (x) { var o = tzOffset(x[3], Date.UTC(2026, 0, 15)), u = o == null ? '' : ' (UTC' + (o >= 0 ? '+' : '−') + Math.floor(Math.abs(o) / 60) + (Math.abs(o) % 60 ? ':' + ('0' + Math.abs(o) % 60).slice(-2) : '') + ')';
-      return '<option value="' + x[0] + '">' + esc(S.lang === 'ko' ? x[1] : x[2]) + u + '</option>'; }).join('');
     return '<div class="wrap" style="padding-top:calc(24px + env(safe-area-inset-top,0px));gap:16px">' + (S.profiles.length ? '<a class="back" href="#home" aria-label="back" style="margin-left:-12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>' : '<div class="row" style="justify-content:space-between"><div class="brand"><div class="seal">運</div><b>' + esc(U('app')) + '</b></div>' + langPill() + '</div>') +
       '<div><div style="font-size:12px;color:var(--red);font-weight:700;letter-spacing:1px">' + esc(U('startKicker')) + '</div><h1>' + esc(U('startTitle')) + '</h1><p class="small" style="font-size:13px;margin:6px 0 4px">' + esc(U('startLead')) + '</p><p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--red);font-weight:700">' + esc(U('startTag')) + '</p></div>' +
       '<form id="f" style="display:flex;flex-direction:column;gap:14px" novalidate>' +
@@ -487,18 +545,19 @@
       '<input class="in" id="bd" type="date" min="1900-01-01" max="2050-12-31" required></div>' +
       '<div style="display:flex;flex-direction:column;gap:6px"><label for="bt" style="font-size:13px;font-weight:700">' + esc(U('time')) + '</label><div class="row" style="gap:8px"><input class="in" id="bt" type="time" style="flex:1;min-width:0"><label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mute);white-space:nowrap"><input type="checkbox" id="tu" style="width:20px;height:20px">' + esc(U('timeUnknown')) + '</label></div><div class="small">' + esc(U('timeHint')) + '</div></div>' +
       '<div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700">' + esc(U('gender')) + '</div><div class="two"><button type="button" class="choice' + (F.gender === 'F' ? ' on' : '') + '" data-g="F">' + esc(U('female')) + '</button><button type="button" class="choice' + (F.gender === 'M' ? ' on' : '') + '" data-g="M">' + esc(U('male')) + '</button></div></div>' +
-      '<label class="f">' + esc(U('place')) + '<select class="in" id="pl">' + opts + '</select><span class="small" style="font-weight:400">' + esc(U('placeHint')) + '</span></label>' +
+      '<div style="display:flex;flex-direction:column;gap:6px"><label for="pl" style="font-size:13px;font-weight:700">' + esc(U('place')) + '</label><div style="position:relative"><input class="in" id="pl" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box" value="' + esc(plLabel(PLACES[0])) + '"><input type="hidden" id="plv" value="&quot;kr&quot;"><div id="plsug" class="plsug" role="listbox" hidden></div></div><span class="small" style="font-weight:400">' + esc(X('placeHint2')) + '</span></div>' +
       '<div class="small" id="err" style="color:var(--red)" hidden>' + esc(U('errDate')) + '</div>' +
       '<button class="btn" type="submit">' + esc(U('build')) + '</button><p class="note" style="padding:0">' + esc(U('privacy')) + '</p></form></div>';
   }
   function submitStart(e) {
     e.preventDefault();
     var nm = document.getElementById('nm').value.trim(), bd = document.getElementById('bd').value, bt = document.getElementById('bt').value, tu = document.getElementById('tu').checked;
-    var err = document.getElementById('err');
+    var err = document.getElementById('err'); err.textContent = U('errDate');
     if (!nm || !/^\d{4}-\d{2}-\d{2}$/.test(bd)) { err.hidden = false; return; }
     var a = bd.split('-').map(Number), hh = null, mm = null;
     if (!tu && bt) { var b = bt.split(':').map(Number); hh = b[0]; mm = b[1]; }
-    var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: document.getElementById('pl').value };
+    var p = { id: 'p' + Date.now().toString(36), name: nm, y: a[0], m: a[1], d: a[2], hh: hh, mm: mm, cal: F.cal === 'solar' ? 'solar' : 'lunar', leap: F.leap, gender: F.gender, place: plChosen() };
+    if (p.place == null) { err.textContent = X('placeErr'); err.hidden = false; return; }
     try { chartOf(p); } catch (x) { err.hidden = false; return; }
     S.profiles.push(p); if (R.q === 'gung' && S.active) { G.other = p.id; save(); location.hash = '#gung'; return; } S.active = p.id; save(); location.hash = '#home';
   }
@@ -716,7 +775,7 @@
     else if (t.dataset.buymove && window.KF_PAY) window.KF_PAY.buy('move', prof(), Number(t.dataset.buymove));
   });
   function keepQ() { var qd = document.getElementById('qd'); if (qd) Q.date = qd.value; render(); }
-  function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;
+  function keepForm() { var ids = ['nm', 'bd', 'bt', 'pl', 'plv'], v = {}; ids.forEach(function (i) { var el = document.getElementById(i); if (el) v[i] = el.value; }); var tu = (document.getElementById('tu') || {}).checked;
     render(); ids.forEach(function (i) { var el = document.getElementById(i); if (el && v[i] != null) el.value = v[i]; }); if (tu) document.getElementById('tu').checked = true; }
   function setLang(l) {
     S.lang = l; save();
